@@ -1,34 +1,25 @@
-package com.project.furnishyourhome;
+package com.project.furnishyourhome.fragments;
 
-import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-//ToDo: Still in proggress. Must change fragment_nav_drawer_right to fill the info here
+import com.project.furnishyourhome.R;
+
+//ToDo: Still in progress.
 public class NavDrawerRightFragment extends Fragment {
 
     public static NavDrawerRightFragment newInstance() {
         NavDrawerRightFragment fragment = new NavDrawerRightFragment();
         Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
 
     public NavDrawerRightFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
     }
 
     @Override

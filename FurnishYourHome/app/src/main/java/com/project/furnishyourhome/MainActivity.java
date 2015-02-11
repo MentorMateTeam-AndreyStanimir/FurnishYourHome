@@ -1,25 +1,31 @@
 package com.project.furnishyourhome;
 
 import android.content.res.Configuration;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.project.furnishyourhome.adapters.NavDrawerListAdapter;
+import com.project.furnishyourhome.adapters.ViewPagerAdapter;
+import com.project.furnishyourhome.materialdesign.SlidingTabLayout;
 import com.project.furnishyourhome.models.NavDrawerItem;
 
 import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener{
+
+    private final CharSequence Titles[]={"Dimensions","My Room", "My furniture"};
+    private final int Numboftabs =3;
 
     private DrawerLayout mDrawerLayoutLeft;
     private DrawerLayout mDrawerLayoutRight;
@@ -32,6 +38,11 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private ArrayList<NavDrawerItem> navDrawerItems;
     private NavDrawerListAdapter adapter;
 
+    private Toolbar toolbar;
+    private ViewPager pager;
+    private ViewPagerAdapter adapterViewPager;
+    private SlidingTabLayout tabs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +50,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         setDrawerMenu();
 
-        // Set Action bar
         mDrawerLayoutLeft = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         //TODO: android.support.v7.app.ActionBarDrawerToggle; because now is deprecated
@@ -59,6 +69,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        setActionBarTabs();
+
         // Right drawer
 //        mDrawerLayoutRight = (DrawerLayout) findViewById(R.id.drawer_layout);
 //        mDrawerRightList = (ListView) findViewById(R.id.right_drawer);
@@ -66,6 +78,30 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 //        // Set the adapter for the list view
 //        mDrawerLeftList.setAdapter(new ArrayAdapter<String>(this,
 //                R.layout.support_simple_spinner_dropdown_item, mRightDrawerMenu));
+    }
+
+    private void setActionBarTabs() {
+        // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
+        adapterViewPager =  new ViewPagerAdapter(getSupportFragmentManager(),Titles,Numboftabs);
+
+        // Assigning ViewPager View and setting the adapter
+        pager = (ViewPager) findViewById(R.id.pager);
+        pager.setAdapter(adapterViewPager);
+
+        // Assiging the Sliding Tab Layout View
+        tabs = (SlidingTabLayout) findViewById(R.id.tabs);
+        tabs.setDistributeEvenly(true); // To make the Tabs Fixed set this true, This makes the tabs Space Evenly in Available width
+
+        // Setting Custom Color for the Scroll bar indicator of the Tab View
+        tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+            @Override
+            public int getIndicatorColor(int position) {
+                return getResources().getColor(R.color.tabsScrollColor);
+            }
+        });
+
+        // Setting the ViewPager For the SlidingTabsLayout
+        tabs.setViewPager(pager);
     }
 
     private void setDrawerMenu() {
@@ -82,7 +118,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             navDrawerItems.add(new NavDrawerItem(title, R.drawable.ic_home));
         }
 
-        // Set the adapter for the list view
+        // Set the adapter
         adapter = new NavDrawerListAdapter(this, navDrawerItems);
         mDrawerLeftList.setAdapter(adapter);
         mDrawerLeftList.setOnItemClickListener(MainActivity.this);

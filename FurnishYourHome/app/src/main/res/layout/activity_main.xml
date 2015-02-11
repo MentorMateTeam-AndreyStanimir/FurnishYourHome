@@ -10,7 +10,32 @@
     <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".MainActivity">
+
+            <com.project.furnishyourhome.materialdesign.SlidingTabLayout
+                android:id="@+id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="3dp"
+                android:background="@color/ColorPrimary"/>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/pager"
+
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                ></android.support.v4.view.ViewPager>
+
+
+        </LinearLayout>
+    </FrameLayout>
 
     <!-- The navigation drawer -->
     <ListView android:id="@+id/left_drawer"
@@ -26,6 +51,6 @@
         android:layout_width="240dp"
         android:layout_height="match_parent"
         android:layout_gravity="right"
-        android:name="com.project.furnishyourhome.NavDrawerRightFragment"
+        android:name="com.project.furnishyourhome.fragments.NavDrawerRightFragment"
         tools:layout="@layout/fragment_nav_drawer_right" />
 </android.support.v4.widget.DrawerLayout>
