@@ -8,7 +8,7 @@
     <color name="counter_text_color">#c5c4c4</color>
 
     <color name="ColorPrimary">#303030</color>
-    <color name="ColorPrimaryDark">#992416</color>
+    <color name="ColorPrimaryDark">#ff262626</color>
     <color name="tabsScrollColor">#AAA</color>
 
 </resources>

@@ -5,15 +5,16 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.project.furnishyourhome.R;
 
 //ToDo: Still in progress.
 public class NavDrawerRightFragment extends Fragment {
 
-    public static NavDrawerRightFragment newInstance() {
+    public static NavDrawerRightFragment newInstance(Bundle args) {
         NavDrawerRightFragment fragment = new NavDrawerRightFragment();
-        Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
@@ -23,9 +24,17 @@ public class NavDrawerRightFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_nav_drawer_right, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_nav_drawer_right, container, false);
+
+        ImageView iv = (ImageView) rootView.findViewById(R.id.iv_image);
+        //price
+        TextView tvTitle = (TextView) rootView.findViewById(R.id.tv_title);
+        TextView tvDimensions = (TextView) rootView.findViewById(R.id.tv_dimensions);
+        TextView tvDescription = (TextView) rootView.findViewById(R.id.tv_description);
+
+
+        return rootView;
     }
 }

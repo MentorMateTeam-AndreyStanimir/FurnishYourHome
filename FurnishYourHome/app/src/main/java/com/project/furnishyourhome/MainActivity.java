@@ -1,6 +1,7 @@
 package com.project.furnishyourhome;
 
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.v4.view.ViewPager;
@@ -8,6 +9,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,7 +39,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private ListView mDrawerRightList;
     private String[] mLeftDrawerMenu;
     private String[] mRightDrawerMenu;
-    private ArrayList<NavDrawerItem> navDrawerItems;
+    private ArrayList<NavDrawerItem> leftNavDrawerItems;
     private NavDrawerListAdapter adapter;
 
     private Toolbar toolbar;
@@ -86,7 +88,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         // Creating The Toolbar and setting it as the Toolbar for the activity
 
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        toolbar.setTitleTextColor(getResources().getColor(android.R.color.holo_green_light));
         setSupportActionBar(toolbar);
+
 
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
         adapterViewPager =  new ViewPagerAdapter(getSupportFragmentManager(),Titles,Numboftabs);
@@ -110,20 +114,15 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         // Setting the ViewPager For the SlidingTabsLayout
         tabs.setViewPager(pager);
 
-        Intent intent = getIntent();
-        handleIntent(intent);
     }
 
-    private void handleIntent(Intent intent) {
-        if(Intent.ACTION_SEARCH.equals(intent.getAction())){
-            String query = intent.getStringExtra(SearchManager.QUERY);
+    private void handleSearch(String query) {
             //doMySearch(query); //ToDo:
-        }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        handleIntent(intent);
+        super.onNewIntent(intent);
     }
 
     private void setDrawerMenu() {
@@ -134,14 +133,14 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         this.mLeftDrawerMenu = new String[]{"Home", "TVs", "Laptops", "Sofas", "Chairs", "Chandeliers"};  // TODO: get menu from DB
 //        mRightDrawerMenu = new String[]{"4", "5", "6"};
 
-        this.navDrawerItems = new ArrayList<NavDrawerItem>();
+        this.leftNavDrawerItems = new ArrayList<NavDrawerItem>();
 
         for (String title : mLeftDrawerMenu) {
-            navDrawerItems.add(new NavDrawerItem(title, R.drawable.ic_home));
+            leftNavDrawerItems.add(new NavDrawerItem(title, R.drawable.ic_home));
         }
 
         // Set the adapter
-        adapter = new NavDrawerListAdapter(this, navDrawerItems);
+        adapter = new NavDrawerListAdapter(this, leftNavDrawerItems);
         mDrawerLeftList.setAdapter(adapter);
         mDrawerLeftList.setOnItemClickListener(MainActivity.this);
     }
@@ -158,6 +157,23 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        // Get the SearchView and set the searchable configuration
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                //handleSearch(newText);
+                return false;
+            }
+        });
+
         return true;
     }
 
