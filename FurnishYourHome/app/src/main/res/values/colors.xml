@@ -9,6 +9,6 @@
 
     <color name="ColorPrimary">#303030</color>
     <color name="ColorPrimaryDark">#992416</color>
-    <color name="tabsScrollColor">#992416</color>
+    <color name="tabsScrollColor">#AAA</color>
 
 </resources>

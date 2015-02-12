@@ -1,5 +1,7 @@
 package com.project.furnishyourhome;
 
+import android.app.SearchManager;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -48,6 +50,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setActionBarTabs();
+
         setDrawerMenu();
 
         mDrawerLayoutLeft = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -69,8 +73,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        setActionBarTabs();
-
         // Right drawer
 //        mDrawerLayoutRight = (DrawerLayout) findViewById(R.id.drawer_layout);
 //        mDrawerRightList = (ListView) findViewById(R.id.right_drawer);
@@ -81,6 +83,11 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     }
 
     private void setActionBarTabs() {
+        // Creating The Toolbar and setting it as the Toolbar for the activity
+
+        toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
+
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
         adapterViewPager =  new ViewPagerAdapter(getSupportFragmentManager(),Titles,Numboftabs);
 
@@ -102,6 +109,21 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         // Setting the ViewPager For the SlidingTabsLayout
         tabs.setViewPager(pager);
+
+        Intent intent = getIntent();
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        if(Intent.ACTION_SEARCH.equals(intent.getAction())){
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            //doMySearch(query); //ToDo:
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        handleIntent(intent);
     }
 
     private void setDrawerMenu() {
@@ -149,6 +171,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        else if(id == R.id.action_search){
+            onSearchRequested();
         }
 
         if (drawerListener.onOptionsItemSelected(item)){
