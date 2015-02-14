@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-    <LinearLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,62 +8,58 @@
     android:orientation="vertical" >
 
 
-<include
-    android:id="@+id/tool_bar"
-    layout="@layout/tool_bar"
-    android:layout_height="wrap_content"
-    android:layout_width="match_parent"
-    />
+    <include
+        android:id="@+id/tool_bar"
+        layout="@layout/tool_bar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        />
 
-<android.support.v4.widget.DrawerLayout
+    <android.support.v4.widget.DrawerLayout
 
-    android:id="@+id/drawer_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <!-- The main content view -->
+        <!-- The main content view -->
 
-        <LinearLayout
-            android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                tools:context=".MainActivity">
+
+                <com.project.furnishyourhome.materialdesign.SlidingTabLayout
+                    android:id="@+id/tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/ColorPrimary" />
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/pager"
+                    android:layout_height="0dp"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+        <!-- The navigation drawer -->
+        <ListView android:id="@+id/left_drawer"
+            android:layout_width="240dp"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            tools:context=".MainActivity">
+            android:layout_gravity="start"
+            android:choiceMode="singleChoice"
+            android:divider="@color/list_divider"
+            android:dividerHeight="1dp"
+            android:background="@color/list_background"/>
 
+        <fragment android:id="@+id/navigation_drawer"
+            android:layout_width="240dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:name="com.project.furnishyourhome.fragments.NavDrawerRightFragment"
+            tools:layout="@layout/fragment_nav_drawer_right" />
 
+    </android.support.v4.widget.DrawerLayout>
 
-            <com.project.furnishyourhome.materialdesign.SlidingTabLayout
-                android:id="@+id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/ColorPrimary"
-                />
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/pager"
-                android:layout_height="0dp"
-                android:layout_width="match_parent"
-                android:layout_weight="1"
-                />
-
-
-        </LinearLayout>
-
-    <!-- The navigation drawer -->
-    <ListView android:id="@+id/left_drawer"
-        android:layout_width="240dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:choiceMode="singleChoice"
-        android:divider="@color/list_divider"
-        android:dividerHeight="1dp"
-        android:background="@color/list_background"/>
-
-    <fragment android:id="@+id/navigation_drawer"
-        android:layout_width="240dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:name="com.project.furnishyourhome.fragments.NavDrawerRightFragment"
-        tools:layout="@layout/fragment_nav_drawer_right" />
-</android.support.v4.widget.DrawerLayout>
-
-    </LinearLayout>
+</LinearLayout>

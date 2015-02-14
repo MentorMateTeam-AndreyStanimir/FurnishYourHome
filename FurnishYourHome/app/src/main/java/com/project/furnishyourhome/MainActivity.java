@@ -28,8 +28,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener{
 
-    private final CharSequence Titles[]={"Dimensions","My Room", "My furniture"};
-    private final int Numboftabs =3;
+    private final int Numboftabs = 3;
 
     private DrawerLayout mDrawerLayoutLeft;
     private DrawerLayout mDrawerLayoutRight;
@@ -93,7 +92,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
 
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
-        adapterViewPager =  new ViewPagerAdapter(getSupportFragmentManager(),Titles,Numboftabs);
+        adapterViewPager =  new ViewPagerAdapter(getSupportFragmentManager(), getResources().getStringArray(R.array.tabs), Numboftabs);
 
         // Assigning ViewPager View and setting the adapter
         pager = (ViewPager) findViewById(R.id.pager);

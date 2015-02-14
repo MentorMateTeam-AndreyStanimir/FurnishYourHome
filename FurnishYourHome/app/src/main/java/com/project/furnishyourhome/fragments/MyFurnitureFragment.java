@@ -15,7 +15,8 @@ import com.project.furnishyourhome.R;
 public class MyFurnitureFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_my_furniture,container,false);
-        return v;
+        View rootView = inflater.inflate(R.layout.fragment_my_furniture,container,false);
+
+        return rootView;
     }
 }

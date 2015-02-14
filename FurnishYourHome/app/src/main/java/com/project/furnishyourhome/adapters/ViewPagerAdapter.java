@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.project.furnishyourhome.fragments.DimensionsFragment;
+import com.project.furnishyourhome.fragments.MapFragment;
 import com.project.furnishyourhome.fragments.MyFurnitureFragment;
 import com.project.furnishyourhome.fragments.MyRoomFragment;
 
@@ -33,18 +33,18 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
         if(position == 0) // if the position is 0 we are returning the First tab
         {
-            DimensionsFragment dimensionsFragment = new DimensionsFragment();
-            return dimensionsFragment;
-        }
-        else if(position == 1)
-        {
             MyRoomFragment myRoomFragment = new MyRoomFragment();
             return myRoomFragment;
         }
-        else            // As we are having 3 tabs if the position is not 0 or 1 it must be 2 so we are returning third tab
+        else if(position == 1)
         {
             MyFurnitureFragment myFurnitureFragment = new MyFurnitureFragment();
             return myFurnitureFragment;
+        }
+        else            // As we are having 3 tabs if the position is not 0 or 1 it must be 2 so we are returning third tab
+        {
+            MapFragment mapFragment = new MapFragment();
+            return mapFragment;
         }
 
 

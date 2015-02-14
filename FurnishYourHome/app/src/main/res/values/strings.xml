@@ -21,4 +21,10 @@
         <item>Dining room</item>
         <item>Bathroom</item>
     </array>
+
+    <array name="tabs">
+        <item>My Room</item>
+        <item>My furniture</item>
+        <item>Map</item>
+    </array>
 </resources>
