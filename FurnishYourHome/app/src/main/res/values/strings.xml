@@ -12,4 +12,13 @@
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragmentHello blank fragment</string>
+    <string name="title_activity_add_room">AddRoomActivity</string>
+
+    <array name="rooms">
+        <item>Living room</item>
+        <item>Bedroom</item>
+        <item>Kitchen</item>
+        <item>Dining room</item>
+        <item>Bathroom</item>
+    </array>
 </resources>
