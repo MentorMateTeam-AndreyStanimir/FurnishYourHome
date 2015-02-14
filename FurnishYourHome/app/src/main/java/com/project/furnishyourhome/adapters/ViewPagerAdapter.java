@@ -1,12 +1,17 @@
 package com.project.furnishyourhome.adapters;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import com.project.furnishyourhome.R;
 import com.project.furnishyourhome.fragments.MapFragment;
 import com.project.furnishyourhome.fragments.MyFurnitureFragment;
 import com.project.furnishyourhome.fragments.MyRoomFragment;
+import com.project.furnishyourhome.models.CustomListItem;
+
+import java.util.ArrayList;
 
 /**
  * Created by Andrey on 11.2.2015 г..
@@ -38,6 +43,16 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
         }
         else if(position == 1)
         {
+           /* //debug
+            ArrayList<CustomListItem> list = new ArrayList<>();
+            list.add(new CustomListItem("table1", R.drawable.ic_launcher));
+            list.add(new CustomListItem("table2", R.drawable.ic_launcher));
+            list.add(new CustomListItem("table3", R.drawable.ic_launcher));
+            Bundle b = new Bundle();
+            b.putParcelableArrayList("chosenItems", list);
+            MyFurnitureFragment myFurnitureFragment = MyFurnitureFragment.newInstance(b);
+            //#############################################################*/
+
             MyFurnitureFragment myFurnitureFragment = new MyFurnitureFragment();
             return myFurnitureFragment;
         }

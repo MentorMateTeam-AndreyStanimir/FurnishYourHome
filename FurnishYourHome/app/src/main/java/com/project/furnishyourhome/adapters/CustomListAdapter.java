@@ -10,30 +10,30 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.project.furnishyourhome.R;
-import com.project.furnishyourhome.models.NavDrawerItem;
+import com.project.furnishyourhome.models.CustomListItem;
 
 import java.util.ArrayList;
 
 /**
  * Created by Andrey on 10.2.2015 г..
  */
-public class NavDrawerListAdapter extends BaseAdapter {
+public class CustomListAdapter extends BaseAdapter {
     private Context context;
-    private ArrayList<NavDrawerItem> navDrawerItems;
+    private ArrayList<CustomListItem> listItems;
 
-    public NavDrawerListAdapter(Context context, ArrayList<NavDrawerItem> navDrawerItems) {
+    public CustomListAdapter(Context context, ArrayList<CustomListItem> listItems) {
         this.context = context;
-        this.navDrawerItems = navDrawerItems;
+        this.listItems = listItems;
     }
 
     @Override
     public int getCount() {
-        return navDrawerItems.size();
+        return listItems.size();
     }
 
     @Override
-    public NavDrawerItem getItem(int position) {
-        return navDrawerItems.get(position);
+    public CustomListItem getItem(int position) {
+        return listItems.get(position);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class NavDrawerListAdapter extends BaseAdapter {
         TextView txtTitle = (TextView) convertView.findViewById(R.id.titleMenu);
 
         imgIcon.setImageResource(getItem(position).getIcon());
-        txtTitle.setText(navDrawerItems.get(position).getTitle());
+        txtTitle.setText(listItems.get(position).getTitle());
 
         return convertView;
     }

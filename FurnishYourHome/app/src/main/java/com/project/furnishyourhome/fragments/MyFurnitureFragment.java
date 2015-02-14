@@ -1,22 +1,30 @@
 package com.project.furnishyourhome.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.support.v4.app.ListFragment;
 
-import com.project.furnishyourhome.R;
+import com.project.furnishyourhome.adapters.CustomListAdapter;
+import com.project.furnishyourhome.models.CustomListItem;
+
+import java.util.ArrayList;
 
 /**
  * Created by Andrey on 11.2.2015 г..
  */
-public class MyFurnitureFragment extends Fragment {
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_my_furniture,container,false);
+public class MyFurnitureFragment extends ListFragment {
 
-        return rootView;
+    public static MyFurnitureFragment newInstance(Bundle args) {
+        MyFurnitureFragment f = new MyFurnitureFragment();
+        f.setArguments(args);
+        return f;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        ArrayList <CustomListItem> list = getArguments().getParcelableArrayList("chosenItems");
+
+        setListAdapter(new CustomListAdapter(getActivity().getApplicationContext(), list));
     }
 }

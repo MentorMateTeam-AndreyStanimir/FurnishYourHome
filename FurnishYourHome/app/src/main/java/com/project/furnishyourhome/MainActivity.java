@@ -18,10 +18,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.project.furnishyourhome.adapters.NavDrawerListAdapter;
+import com.project.furnishyourhome.adapters.CustomListAdapter;
 import com.project.furnishyourhome.adapters.ViewPagerAdapter;
 import com.project.furnishyourhome.materialdesign.SlidingTabLayout;
-import com.project.furnishyourhome.models.NavDrawerItem;
+import com.project.furnishyourhome.models.CustomListItem;
 
 import java.util.ArrayList;
 
@@ -38,8 +38,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private ListView mDrawerRightList;
     private String[] mLeftDrawerMenu;
     private String[] mRightDrawerMenu;
-    private ArrayList<NavDrawerItem> leftNavDrawerItems;
-    private NavDrawerListAdapter adapter;
+    private ArrayList<CustomListItem> leftNavDrawerItems;
+    private CustomListAdapter adapter;
 
     private Toolbar toolbar;
     private ViewPager pager;
@@ -132,14 +132,14 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         this.mLeftDrawerMenu = new String[]{"Home", "TVs", "Laptops", "Sofas", "Chairs", "Chandeliers"};  // TODO: get menu from DB
 //        mRightDrawerMenu = new String[]{"4", "5", "6"};
 
-        this.leftNavDrawerItems = new ArrayList<NavDrawerItem>();
+        this.leftNavDrawerItems = new ArrayList<CustomListItem>();
 
         for (String title : mLeftDrawerMenu) {
-            leftNavDrawerItems.add(new NavDrawerItem(title, R.drawable.ic_home));
+            leftNavDrawerItems.add(new CustomListItem(title, R.drawable.ic_home));
         }
 
         // Set the adapter
-        adapter = new NavDrawerListAdapter(this, leftNavDrawerItems);
+        adapter = new CustomListAdapter(this, leftNavDrawerItems);
         mDrawerLeftList.setAdapter(adapter);
         mDrawerLeftList.setOnItemClickListener(MainActivity.this);
     }
