@@ -53,7 +53,7 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
             MyFurnitureFragment myFurnitureFragment = MyFurnitureFragment.newInstance(b);
             //#############################################################*/
 
-            MyFurnitureFragment myFurnitureFragment = new MyFurnitureFragment();
+            MyFurnitureFragment myFurnitureFragment = MyFurnitureFragment.newInstance();
             return myFurnitureFragment;
         }
         else            // As we are having 3 tabs if the position is not 0 or 1 it must be 2 so we are returning third tab

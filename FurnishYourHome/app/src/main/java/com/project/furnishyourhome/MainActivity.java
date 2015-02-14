@@ -30,9 +30,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     private final int Numboftabs = 3;
 
-    private DrawerLayout mDrawerLayoutLeft;
+    private DrawerLayout leftDrawerLayout;
     private DrawerLayout mDrawerLayoutRight;
-    private ActionBarDrawerToggle drawerListener;
+    private ActionBarDrawerToggle leftDrawerListener;
 
     private ListView mDrawerLeftList;
     private ListView mDrawerRightList;
@@ -55,32 +55,15 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         setDrawerMenu();
 
-        mDrawerLayoutLeft = (DrawerLayout) findViewById(R.id.drawer_layout);
+        leftDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         //TODO: android.support.v7.app.ActionBarDrawerToggle; because now is deprecated
-        drawerListener = new ActionBarDrawerToggle(this, mDrawerLayoutLeft, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close){
-//            @Override
-//            public void onDrawerOpened(View drawerView) {
-//                super.onDrawerOpened(drawerView);
-//            }
-//
-//            @Override
-//            public void onDrawerClosed(View drawerView) {
-//                super.onDrawerClosed(drawerView);
-//            }
-        };
+        leftDrawerListener = new ActionBarDrawerToggle(this, leftDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
 
-        mDrawerLayoutLeft.setDrawerListener(drawerListener);
+        leftDrawerLayout.setDrawerListener(leftDrawerListener);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Right drawer
-//        mDrawerLayoutRight = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        mDrawerRightList = (ListView) findViewById(R.id.right_drawer);
-//
-//        // Set the adapter for the list view
-//        mDrawerLeftList.setAdapter(new ArrayAdapter<String>(this,
-//                R.layout.support_simple_spinner_dropdown_item, mRightDrawerMenu));
     }
 
     private void setActionBarTabs() {
@@ -126,14 +109,12 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     private void setDrawerMenu() {
 
+        this.mLeftDrawerMenu = new String[]{"Home", "TVs", "Laptops", "Sofas", "Chairs", "Chandeliers"};  // TODO: get menu from DB
+
         //Initialize left menu
         this.mDrawerLeftList = (ListView) findViewById(R.id.left_drawer);
 
-        this.mLeftDrawerMenu = new String[]{"Home", "TVs", "Laptops", "Sofas", "Chairs", "Chandeliers"};  // TODO: get menu from DB
-//        mRightDrawerMenu = new String[]{"4", "5", "6"};
-
         this.leftNavDrawerItems = new ArrayList<CustomListItem>();
-
         for (String title : mLeftDrawerMenu) {
             leftNavDrawerItems.add(new CustomListItem(title, R.drawable.ic_home));
         }
@@ -149,7 +130,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         super.onPostCreate(savedInstanceState);
 
         // Shows Action bar icon
-        drawerListener.syncState();
+        leftDrawerListener.syncState();
     }
 
     @Override
@@ -191,7 +172,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             onSearchRequested();
         }
 
-        if (drawerListener.onOptionsItemSelected(item)){
+        if (leftDrawerListener.onOptionsItemSelected(item)){
             return true;
         }
 
@@ -201,7 +182,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        drawerListener.onConfigurationChanged(newConfig);
+        leftDrawerListener.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -210,7 +191,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             Toast.makeText(this, mLeftDrawerMenu[position], Toast.LENGTH_SHORT).show(); //TODO: Change Custom list items
 
             selectItem(position);
-            mDrawerLayoutLeft.closeDrawers();
+            leftDrawerLayout.closeDrawers();
         }
     }
 
