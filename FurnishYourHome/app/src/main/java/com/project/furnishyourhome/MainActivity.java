@@ -53,17 +53,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         setActionBarTabs();
 
-        setDrawerMenu();
-
-        leftDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        //TODO: android.support.v7.app.ActionBarDrawerToggle; because now is deprecated
-        leftDrawerListener = new ActionBarDrawerToggle(this, leftDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
-
-        leftDrawerLayout.setDrawerListener(leftDrawerListener);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        setLeftDrawer();
     }
 
     private void setActionBarTabs() {
@@ -98,16 +88,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     }
 
-    private void handleSearch(String query) {
-            //doMySearch(query); //ToDo:
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-    }
-
-    private void setDrawerMenu() {
+    private void setLeftDrawer() {
 
         this.mLeftDrawerMenu = new String[]{"Home", "TVs", "Laptops", "Sofas", "Chairs", "Chandeliers"};  // TODO: get menu from DB
 
@@ -123,6 +104,25 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         adapter = new CustomListAdapter(this, leftNavDrawerItems);
         mDrawerLeftList.setAdapter(adapter);
         mDrawerLeftList.setOnItemClickListener(MainActivity.this);
+
+        // set left drawer layout
+        leftDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        //TODO: android.support.v7.app.ActionBarDrawerToggle; because now is deprecated
+        leftDrawerListener = new ActionBarDrawerToggle(this, leftDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
+
+        leftDrawerLayout.setDrawerListener(leftDrawerListener);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void handleSearch(String query) {
+        //doMySearch(query); //ToDo:
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
     }
 
     @Override
