@@ -23,35 +23,38 @@
 
         <!-- The main content view -->
 
-            <LinearLayout
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".MainActivity">
+
+            <com.project.furnishyourhome.materialdesign.SlidingTabLayout
+                android:id="@+id/tabs"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                tools:context=".MainActivity">
+                android:layout_height="wrap_content"
+                android:background="@color/ColorPrimary" />
 
-                <com.project.furnishyourhome.materialdesign.SlidingTabLayout
-                    android:id="@+id/tabs"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/ColorPrimary" />
+            <android.support.v4.view.ViewPager
+                android:id="@+id/pager"
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:layout_weight="1" />
 
-                <android.support.v4.view.ViewPager
-                    android:id="@+id/pager"
-                    android:layout_height="0dp"
-                    android:layout_width="match_parent"
-                    android:layout_weight="1" />
-
-            </LinearLayout>
+        </LinearLayout>
 
         <!-- The navigation drawer -->
-        <ListView android:id="@+id/left_drawer"
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/RecyclerView"
             android:layout_width="240dp"
+            android:background="#ffffff"
             android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:choiceMode="singleChoice"
-            android:divider="@color/list_divider"
-            android:dividerHeight="1dp"
-            android:background="@color/list_background"/>
+            android:layout_gravity="left"
+            android:scrollbars="vertical"
+            >
+
+        </android.support.v7.widget.RecyclerView>
 
         <fragment android:id="@+id/navigation_drawer"
             android:layout_width="240dp"
