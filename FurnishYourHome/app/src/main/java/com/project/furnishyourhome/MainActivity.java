@@ -69,6 +69,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         toolbar.setTitleTextColor(getResources().getColor(android.R.color.holo_green_light));
+        toolbar.setBackgroundColor(0xFFFFFFFF);
         setSupportActionBar(toolbar);
 
 
@@ -99,70 +100,70 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private void setLeftDrawer() {
 
         this.mLeftDrawerMenu = new String[]{"Home", "TVs", "Laptops", "Sofas", "Chairs", "Chandeliers"};  // TODO: get menu from DB
-        int icons[] = {android.R.drawable.star_big_on,android.R.drawable.star_big_on,android.R.drawable.star_big_on,android.R.drawable.star_big_on,android.R.drawable.star_big_on,android.R.drawable.star_big_on};
+        //int icons[] = {android.R.drawable.star_big_on,android.R.drawable.star_big_on,android.R.drawable.star_big_on,android.R.drawable.star_big_on,android.R.drawable.star_big_on,android.R.drawable.star_big_on};
 
-        String name = "Name Name";
-        String email = "email@email.com";
-        int profile = android.R.drawable.star_big_on;
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.RecyclerView); // Assigning the RecyclerView Object to the xml View
-
-        mRecyclerView.setHasFixedSize(true);                            // Letting the system know that the list objects are of fixed size
-
-        mAdapter = new NavDrawerAdapter(mLeftDrawerMenu,icons,name,email,profile);       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
-        // And passing the titles,icons,header view name, header view email,
-        // and header view profile picture
-
-        mRecyclerView.setAdapter(mAdapter);                              // Setting the adapter to RecyclerView
-
-        mLayoutManager = new LinearLayoutManager(this);                 // Creating a layout Manager
-
-        mRecyclerView.setLayoutManager(mLayoutManager);                 // Setting the layout Manager
-
-
-        leftDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);        // Drawer object Assigned to the view
-        leftDrawerListener = new ActionBarDrawerToggle(this,leftDrawerLayout,toolbar,R.string.drawer_open,R.string.drawer_close){
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                // code here will execute once the drawer is opened( As I dont want anything happened whe drawer is
-                // open I am not going to put anything here)
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-                // Code here will execute once drawer is closed
-            }
-
-
-
-        }; // Drawer Toggle Object Made
-        leftDrawerLayout.setDrawerListener(leftDrawerListener); // Drawer Listener set to the Drawer toggle
-        leftDrawerListener.syncState();               // Finally we set the drawer toggle sync State
+//        String name = "Name Name";
+//        String email = "email@email.com";
+//        int profile = android.R.drawable.star_big_on;
+//
+//        mRecyclerView = (RecyclerView) findViewById(R.id.RecyclerView); // Assigning the RecyclerView Object to the xml View
+//
+//        mRecyclerView.setHasFixedSize(true);                            // Letting the system know that the list objects are of fixed size
+//
+//        mAdapter = new NavDrawerAdapter(mLeftDrawerMenu,icons,name,email,profile);       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
+//        // And passing the titles,icons,header view name, header view email,
+//        // and header view profile picture
+//
+//        mRecyclerView.setAdapter(mAdapter);                              // Setting the adapter to RecyclerView
+//
+//        mLayoutManager = new LinearLayoutManager(this);                 // Creating a layout Manager
+//
+//        mRecyclerView.setLayoutManager(mLayoutManager);                 // Setting the layout Manager
+//
+//
+//        leftDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);        // Drawer object Assigned to the view
+//        leftDrawerListener = new ActionBarDrawerToggle(this,leftDrawerLayout,toolbar,R.string.drawer_open,R.string.drawer_close){
+//
+//            @Override
+//            public void onDrawerOpened(View drawerView) {
+//                super.onDrawerOpened(drawerView);
+//                // code here will execute once the drawer is opened( As I dont want anything happened whe drawer is
+//                // open I am not going to put anything here)
+//            }
+//
+//            @Override
+//            public void onDrawerClosed(View drawerView) {
+//                super.onDrawerClosed(drawerView);
+//                // Code here will execute once drawer is closed
+//            }
+//
+//
+//
+//        }; // Drawer Toggle Object Made
+//        leftDrawerLayout.setDrawerListener(leftDrawerListener); // Drawer Listener set to the Drawer toggle
+//        leftDrawerListener.syncState();               // Finally we set the drawer toggle sync State
 
         //Initialize left menu
-//        this.mDrawerLeftList = (ListView) findViewById(R.id.left_drawer);
-//
-//        this.leftNavDrawerItems = new ArrayList<CustomListItem>();
-//        for (String title : mLeftDrawerMenu) {
-//            leftNavDrawerItems.add(new CustomListItem(title, R.drawable.ic_home));
-//        }
-//
-//        // Set the adapter
-//        adapter = new CustomListAdapter(this, leftNavDrawerItems);
-//        mDrawerLeftList.setAdapter(adapter);
-//        mDrawerLeftList.setOnItemClickListener(MainActivity.this);
-//
-//        // set left drawer layout
-//        leftDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-//
-//        leftDrawerListener = new ActionBarDrawerToggle(this, leftDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
-//
-//        leftDrawerLayout.setDrawerListener(leftDrawerListener);
-//        getSupportActionBar().setHomeButtonEnabled(true);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.mDrawerLeftList = (ListView) findViewById(R.id.left_drawer);
+
+        this.leftNavDrawerItems = new ArrayList<CustomListItem>();
+        for (String title : mLeftDrawerMenu) {
+            leftNavDrawerItems.add(new CustomListItem(title, R.drawable.ic_home));
+        }
+
+        // Set the adapter
+        adapter = new CustomListAdapter(this, leftNavDrawerItems);
+        mDrawerLeftList.setAdapter(adapter);
+        mDrawerLeftList.setOnItemClickListener(MainActivity.this);
+
+        // set left drawer layout
+        leftDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        leftDrawerListener = new ActionBarDrawerToggle(this, leftDrawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
+
+        leftDrawerLayout.setDrawerListener(leftDrawerListener);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void handleSearch(String query) {
@@ -221,9 +222,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             onSearchRequested();
         }
 
-//        if (leftDrawerListener.onOptionsItemSelected(item)){
-//            return true;
-//        }
+        if (leftDrawerListener.onOptionsItemSelected(item)){
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -240,12 +241,12 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 //        and ListView extends android.widget.AbsListView
 //        that's why we implement onClick in our RecyclerView Adapter:
 
-//        if(parent.getId() == R.id.left_drawer) {
-//            Toast.makeText(this, mLeftDrawerMenu[position], Toast.LENGTH_SHORT).show(); //TODO: Change Custom list items
-//
-//            selectItem(position);
-//            leftDrawerLayout.closeDrawers();
-//        }
+        if(parent.getId() == R.id.left_drawer) {
+            Toast.makeText(this, mLeftDrawerMenu[position], Toast.LENGTH_SHORT).show(); //TODO: Change Custom list items
+
+            selectItem(position);
+            leftDrawerLayout.closeDrawers();
+        }
     }
 
     private void selectItem(int position) {

@@ -40,17 +40,21 @@
         </LinearLayout>
 
         <!-- The navigation drawer -->
+        <FrameLayout
+            android:id="@+id/content_left_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/RecyclerView"
+        <ListView
+            android:id="@+id/left_drawer"
             android:layout_width="240dp"
-            android:background="#ffffff"
             android:layout_height="match_parent"
-            android:layout_gravity="left"
-            android:scrollbars="vertical"
-            >
-
-        </android.support.v7.widget.RecyclerView>
+            android:layout_gravity="start"
+            android:choiceMode="singleChoice"
+            android:divider="@color/list_divider"
+            android:dividerHeight="1dp"
+            android:background="@color/list_background"/>
+            />
 
         <fragment android:id="@+id/navigation_drawer"
             android:layout_width="240dp"
