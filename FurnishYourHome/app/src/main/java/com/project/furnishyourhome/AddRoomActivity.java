@@ -1,6 +1,5 @@
 package com.project.furnishyourhome;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
@@ -33,7 +32,7 @@ public class AddRoomActivity extends ActionBarActivity {
         ivRoom = (ImageView) findViewById(R.id.iv_room);
 
         Spinner spinner = (Spinner) findViewById(R.id.sp_rooms);
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.spiner_item, getResources().getStringArray(R.array.spinerItems));
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.spiner_item, getResources().getStringArray(R.array.spinnerItems));
         spinnerAdapter.setDropDownViewResource(R.layout.spiner_item);
         spinner.setAdapter(spinnerAdapter);
         spinner.setSelection(0);
@@ -103,9 +102,9 @@ public class AddRoomActivity extends ActionBarActivity {
         }
 
         if(etWidth.getText().toString().isEmpty() && etHeight.getText().toString().isEmpty() && etDepth.getText().toString().isEmpty() ) {
-            etWidth.setError("Please enter width");
-            etHeight.setError("Please enter height");
-            etDepth.setError("Please enter depth");
+            etWidth.setError("");
+            etHeight.setError("");
+            etDepth.setError("");
             Toast.makeText(this, "Please fill all fields.", Toast.LENGTH_SHORT).show();
             return;
         } else {
