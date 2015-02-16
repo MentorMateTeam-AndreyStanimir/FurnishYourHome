@@ -106,6 +106,7 @@ public class AddRoomActivity extends ActionBarActivity {
             etWidth.setError("Please enter width");
             etHeight.setError("Please enter height");
             etDepth.setError("Please enter depth");
+            Toast.makeText(this, "Please fill all fields.", Toast.LENGTH_SHORT).show();
             return;
         } else {
             if(etWidth.getText().toString().isEmpty()) {

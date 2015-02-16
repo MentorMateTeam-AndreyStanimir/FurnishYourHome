@@ -15,7 +15,7 @@
     <string name="title_activity_add_room">AddRoomActivity</string>
     <string name="google_maps_key">AIzaSyB5TpazgprmQJhHBBDl-POz4Ucq5Nibh3E</string>
 
-    <array name="spinerItems">
+    <array name="spinnerItems">
         <item>-</item>
         <item>Living room</item>
         <item>Bedroom</item>
