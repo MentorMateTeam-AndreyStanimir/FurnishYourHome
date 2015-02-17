@@ -22,7 +22,7 @@
             android:scaleType="fitCenter"/>
 
         <Spinner
-            android:id="@+id/sp_rooms"
+            android:id="@+id/sp_available_rooms"
             android:theme="@style/AppTheme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -31,7 +31,7 @@ public class AddRoomActivity extends ActionBarActivity {
 
         ivRoom = (ImageView) findViewById(R.id.iv_room);
 
-        Spinner spinner = (Spinner) findViewById(R.id.sp_rooms);
+        Spinner spinner = (Spinner) findViewById(R.id.sp_available_rooms);
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.spiner_item, getResources().getStringArray(R.array.spinnerItems));
         spinnerAdapter.setDropDownViewResource(R.layout.spiner_item);
         spinner.setAdapter(spinnerAdapter);

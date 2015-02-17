@@ -3,14 +3,49 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="You Are In Tab My Room"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true" >
+
+        <Spinner
+            android:id="@+id/sp_created_rooms"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <com.project.furnishyourhome.models.CanvasView
+            android:id="@+id/cv_room_canvas"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="#FF0000"
+            android:layout_weight="7"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2">
+
+            <org.lucasr.twowayview.TwoWayView
+                android:id="@+id/twv_furniture"
+                style="@style/TwoWayView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawSelectorOnTop="false"
+                android:layout_weight="2"/>
+
+            <TextView
+                android:id="@+id/tv_empty_furniture_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Furniture list is empty. Please choose type from left drawer."
+                android:visibility="invisible"/>
+            </FrameLayout>
+
+
+    </LinearLayout>
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_room"

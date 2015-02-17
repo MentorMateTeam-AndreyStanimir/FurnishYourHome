@@ -51,7 +51,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private ViewPagerAdapter adapterViewPager;
     private SlidingTabLayout tabs;
 
-
     private boolean mTwoPane; // check is in Landscape mode
 
     @Override
