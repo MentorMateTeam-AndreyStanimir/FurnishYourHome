@@ -25,6 +25,7 @@ import com.project.furnishyourhome.adapters.CustomListAdapter;
 import com.project.furnishyourhome.adapters.ViewPagerAdapter;
 import com.project.furnishyourhome.materialdesign.SlidingTabLayout;
 import com.project.furnishyourhome.models.CustomListItem;
+import com.project.furnishyourhome.models.CustomViewPager;
 
 import java.util.ArrayList;
 
@@ -42,7 +43,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private CustomListAdapter adapter;
 
     private Toolbar toolbar;
-    private ViewPager pager;
+    private CustomViewPager pager;
     private ViewPagerAdapter adapterViewPager;
     private SlidingTabLayout tabs;
 
@@ -71,7 +72,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         adapterViewPager =  new ViewPagerAdapter(getSupportFragmentManager(), getResources().getStringArray(R.array.tabs), Numboftabs);
 
         // Assigning ViewPager View and setting the adapter
-        pager = (ViewPager) findViewById(R.id.pager);
+        pager = (CustomViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapterViewPager);
 
         // Assiging the Sliding Tab Layout View

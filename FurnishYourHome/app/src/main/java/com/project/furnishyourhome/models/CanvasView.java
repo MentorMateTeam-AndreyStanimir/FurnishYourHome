@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.project.furnishyourhome.R;
+import com.project.furnishyourhome.interfaces.ISwipable;
 
 import java.util.ArrayList;
 
@@ -32,6 +33,8 @@ public class CanvasView extends View
     private float mX;
     private float mY;
 
+    private ISwipable pager;
+
     public CanvasView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
         this.context = context;
@@ -39,6 +42,12 @@ public class CanvasView extends View
         this.mPaint = new Paint();
         this.addedBitmaps = new ArrayList<>();
         this.hasItemOnFocus = false;
+
+        try {
+            this.pager = CustomViewPager.getInstanceIfExist();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void moveTouch(float x, float y) {
@@ -62,11 +71,13 @@ public class CanvasView extends View
     }
 
     private void startTouch(float x, float y) {
+
         for (int i = 0; i<addedBitmaps.size(); i++) {
             if (this.addedBitmaps.get(i).isInBitmap(x, y)) {
                 itemOnFocus = i;
                 Log.d(TAG, itemOnFocus + "");
                 hasItemOnFocus = true;
+                pager.setSwipeable(false);  // stops view pager swiping
                 break;
             }
             mX = x;
@@ -81,6 +92,7 @@ public class CanvasView extends View
             Toast.makeText(this.context, "Bitmap " + itemOnFocus + " set on cords X: " + addedBitmaps.get(itemOnFocus).getX() + " Y: " + addedBitmaps.get(this.itemOnFocus).getY(), Toast.LENGTH_SHORT).show();
         }
         itemOnFocus = 0;
+        pager.setSwipeable(true);
     }
 
     public void addNewElement(int drawableID) {
