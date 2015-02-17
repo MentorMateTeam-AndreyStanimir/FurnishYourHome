@@ -1,53 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="178dp"
-    android:background="@color/ColorPrimary"
-    android:orientation="vertical"
-    android:weightSum="1">
-
-
-
-    <LinearLayout
+    android:layout_height="wrap_content" >
+    <RelativeLayout
+        android:id="@+id/RelativeLayout1"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:orientation="vertical"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-
+        android:layout_height="80dp"
+        android:background="@color/material_blue_grey_800" >
         <TextView
-            android:id="@+id/name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:textColor="#ffffff"
-            android:text="Name Name"
-            android:textSize="14sp"
-            android:textStyle="bold"
-
-            />
-
-        <TextView
-            android:id="@+id/email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#ffffff"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="5dp"
-            android:text="email@gmail.com"
-            android:textSize="14sp"
-            android:textStyle="normal"
-
-            />
-    </LinearLayout>
-
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:src="@android:drawable/btn_star"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="38dp"
-        android:id="@+id/circleView"
-        />
-</RelativeLayout>
+            android:id="@+id/textView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_margin="5dp"
+            android:layout_toRightOf="@+id/profile_image"
+            android:gravity="center_vertical"
+            android:text="The best program ever"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/wallet_highlighted_text_holo_light"
+            android:textStyle="bold" />
+        <ImageView
+            android:id="@+id/profile_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@android:drawable/btn_star"
+            android:layout_margin="5dp"
+            android:gravity="center_vertical" />
+    </RelativeLayout>
+</FrameLayout>

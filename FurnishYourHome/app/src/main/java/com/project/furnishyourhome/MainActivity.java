@@ -17,11 +17,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.project.furnishyourhome.adapters.CustomListAdapter;
-import com.project.furnishyourhome.adapters.NavDrawerAdapter;
 import com.project.furnishyourhome.adapters.ViewPagerAdapter;
 import com.project.furnishyourhome.materialdesign.SlidingTabLayout;
 import com.project.furnishyourhome.models.CustomListItem;
@@ -35,14 +35,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     private DrawerLayout leftDrawerLayout;
     private ActionBarDrawerToggle leftDrawerListener;
-    private RecyclerView mRecyclerView;                           // Declaring RecyclerView
-    private RecyclerView.Adapter mAdapter;                        // Declaring Adapter For Recycler View
-    private RecyclerView.LayoutManager mLayoutManager;            // Declaring Layout Manager as a linear layout manager
-
     private ListView mDrawerLeftList;
     private ListView mDrawerRightList;
     private String[] mLeftDrawerMenu;
-    private String[] mRightDrawerMenu;
     private ArrayList<CustomListItem> leftNavDrawerItems;
     private CustomListAdapter adapter;
 
@@ -98,53 +93,24 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     private void setLeftDrawer() {
 
-        this.mLeftDrawerMenu = new String[]{"Home", "TVs", "Laptops", "Sofas", "Chairs", "Chandeliers"};  // TODO: get menu from DB
-        //int icons[] = {android.R.drawable.star_big_on,android.R.drawable.star_big_on,android.R.drawable.star_big_on,android.R.drawable.star_big_on,android.R.drawable.star_big_on,android.R.drawable.star_big_on};
-
-//        String name = "Name Name";
-//        String email = "email@email.com";
-//        int profile = android.R.drawable.star_big_on;
-//
-//        mRecyclerView = (RecyclerView) findViewById(R.id.RecyclerView); // Assigning the RecyclerView Object to the xml View
-//
-//        mRecyclerView.setHasFixedSize(true);                            // Letting the system know that the list objects are of fixed size
-//
-//        mAdapter = new NavDrawerAdapter(mLeftDrawerMenu,icons,name,email,profile);       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
-//        // And passing the titles,icons,header view name, header view email,
-//        // and header view profile picture
-//
-//        mRecyclerView.setAdapter(mAdapter);                              // Setting the adapter to RecyclerView
-//
-//        mLayoutManager = new LinearLayoutManager(this);                 // Creating a layout Manager
-//
-//        mRecyclerView.setLayoutManager(mLayoutManager);                 // Setting the layout Manager
-//
-//
-//        leftDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);        // Drawer object Assigned to the view
-//        leftDrawerListener = new ActionBarDrawerToggle(this,leftDrawerLayout,toolbar,R.string.drawer_open,R.string.drawer_close){
-//
-//            @Override
-//            public void onDrawerOpened(View drawerView) {
-//                super.onDrawerOpened(drawerView);
-//                // code here will execute once the drawer is opened( As I dont want anything happened whe drawer is
-//                // open I am not going to put anything here)
-//            }
-//
-//            @Override
-//            public void onDrawerClosed(View drawerView) {
-//                super.onDrawerClosed(drawerView);
-//                // Code here will execute once drawer is closed
-//            }
-//
-//
-//
-//        }; // Drawer Toggle Object Made
-//        leftDrawerLayout.setDrawerListener(leftDrawerListener); // Drawer Listener set to the Drawer toggle
-//        leftDrawerListener.syncState();               // Finally we set the drawer toggle sync State
+        this.mLeftDrawerMenu = new String[]{"All", "TVs", "Laptops", "Sofas", "Chairs", "Chandeliers"};  // TODO: get menu from DB
 
         //Initialize left menu
         this.mDrawerLeftList = (ListView) findViewById(R.id.left_drawer);
 
+        // adding header to listView
+        View header=getLayoutInflater().inflate(R.layout.header, null);
+        ImageView pro=(ImageView)header.findViewById(R.id.profile_image);
+        pro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                // TODO Auto-generated method stub
+                Toast.makeText(getApplicationContext(), "Clicked",                                                                                    Toast.LENGTH_SHORT).show();
+            }
+        });
+        this.mDrawerLeftList.addHeaderView(header);
+
+        // fill ArrayList with data
         this.leftNavDrawerItems = new ArrayList<CustomListItem>();
         for (String title : mLeftDrawerMenu) {
             leftNavDrawerItems.add(new CustomListItem(title, R.drawable.ic_home));
@@ -236,12 +202,14 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//        RecyclerView does not have onItemClickListener(). Because RecyclerView extends android.view.ViewGroup
-//        and ListView extends android.widget.AbsListView
-//        that's why we implement onClick in our RecyclerView Adapter:
-
         if(parent.getId() == R.id.left_drawer) {
-            Toast.makeText(this, mLeftDrawerMenu[position], Toast.LENGTH_SHORT).show(); //TODO: Change Custom list items
+
+            //TODO: Change onClick event
+            if(position == 0){
+                Toast.makeText(this, getResources().getString(R.string.app_name), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, mLeftDrawerMenu[position -1], Toast.LENGTH_SHORT).show();
+            }
 
             selectItem(position);
             leftDrawerLayout.closeDrawers();
@@ -254,7 +222,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         if(position == 0){
             setTitle(getResources().getString(R.string.app_name));
         } else {
-            setTitle(mLeftDrawerMenu[position]);
+            setTitle(mLeftDrawerMenu[position - 1]);
 //        getSupportActionBar().setTitle(mLeftDrawerMenu[position]);
         }
     }

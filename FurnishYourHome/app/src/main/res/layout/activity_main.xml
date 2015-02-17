@@ -41,7 +41,7 @@
 
         <!-- The navigation drawer -->
         <FrameLayout
-            android:id="@+id/content_left_frame"
+            android:id="@+id/image_left_frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
