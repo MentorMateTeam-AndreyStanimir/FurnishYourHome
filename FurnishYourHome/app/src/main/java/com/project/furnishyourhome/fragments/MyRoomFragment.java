@@ -1,6 +1,7 @@
 package com.project.furnishyourhome.fragments;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -34,6 +36,8 @@ public class MyRoomFragment extends Fragment {
     private CanvasView customCanvas;
     int oldh;
     int oldw;
+
+    int spinnerItem;
 
     public static MyFurnitureFragment newInstance() {
         MyFurnitureFragment f = new MyFurnitureFragment();
@@ -61,43 +65,38 @@ public class MyRoomFragment extends Fragment {
             oldw = savedInstanceState.getInt("oldw");
             oldh = savedInstanceState.getInt("oldh");
             arrayList = savedInstanceState.getParcelableArrayList("savedBitmaps");
-        }
-        super.onViewStateRestored(savedInstanceState);
-    }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        if ((this.oldw != 0) && (this.oldh != 0)) {
+            if ((this.oldw != 0) && (this.oldh != 0)) {
 //            float f1 = this.customCanvas.getWidth() / this.oldw;  // incorrect
 
-            float currentWidth = this.customCanvas.getWidth(); // get current canvas width
-            float currentHeight = this.customCanvas.getHeight();  // get current canvas height
+                float currentWidth = this.customCanvas.getWidth(); // get current canvas width
+                float currentHeight = this.customCanvas.getHeight();  // get current canvas height
 
 //            Log.d("DIMENTIONS", "w: " + this.customCanvas.getWidth() + " oldw: " + this.oldw + " coef: " + f1);
 //            float f2 = this.customCanvas.getHeight() / this.oldh; // incorrect
 //
 //            Log.d("DIMENTIONS", "h: " + this.customCanvas.getHeight() + " oldh: " + this.oldh + " coef: " + f2);
 
-            for (int i = 0; i < this.arrayList.size(); i++) {
-                CustomBitmap item = this.arrayList.get(i); // and the problem with X and Y equals 0 disappears :)
+                for (int i = 0; i < this.arrayList.size(); i++) {
+                    CustomBitmap item = this.arrayList.get(i); // and the problem with X and Y equals 0 disappears :)
 
-                float coefficientX = this.oldw / (item.getX() + item.getHalfWidth()); // add getHalfWidth to find the center X of the image
-                float coefficientY = this.oldh / (item.getY() + item.getHalfHeight()); // add getHalfHeight to find the center Y of the image
+                    float coefficientX = this.oldw / (item.getX() + item.getHalfWidth()); // add getHalfWidth to find the center X of the image
+                    float coefficientY = this.oldh / (item.getY() + item.getHalfHeight()); // add getHalfHeight to find the center Y of the image
 
-                Log.d("DIMENTIONS", "w: " + currentWidth + " oldw: " + this.oldw + " coef: " + coefficientX);
-                Log.d("DIMENTIONS", "h: " + currentHeight + " oldh: " + this.oldh + " coef: " + coefficientY);
+                    Log.d("DIMENTIONS", "w: " + currentWidth + " oldw: " + this.oldw + " coef: " + coefficientX);
+                    Log.d("DIMENTIONS", "h: " + currentHeight + " oldh: " + this.oldh + " coef: " + coefficientY);
 
-                float nextX = currentWidth / coefficientX;
-                float nextY = currentHeight / coefficientY;
+                    float nextX = currentWidth / coefficientX;
+                    float nextY = currentHeight / coefficientY;
 
-                item.setX(nextX);
-                item.setY(nextY);
-                this.arrayList.set(i, item);
+                    item.setX(nextX);
+                    item.setY(nextY);
+                    this.arrayList.set(i, item);
+                }
+                this.customCanvas.setAddedBitmaps(this.arrayList);
             }
-            this.customCanvas.setAddedBitmaps(this.arrayList);
         }
-
-        super.onConfigurationChanged(newConfig);
+        super.onViewStateRestored(savedInstanceState);
     }
 
     @Override
@@ -105,13 +104,35 @@ public class MyRoomFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_my_room,container,false);
 
         Spinner spinner = (Spinner) rootView.findViewById(R.id.sp_created_rooms);
-        //spinner logic
+        //ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.spiner_item, getResources().getStringArray(R.array.spinnerItems));
+        //spinnerAdapter.setDropDownViewResource(R.layout.spiner_item);
+        //spinner.setAdapter(spinnerAdapter);
+        spinner.setSelection(0);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                spinnerItem = position;
+            }
 
-        customCanvas = (CanvasView)rootView.findViewById(R.id.cv_room_canvas);
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                //room = "";
+            }
+        });
+
+        if(spinnerItem != 0) {// TODO: need to be changed to == when DB is ready
+            TextView tv = (TextView) rootView.findViewById(R.id.tv_empty_canvas);
+            tv.setTextColor(Color.RED);
+            tv.setVisibility(View.VISIBLE);
+        } else {
+            customCanvas = (CanvasView)rootView.findViewById(R.id.cv_room_canvas);
+            customCanvas.setBackgroundColor(Color.RED);
+        }
 
 
-        if(getArguments() != null) {
+        if(getArguments() != null) { // TODO: need to be changed to == when DB is ready
             TextView tv = (TextView) rootView.findViewById(R.id.tv_empty_furniture_list);
+            tv.setTextColor(Color.RED);
             tv.setVisibility(View.VISIBLE);
         } else {
             Bundle bundle = getArguments();
@@ -132,18 +153,13 @@ public class MyRoomFragment extends Fragment {
             twoWayView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    CustomListItem item = (CustomListItem) parent.getItemAtPosition(position);
-                    customCanvas.addNewElement(item.getIcon());
+                    if(spinnerItem == 0) {// TODO: need to be changed to != when DB is ready
+                        CustomListItem item = (CustomListItem) parent.getItemAtPosition(position);
+                        customCanvas.addNewElement(item.getIcon());
+                    }
                 }
             });
         }
-
-
-
-
-
-
-
 
         FloatingActionButton fab = (FloatingActionButton)rootView.findViewById(R.id.fab_add_room);
         fab.setColorNormal(getActivity().getResources().getColor(R.color.ColorPrimary));
