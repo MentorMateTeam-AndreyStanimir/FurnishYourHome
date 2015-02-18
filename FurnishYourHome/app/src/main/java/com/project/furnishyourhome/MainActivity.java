@@ -14,11 +14,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.parse.Parse;
+import com.parse.ParseObject;
 import com.project.furnishyourhome.adapters.CustomListAdapter;
 import com.project.furnishyourhome.adapters.ViewPagerAdapter;
 import com.project.furnishyourhome.interfaces.IGestureListener;
@@ -56,6 +59,15 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Enable Local Datastore.
+        Parse.enableLocalDatastore(this);
+
+        Parse.initialize(this, "ueFuNcN0Cx1xgBzycLJOgwqGqLwDzlt9zJEHulqJ", "s1vnSldgEhOfOMyBfIXSnKsl8F7YHuGNXisSr2jM");
+
+//        ParseObject testObject = new ParseObject("TestObject");
+//        testObject.put("foo", "bar");
+//        testObject.saveInBackground();
+
         this.detector = new SimpleGestureFilter(this,this);
         this.swipeable = true;
 
@@ -70,6 +82,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setShowHideAnimationEnabled(true);  // not working
     }
 
     private void setActionBarTabs() {
@@ -243,11 +256,13 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     public void onSwipe(int direction) {
 
         if(swipeable) {
+            getSupportActionBar().setShowHideAnimationEnabled(true);
             switch (direction) {
                 case SimpleGestureFilter.SWIPE_DOWN:
                     getSupportActionBar().show();
                     break;
                 case SimpleGestureFilter.SWIPE_UP:
+//                    toolbar.animate().translationY(-toolbar.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
                     getSupportActionBar().hide();
                     break;
             }
