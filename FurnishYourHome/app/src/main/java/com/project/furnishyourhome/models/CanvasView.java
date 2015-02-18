@@ -1,5 +1,6 @@
 package com.project.furnishyourhome.models;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,8 +13,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import com.project.furnishyourhome.R;
-import com.project.furnishyourhome.interfaces.ISwipable;
+import com.project.furnishyourhome.MainActivity;
+import com.project.furnishyourhome.interfaces.ISwipeable;
 
 import java.util.ArrayList;
 
@@ -33,7 +34,7 @@ public class CanvasView extends View
     private float mX;
     private float mY;
 
-    private ISwipable pager;
+    private ISwipeable pager;
 
     public CanvasView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);

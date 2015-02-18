@@ -4,17 +4,15 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -23,14 +21,16 @@ import android.widget.Toast;
 
 import com.project.furnishyourhome.adapters.CustomListAdapter;
 import com.project.furnishyourhome.adapters.ViewPagerAdapter;
+import com.project.furnishyourhome.interfaces.IGestureListener;
+import com.project.furnishyourhome.interfaces.ISwipeable;
 import com.project.furnishyourhome.materialdesign.SlidingTabLayout;
 import com.project.furnishyourhome.models.CustomListItem;
 import com.project.furnishyourhome.models.CustomViewPager;
+import com.project.furnishyourhome.models.SimpleGestureFilter;
 
 import java.util.ArrayList;
 
-
-public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener{
+public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable {
 
     private final int Numboftabs = 3;
 
@@ -41,6 +41,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private String[] mLeftDrawerMenu;
     private ArrayList<CustomListItem> leftNavDrawerItems;
     private CustomListAdapter adapter;
+    private SimpleGestureFilter detector;
 
     private Toolbar toolbar;
     private CustomViewPager pager;
@@ -48,25 +49,30 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private SlidingTabLayout tabs;
 
     private boolean mTwoPane; // check is in Landscape mode
+    private boolean swipeable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setActionBarTabs();
+        this.detector = new SimpleGestureFilter(this,this);
+        this.swipeable = true;
 
-        setLeftDrawer();
+        // Creating The Toolbar and setting it as the Toolbar for the activity
+        this.toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        this.toolbar.setTitleTextColor(getResources().getColor(android.R.color.holo_green_light));
+        this.toolbar.setBackgroundColor(0xFFFFFFFF);
+        setSupportActionBar(toolbar);
+
+        this.setActionBarTabs();
+        this.setLeftDrawer();
+
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void setActionBarTabs() {
-        // Creating The Toolbar and setting it as the Toolbar for the activity
-
-        toolbar = (Toolbar) findViewById(R.id.tool_bar);
-        toolbar.setTitleTextColor(getResources().getColor(android.R.color.holo_green_light));
-        toolbar.setBackgroundColor(0xFFFFFFFF);
-        setSupportActionBar(toolbar);
-
 
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
         adapterViewPager =  new ViewPagerAdapter(getSupportFragmentManager(), getResources().getStringArray(R.array.tabs), Numboftabs);
@@ -128,8 +134,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         leftDrawerListener = new ActionBarDrawerToggle(this, leftDrawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
 
         leftDrawerLayout.setDrawerListener(leftDrawerListener);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void handleSearch(String query) {
@@ -226,5 +230,37 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             setTitle(mLeftDrawerMenu[position - 1]);
 //        getSupportActionBar().setTitle(mLeftDrawerMenu[position]);
         }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent me){
+        // Call onTouchEvent of SimpleGestureFilter class
+        this.detector.onTouchEvent(me);
+        return super.dispatchTouchEvent(me);
+    }
+
+    @Override
+    public void onSwipe(int direction) {
+
+        if(swipeable) {
+            switch (direction) {
+                case SimpleGestureFilter.SWIPE_DOWN:
+                    getSupportActionBar().show();
+                    break;
+                case SimpleGestureFilter.SWIPE_UP:
+                    getSupportActionBar().hide();
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void onDoubleTap() {
+        Toast.makeText(this, "Double Tap", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void setSwipeable(boolean swipeable) {
+        this.swipeable = swipeable;
     }
 }

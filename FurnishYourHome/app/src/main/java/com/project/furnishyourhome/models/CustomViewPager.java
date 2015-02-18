@@ -2,28 +2,39 @@ package com.project.furnishyourhome.models;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import com.project.furnishyourhome.interfaces.ISwipable;
+import com.project.furnishyourhome.R;
+import com.project.furnishyourhome.interfaces.ISwipeable;
 
 /**
  * Created by Andrey on 18.2.2015 г..
  */
-public class CustomViewPager extends ViewPager implements ISwipable {
+public class CustomViewPager extends ViewPager implements ISwipeable {
     private boolean swipeable;
     private static CustomViewPager instance = null;
+    private Context context;
+
+    private Toolbar toolbar;
 
     public CustomViewPager(Context context) {
         super(context);
 
-        this.swipeable = true;
-        instance = this;
+        initializeElements(context);
     }
 
     public CustomViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+
+        initializeElements(context);
+    }
+
+    private void initializeElements(Context context) {
+        this.context = context;
+        toolbar = (Toolbar) findViewById(R.id.tool_bar);
         this.swipeable = true;
         instance = this;
     }
