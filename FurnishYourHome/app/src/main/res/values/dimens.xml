@@ -3,9 +3,16 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <!-- activity_main items -->
+    <dimen name="activity_main_drawer_width">240dp</dimen>
+    <dimen name="activity_main_drawer_divider_height">1dp</dimen>
+    <!-- activity_main items -->
 
-    <!-- activity_add_room items -->
-    <dimen name="activity_add_room_padding">10dp</dimen>
-    <!-- activity_add_room items -->
+    <!-- fragment_nav_drawer_right items -->
+    <dimen name="fragment_nav_drawer_right_padding">5dp</dimen>
+    <dimen name="fragment_nav_drawer_right_image_height">240dp</dimen>
+    <!-- fragment_nav_drawer_right items -->
+
+
 
 </resources>

@@ -21,10 +21,12 @@ import java.util.ArrayList;
 public class CustomListAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<CustomListItem> listItems;
+    private int layoutID;
 
-    public CustomListAdapter(Context context, ArrayList<CustomListItem> listItems) {
+    public CustomListAdapter(Context context, int layoutID, ArrayList<CustomListItem> listItems) {
         this.context = context;
         this.listItems = listItems;
+        this.layoutID = layoutID;
     }
 
     @Override
@@ -46,7 +48,7 @@ public class CustomListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-            convertView = mInflater.inflate(R.layout.drawer_list_item, null);
+            convertView = mInflater.inflate(layoutID, null);
         }
 
         ImageView imgIcon = (ImageView) convertView.findViewById(R.id.iconMenu);

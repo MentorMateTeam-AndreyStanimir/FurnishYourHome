@@ -43,7 +43,7 @@ public class MyFurnitureFragment extends Fragment {
             ArrayList <CustomListItem> list = getArguments().getParcelableArrayList("chosenItems");
 
             ListView listView = (ListView) rootView.findViewById(R.id.lv_my_furniture);
-            listView.setAdapter(new CustomListAdapter(getActivity().getApplicationContext(), list));
+            listView.setAdapter(new CustomListAdapter(getActivity().getApplicationContext(), R.layout.drawer_list_item, list));
         } else {
             textView.setVisibility(View.VISIBLE);
         }

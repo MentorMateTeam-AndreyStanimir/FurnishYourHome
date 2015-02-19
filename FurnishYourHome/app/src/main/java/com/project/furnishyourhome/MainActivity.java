@@ -213,7 +213,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         }
 
         // Set the adapter
-        adapter = new CustomListAdapter(this, leftNavDrawerItems);
+        adapter = new CustomListAdapter(this, R.layout.drawer_list_item, leftNavDrawerItems);
         mDrawerLeftList.setAdapter(adapter);
         mDrawerLeftList.setOnItemClickListener(MainActivity.this);
 

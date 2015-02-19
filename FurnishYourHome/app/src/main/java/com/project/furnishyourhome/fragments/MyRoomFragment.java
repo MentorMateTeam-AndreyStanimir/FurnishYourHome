@@ -89,7 +89,7 @@ public class MyRoomFragment extends Fragment {
         Bundle bundle = getArguments(); // TODO: get parameters for horizontal list view
 
         TwoWayView twoWayView = (TwoWayView) rootView.findViewById(R.id.twv_furniture);
-        twoWayView.setAdapter(new CustomListAdapter(getActivity().getBaseContext(), listItems));
+        twoWayView.setAdapter(new CustomListAdapter(getActivity().getBaseContext(), R.layout.horizontal_list_item, listItems));
         twoWayView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

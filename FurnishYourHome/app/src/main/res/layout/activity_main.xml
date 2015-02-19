@@ -39,7 +39,7 @@
 
         </LinearLayout>
 
-        <!-- The navigation drawer -->
+        <!-- The navigation drawer left-->
         <FrameLayout
             android:id="@+id/image_left_frame"
             android:layout_width="match_parent"
@@ -47,18 +47,19 @@
 
         <ListView
             android:id="@+id/left_drawer"
-            android:layout_width="240dp"
+            android:layout_width="@dimen/activity_main_drawer_width"
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:choiceMode="singleChoice"
             android:divider="@color/list_divider"
-            android:dividerHeight="1dp"
+            android:dividerHeight="@dimen/activity_main_drawer_divider_height"
             android:background="@color/list_background"/>
 
+        <!-- The navigation drawer right-->
         <FrameLayout
             android:id="@+id/right_drawer"
             android:background="@color/list_background"
-            android:layout_width="240dp"
+            android:layout_width="@dimen/activity_main_drawer_width"
             android:layout_height="match_parent"
             android:layout_gravity="end" />
 
