@@ -1,5 +1,6 @@
 package com.project.furnishyourhome.models;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -9,6 +10,7 @@ import android.os.Parcelable;
 public class CustomListItem implements Parcelable {
     private String title;
     private int icon;
+    private Bitmap bitmap;
 
     public CustomListItem(){}
 
@@ -61,5 +63,13 @@ public class CustomListItem implements Parcelable {
 
     public void setIcon(int icon){
         this.icon = icon;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
     }
 }

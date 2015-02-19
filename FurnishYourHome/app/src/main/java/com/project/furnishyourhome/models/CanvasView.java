@@ -96,10 +96,10 @@ public class CanvasView extends View
         pager.setSwipeable(true);
     }
 
-    public void addNewElement(int drawableID) {
+    public void addNewElement(Bitmap drawableID) {
         float canvasCenterX = getWidth()/2;
         float canvasCenterY = getHeight()/2;
-        CustomBitmap localCustomBitmap = new CustomBitmap(BitmapFactory.decodeResource(getResources(), drawableID), canvasCenterX, canvasCenterY);
+        CustomBitmap localCustomBitmap = new CustomBitmap(drawableID, canvasCenterX, canvasCenterY);
         addedBitmaps.add(localCustomBitmap);
         invalidate();
     }

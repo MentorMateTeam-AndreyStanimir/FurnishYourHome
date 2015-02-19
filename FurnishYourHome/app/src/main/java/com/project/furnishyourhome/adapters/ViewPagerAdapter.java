@@ -12,6 +12,7 @@ import com.project.furnishyourhome.fragments.MyRoomFragment;
 import com.project.furnishyourhome.models.CustomListItem;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by Andrey on 11.2.2015 г..
@@ -38,7 +39,7 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
         if(position == 0) // if the position is 0 we are returning the First tab
         {
-            MyRoomFragment myRoomFragment = new MyRoomFragment();
+            MyRoomFragment myRoomFragment = MyRoomFragment.newInstance();
             return myRoomFragment;
         }
         else if(position == 1)
@@ -58,7 +59,7 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
         }
         else            // As we are having 3 tabs if the position is not 0 or 1 it must be 2 so we are returning third tab
         {
-            MapFragment mapFragment = new MapFragment();
+            MapFragment mapFragment = MapFragment.newInstance();
             return mapFragment;
         }
 

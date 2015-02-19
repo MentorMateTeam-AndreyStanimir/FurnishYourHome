@@ -8,11 +8,24 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.project.furnishyourhome.R;
+import com.project.furnishyourhome.models.CanvasView;
+import com.project.furnishyourhome.models.CustomBitmap;
+
+import java.util.ArrayList;
 
 /**
  * Created by Andrey on 11.2.2015 г..
  */
 public class MapFragment extends Fragment {
+
+    private static MapFragment instance = null;
+
+    public static MapFragment newInstance() {
+        if(instance == null) {
+            instance = new MapFragment();
+        }
+        return instance;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

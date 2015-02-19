@@ -2,6 +2,7 @@ package com.project.furnishyourhome.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,7 +52,12 @@ public class CustomListAdapter extends BaseAdapter {
         ImageView imgIcon = (ImageView) convertView.findViewById(R.id.iconMenu);
         TextView txtTitle = (TextView) convertView.findViewById(R.id.titleMenu);
 
-        imgIcon.setImageResource(getItem(position).getIcon());
+        Bitmap bitmap = getItem(position).getBitmap();
+        if(bitmap != null){
+            imgIcon.setImageBitmap(bitmap);
+        } else {
+            imgIcon.setImageResource(getItem(position).getIcon());
+        }
         txtTitle.setText(listItems.get(position).getTitle());
 
         return convertView;

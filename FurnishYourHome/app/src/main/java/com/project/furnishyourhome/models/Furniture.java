@@ -2,6 +2,8 @@ package com.project.furnishyourhome.models;
 
 import android.graphics.Bitmap;
 
+import java.io.ByteArrayOutputStream;
+
 /**
  * Created by Andrey on 18.2.2015 г..
  */
@@ -94,5 +96,14 @@ public abstract class Furniture {
 
     public void setStore(Store store) {
         this.store = store;
+    }
+
+
+    public byte[] getImageAsByteArray (){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        getDrawable().compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+
+        return byteArray;
     }
 }

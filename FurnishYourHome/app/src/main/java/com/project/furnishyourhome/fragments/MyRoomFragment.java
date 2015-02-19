@@ -1,6 +1,5 @@
 package com.project.furnishyourhome.fragments;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -22,6 +20,7 @@ import com.project.furnishyourhome.adapters.CustomListAdapter;
 import com.project.furnishyourhome.models.CanvasView;
 import com.project.furnishyourhome.models.CustomBitmap;
 import com.project.furnishyourhome.models.CustomListItem;
+import com.project.furnishyourhome.models.Furniture;
 
 import org.lucasr.twowayview.TwoWayView;
 
@@ -31,23 +30,44 @@ import java.util.ArrayList;
  * Created by hp1 on 21-01-2015.
  */
 public class MyRoomFragment extends Fragment {
+    private static MyRoomFragment instance = null;
 
     ArrayList<CustomBitmap> arrayList;
+    ArrayList<CustomListItem> listItems;
     private CanvasView customCanvas;
     int oldh;
     int oldw;
 
     int spinnerItem;
 
-    public static MyFurnitureFragment newInstance() {
-        MyFurnitureFragment f = new MyFurnitureFragment();
+    public static MyRoomFragment newInstance() {
+        if(instance == null) {
+            instance = new MyRoomFragment();
+        }
+        return instance;
+    }
+
+    public static MyRoomFragment newInstance(Bundle args) {
+        instance = MyRoomFragment.newInstance();
+        instance.setArguments(args);
+        return instance;
+    }
+
+    public static MyRoomFragment newInstance(ArrayList<Furniture> listItems) {
+        MyRoomFragment f = MyRoomFragment.newInstance();
+        setListItems(listItems, f);
         return f;
     }
 
-    public static MyFurnitureFragment newInstance(Bundle args) {
-        MyFurnitureFragment f = new MyFurnitureFragment();
-        f.setArguments(args);
-        return f;
+    private static void setListItems(ArrayList<Furniture> listItems, MyRoomFragment f) {
+        f.listItems = new ArrayList<CustomListItem>();
+
+        for (Furniture item : listItems){
+            CustomListItem listItem = new CustomListItem();
+            listItem.setTitle(item.getName());
+            listItem.setBitmap(item.getDrawable());
+            f.listItems.add(listItem);
+        }
     }
 
     @Override
@@ -136,26 +156,15 @@ public class MyRoomFragment extends Fragment {
             tv.setVisibility(View.VISIBLE);
         } else {
             Bundle bundle = getArguments();
-            ArrayList<CustomListItem> list = new ArrayList<>();
-
-            //debug
-            list.add(new CustomListItem("item 1", R.drawable.ic_launcher));
-            list.add(new CustomListItem("item 2", R.drawable.ic_launcher));
-            list.add(new CustomListItem("item 3", R.drawable.ic_launcher));
-            list.add(new CustomListItem("item 4", R.drawable.ic_launcher));
-            list.add(new CustomListItem("item 5", R.drawable.ic_launcher));
-            list.add(new CustomListItem("item 6", R.drawable.ic_launcher));
-            list.add(new CustomListItem("item 7", R.drawable.ic_launcher));
-            //======
 
             TwoWayView twoWayView = (TwoWayView) rootView.findViewById(R.id.twv_furniture);
-            twoWayView.setAdapter(new CustomListAdapter(getActivity().getBaseContext(), list));
+            twoWayView.setAdapter(new CustomListAdapter(getActivity().getBaseContext(), listItems));
             twoWayView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     if(spinnerItem == 0) {// TODO: need to be changed to != when DB is ready
                         CustomListItem item = (CustomListItem) parent.getItemAtPosition(position);
-                        customCanvas.addNewElement(item.getIcon());
+                        customCanvas.addNewElement(item.getBitmap());
                     }
                 }
             });

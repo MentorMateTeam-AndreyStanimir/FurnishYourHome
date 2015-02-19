@@ -26,6 +26,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.project.furnishyourhome.adapters.CustomListAdapter;
 import com.project.furnishyourhome.adapters.ViewPagerAdapter;
+import com.project.furnishyourhome.fragments.MyRoomFragment;
 import com.project.furnishyourhome.interfaces.IGestureListener;
 import com.project.furnishyourhome.interfaces.ISwipeable;
 import com.project.furnishyourhome.materialdesign.SlidingTabLayout;
@@ -54,6 +55,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private ArrayList<CustomListItem> leftNavDrawerItems;
     private CustomListAdapter adapter;
     private SimpleGestureFilter detector;
+    private MyRoomFragment myRoomFragment;
 
     private ArrayList<Furniture> furnitures;
     private ArrayList<Store> stores;
@@ -81,7 +83,13 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         this.detector = new SimpleGestureFilter(this,this);
         this.swipeable = true;
+        setCustomToolbar();
 
+        myRoomFragment = MyRoomFragment.newInstance(this.furnitures);
+
+    }
+
+    private void setCustomToolbar() {
         // Creating The Toolbar and setting it as the Toolbar for the activity
         this.toolbar = (Toolbar) findViewById(R.id.tool_bar);
         this.toolbar.setTitleTextColor(getResources().getColor(android.R.color.holo_green_light));
