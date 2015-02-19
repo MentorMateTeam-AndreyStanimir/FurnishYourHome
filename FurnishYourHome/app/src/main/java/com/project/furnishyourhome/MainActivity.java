@@ -39,7 +39,9 @@ import com.project.furnishyourhome.models.parse.StoreParse;
 import com.project.furnishyourhome.models.parse.TableParse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable {
 
@@ -48,8 +50,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private DrawerLayout leftDrawerLayout;
     private ActionBarDrawerToggle leftDrawerListener;
     private ListView mDrawerLeftList;
-    private ListView mDrawerRightList;
-    private String[] mLeftDrawerMenu;
+    private HashMap<String, Integer> mLeftDrawerMenu;
     private ArrayList<CustomListItem> leftNavDrawerItems;
     private CustomListAdapter adapter;
     private SimpleGestureFilter detector;
@@ -74,9 +75,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         ParseObject.registerSubclass(TableParse.class);
         Parse.initialize(this, "ueFuNcN0Cx1xgBzycLJOgwqGqLwDzlt9zJEHulqJ", "s1vnSldgEhOfOMyBfIXSnKsl8F7YHuGNXisSr2jM");
 
+        this.mLeftDrawerMenu = new HashMap<String, Integer>();  // TODO: get menu from DB
         loadData();
         setContentView(R.layout.activity_main);
-
 
         this.detector = new SimpleGestureFilter(this,this);
         this.swipeable = true;
@@ -108,8 +109,12 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             e.printStackTrace();
         }
 
-        for (TableParse table : tables){
-            furnitures.add(table.getTable());
+        if(tables != null) {
+            this.mLeftDrawerMenu.put("Tables", R.drawable.tables);
+
+            for (TableParse table : tables) {
+                furnitures.add(table.getTable());
+            }
         }
 
         final ParseQuery<SofaParse> query2 = ParseQuery.getQuery(SofaParse.class);
@@ -120,8 +125,12 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             e.printStackTrace();
         }
 
-        for (SofaParse sofa : sofas){
-            furnitures.add(sofa.getSofa());
+        if(sofas != null) {
+            this.mLeftDrawerMenu.put("Sofas", R.drawable.sofas);
+
+            for (SofaParse sofa : sofas) {
+                furnitures.add(sofa.getSofa());
+            }
         }
 
         final ParseQuery<StoreParse> storeQuery = ParseQuery.getQuery(StoreParse.class);
@@ -167,8 +176,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     private void setLeftDrawer() {
 
-        this.mLeftDrawerMenu = new String[]{"All", "TVs", "Laptops", "Sofas", "Chairs", "Chandeliers"};  // TODO: get menu from DB
-
         //Initialize left menu
         this.mDrawerLeftList = (ListView) findViewById(R.id.left_drawer);
 
@@ -178,7 +185,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         pro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                // TODO Auto-generated method stub
                 Toast.makeText(getApplicationContext(), "Clicked",                                                                                    Toast.LENGTH_SHORT).show();
             }
         });
@@ -186,8 +192,11 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         // fill ArrayList with data
         this.leftNavDrawerItems = new ArrayList<CustomListItem>();
-        for (String title : mLeftDrawerMenu) {
-            leftNavDrawerItems.add(new CustomListItem(title, R.drawable.ic_home));
+        int picSource;
+        for (HashMap.Entry<String, Integer> entry : mLeftDrawerMenu.entrySet()) {
+            String key = entry.getKey();
+            int value = entry.getValue();
+            leftNavDrawerItems.add(new CustomListItem(key, value));
         }
 
         // Set the adapter
@@ -280,7 +289,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             if(position == 0){
                 Toast.makeText(this, getResources().getString(R.string.app_name), Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, mLeftDrawerMenu[position -1], Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, leftNavDrawerItems.get(position -1).getTitle(), Toast.LENGTH_SHORT).show();
             }
 
             selectItem(position);
@@ -294,7 +303,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         if(position == 0){
             setTitle(getResources().getString(R.string.app_name));
         } else {
-            setTitle(mLeftDrawerMenu[position - 1]);
+            setTitle(leftNavDrawerItems.get(position - 1).getTitle());
 //        getSupportActionBar().setTitle(mLeftDrawerMenu[position]);
         }
     }

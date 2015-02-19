@@ -15,7 +15,7 @@
             android:layout_margin="5dp"
             android:layout_toRightOf="@+id/profile_image"
             android:gravity="center_vertical"
-            android:text="The best program ever"
+            android:text="Furnish your home"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/wallet_highlighted_text_holo_light"
             android:textStyle="bold" />
