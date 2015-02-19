@@ -15,14 +15,23 @@
     <string name="title_activity_add_room">AddRoomActivity</string>
     <string name="google_maps_key">AIzaSyB5TpazgprmQJhHBBDl-POz4Ucq5Nibh3E</string>
 
+    <!-- activity_add_room items -->
     <array name="spinnerItems">
         <item>-</item>
-        <item>Living room</item>
         <item>Bedroom</item>
+        <item>Living room</item>
         <item>Kitchen</item>
         <item>Dining room</item>
         <item>Bathroom</item>
     </array>
+
+    <string name="room_not_selected">Please choose room from the spinner below.</string>
+    <string name="width">Width:</string>
+    <string name="height">Height:</string>
+    <string name="depth">Depth:</string>
+
+    <string name="meters">meters</string>
+    <!-- activity_add_room items -->
 
     <array name="tabs">
         <item>My Room</item>
