@@ -31,12 +31,12 @@ public class CustomListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return listItems.size();
+        return this.listItems.size();
     }
 
     @Override
     public CustomListItem getItem(int position) {
-        return listItems.get(position);
+        return this.listItems.get(position);
     }
 
     @Override
@@ -54,13 +54,10 @@ public class CustomListAdapter extends BaseAdapter {
         ImageView imgIcon = (ImageView) convertView.findViewById(R.id.iconMenu);
         TextView txtTitle = (TextView) convertView.findViewById(R.id.titleMenu);
 
-        Bitmap bitmap = getItem(position).getBitmap();
-        if(bitmap != null){
-            imgIcon.setImageBitmap(bitmap);
-        } else {
-            imgIcon.setImageResource(getItem(position).getIcon());
-        }
-        txtTitle.setText(listItems.get(position).getTitle());
+        Bitmap bitmap = this.getItem(position).getBitmap();
+
+        imgIcon.setImageBitmap(bitmap);
+        txtTitle.setText(this.listItems.get(position).getTitle());
 
         return convertView;
     }

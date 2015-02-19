@@ -1,27 +1,31 @@
 package com.project.furnishyourhome.models;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * Created by Andrey on 10.2.2015 г..
  */
 public class CustomListItem implements Parcelable {
     private String title;
-    private int icon;
     private Bitmap bitmap;
+    byte[] byteArray;
 
     public CustomListItem(){}
 
-    public CustomListItem(String title, int icon){
+    public CustomListItem(String title, Bitmap bitmap){
         this.title = title;
-        this.icon = icon;
+        this.bitmap = bitmap;
     }
 
     private CustomListItem(Parcel in) {
-        title = in.readString();
-        icon = in.readInt();
+        this.title = in.readString();
+        in.readByteArray(byteArray);
+        this.bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
     }
 
     @Override
@@ -36,7 +40,11 @@ public class CustomListItem implements Parcelable {
 
     public void writeToParcel(Parcel out, int flags) {
         out.writeString(title);
-        out.writeInt(icon);
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        this.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        out.writeByteArray(byteArray);
     }
 
     public static final Parcelable.Creator<CustomListItem> CREATOR = new Parcelable.Creator<CustomListItem>() {
@@ -55,14 +63,6 @@ public class CustomListItem implements Parcelable {
 
     public void setTitle(String title){
         this.title = title;
-    }
-
-    public int getIcon(){
-        return this.icon;
-    }
-
-    public void setIcon(int icon){
-        this.icon = icon;
     }
 
     public Bitmap getBitmap() {

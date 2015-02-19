@@ -74,12 +74,17 @@ public class MyRoomFragment extends Fragment {
         outState.putInt("oldw", customCanvas.getWidth());
         outState.putInt("oldh", customCanvas.getHeight());
         outState.putParcelableArrayList("chosenItems", chosenItems);
+        outState.putParcelableArrayList("listItems", this.listItems);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_my_room,container,false);
+
+        if(savedInstanceState != null){
+            this.listItems = savedInstanceState.getParcelableArrayList("listItems");
+        }
 
         customCanvas = (CanvasView) rootView.findViewById(R.id.cv_room_canvas);
         customCanvas.setBackgroundResource(R.drawable.bedroom);

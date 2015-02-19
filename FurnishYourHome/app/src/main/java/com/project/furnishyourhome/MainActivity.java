@@ -4,6 +4,8 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 
 import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.project.furnishyourhome.adapters.CustomListAdapter;
@@ -48,18 +51,18 @@ import java.util.List;
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable {
 
     private final int Numboftabs = 3;
+    private static boolean isFirstTime = true;
+    private static ArrayList<Furniture> furnitures;
+    private static ArrayList<Store> stores;
+    private static ArrayList<CustomListItem> leftNavDrawerItems;
 
     private DrawerLayout leftDrawerLayout;
     private ActionBarDrawerToggle leftDrawerListener;
     private ListView mDrawerLeftList;
-    private HashMap<String, Integer> mLeftDrawerMenu;
-    private ArrayList<CustomListItem> leftNavDrawerItems;
     private CustomListAdapter adapter;
     private SimpleGestureFilter detector;
     private MyRoomFragment myRoomFragment;
 
-    private ArrayList<Furniture> furnitures;
-    private ArrayList<Store> stores;
     private Toolbar toolbar;
     private CustomViewPager pager;
     private ViewPagerAdapter adapterViewPager;
@@ -72,19 +75,31 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Enable Local Datastore.
-        Parse.enableLocalDatastore(this);
+        if(isFirstTime) {
+            Parse.enableLocalDatastore(this);
+        }
         ParseObject.registerSubclass(SofaParse.class);
         ParseObject.registerSubclass(StoreParse.class);
         ParseObject.registerSubclass(TableParse.class);
         Parse.initialize(this, "ueFuNcN0Cx1xgBzycLJOgwqGqLwDzlt9zJEHulqJ", "s1vnSldgEhOfOMyBfIXSnKsl8F7YHuGNXisSr2jM");
 
-        this.mLeftDrawerMenu = new HashMap<String, Integer>();  // TODO: get menu from DB
-        loadData();
+
+       if(isFirstTime) {
+           this.leftNavDrawerItems = new ArrayList<CustomListItem>();
+           loadData();
+           isFirstTime = false;
+        }
         setContentView(R.layout.activity_main);
 
         this.detector = new SimpleGestureFilter(this,this);
         this.swipeable = true;
         setCustomToolbar();
+
+        this.setActionBarTabs();
+        this.setLeftDrawer();
+
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         myRoomFragment = MyRoomFragment.newInstance(this.furnitures);
 
@@ -97,12 +112,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         this.toolbar.setBackgroundColor(0xFFFFFFFF);
         setSupportActionBar(toolbar);
 
-        this.setActionBarTabs();
-        this.setLeftDrawer();
-
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         //for initializing right fragment
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
         tr.add(R.id.right_drawer, NavDrawerRightFragment.newInstance());
@@ -114,35 +123,66 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         furnitures = new ArrayList<Furniture>();
         stores = new ArrayList<Store>();
 
-        final ParseQuery<TableParse> query = ParseQuery.getQuery(TableParse.class);
-        List<TableParse> tables = null;
         try {
-            tables = query.find();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+            final ParseQuery<ParseObject> typesQuery = ParseQuery.getQuery("Furniture");
+            List<ParseObject> parseObjects = typesQuery.find();
 
-        if(tables != null) {
-            this.mLeftDrawerMenu.put("Tables", R.drawable.tables);
+            for (ParseObject obj : parseObjects){
+                String type = obj.getString("type");
+                ParseFile imgParse = obj.getParseFile("icon");
+                byte[] imageByte = new byte[0];
+                try {
+                    imageByte = imgParse.getData();
+                } catch (ParseException e1) {
+                    e1.printStackTrace();
+                }
 
-            for (TableParse table : tables) {
-                furnitures.add(table.getTable());
+                Bitmap icon = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length);
+                CustomListItem item = new CustomListItem(type, icon);
+                leftNavDrawerItems.add(item);
             }
-        }
 
-        final ParseQuery<SofaParse> query2 = ParseQuery.getQuery(SofaParse.class);
-        List<SofaParse> sofas = null;
-        try {
-            sofas = query2.find();
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
-        if(sofas != null) {
-            this.mLeftDrawerMenu.put("Sofas", R.drawable.sofas);
+        for (CustomListItem item : leftNavDrawerItems) {
 
-            for (SofaParse sofa : sofas) {
-                furnitures.add(sofa.getSofa());
+            String type = item.getTitle();
+
+            if(type.equals("Table")) {
+                final ParseQuery<TableParse> query = ParseQuery.getQuery(TableParse.class);
+                List<TableParse> tables = null;
+
+                try {
+                    tables = query.find();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if (tables != null) {
+
+                    for (TableParse table : tables) {
+                        furnitures.add(table.getTable());
+                    }
+                }
+
+            } else if (type.equals("Sofa")) {
+                final ParseQuery<SofaParse> query = ParseQuery.getQuery(SofaParse.class);
+                List<SofaParse> sofas = null;
+
+                try {
+                    sofas = query.find();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if(sofas != null) {
+
+                    for (SofaParse sofa : sofas) {
+                        furnitures.add(sofa.getSofa());
+                    }
+                }
             }
         }
 
@@ -202,15 +242,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             }
         });
         this.mDrawerLeftList.addHeaderView(header);
-
-        // fill ArrayList with data
-        this.leftNavDrawerItems = new ArrayList<CustomListItem>();
-        int picSource;
-        for (HashMap.Entry<String, Integer> entry : mLeftDrawerMenu.entrySet()) {
-            String key = entry.getKey();
-            int value = entry.getValue();
-            leftNavDrawerItems.add(new CustomListItem(key, value));
-        }
 
         // Set the adapter
         adapter = new CustomListAdapter(this, R.layout.drawer_list_item, leftNavDrawerItems);
