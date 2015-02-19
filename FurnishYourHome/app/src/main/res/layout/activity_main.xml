@@ -54,14 +54,13 @@
             android:divider="@color/list_divider"
             android:dividerHeight="1dp"
             android:background="@color/list_background"/>
-            />
 
-        <fragment android:id="@+id/navigation_drawer"
+        <FrameLayout
+            android:id="@+id/right_drawer"
+            android:background="@color/list_background"
             android:layout_width="240dp"
             android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:name="com.project.furnishyourhome.fragments.NavDrawerRightFragment"
-            tools:layout="@layout/fragment_nav_drawer_right" />
+            android:layout_gravity="end" />
 
     </android.support.v4.widget.DrawerLayout>
 

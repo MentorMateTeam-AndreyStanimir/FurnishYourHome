@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import com.parse.ParseQuery;
 import com.project.furnishyourhome.adapters.CustomListAdapter;
 import com.project.furnishyourhome.adapters.ViewPagerAdapter;
 import com.project.furnishyourhome.fragments.MyRoomFragment;
+import com.project.furnishyourhome.fragments.NavDrawerRightFragment;
 import com.project.furnishyourhome.interfaces.IGestureListener;
 import com.project.furnishyourhome.interfaces.ISwipeable;
 import com.project.furnishyourhome.materialdesign.SlidingTabLayout;
@@ -42,7 +44,6 @@ import com.project.furnishyourhome.models.parse.TableParse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable {
 
@@ -101,7 +102,11 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setShowHideAnimationEnabled(true);  // not working
+
+        //for initializing right fragment
+        FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+        tr.add(R.id.right_drawer, NavDrawerRightFragment.newInstance());
+        tr.commit();
     }
 
     private void loadData() {

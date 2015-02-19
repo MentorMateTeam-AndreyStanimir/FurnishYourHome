@@ -1,6 +1,7 @@
 package com.project.furnishyourhome.fragments;
 
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,7 @@ import com.project.furnishyourhome.models.Furniture;
 
 import org.lucasr.twowayview.TwoWayView;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 /**
@@ -91,6 +93,25 @@ public class MyRoomFragment extends Fragment {
         twoWayView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                CustomListItem item = listItems.get(position);
+
+                Bundle args = new Bundle();
+                args.putString("title", item.getTitle());
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                Bitmap bitmap = item.getBitmap();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+                args.putByteArray("bitmap", byteArray);
+
+                FragmentTransaction tr = getActivity().getSupportFragmentManager().beginTransaction();
+                tr.replace(R.id.right_drawer, NavDrawerRightFragment.newInstance(args));
+                tr.commit();
+            }
+        });
+
+        twoWayView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 CustomListItem item = (CustomListItem) parent.getItemAtPosition(position);
                 customCanvas.addNewElement(item.getBitmap());
 
@@ -101,6 +122,7 @@ public class MyRoomFragment extends Fragment {
                 FragmentTransaction tr = getActivity().getSupportFragmentManager().beginTransaction();
                 tr.replace(R.id.container_my_furniture, MyFurnitureFragment.newInstance(args));
                 tr.commit();
+                return false;
             }
         });
 

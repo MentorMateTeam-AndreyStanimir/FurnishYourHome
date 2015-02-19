@@ -38,7 +38,7 @@ public class MyFurnitureFragment extends Fragment {
         TextView textView = (TextView) rootView.findViewById(R.id.tv_empty_list_info);
 
         if(getArguments() != null) {
-            textView.setVisibility(View.INVISIBLE);
+            textView.setVisibility(View.GONE);
 
             ArrayList <CustomListItem> list = getArguments().getParcelableArrayList("chosenItems");
 

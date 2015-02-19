@@ -11,8 +11,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="List is empty"
-        android:layout_gravity="center"
-        android:visibility="invisible"/>
+        android:layout_gravity="center" />
 
     <ListView
         android:id="@+id/lv_my_furniture"
