@@ -44,6 +44,8 @@ public class MyFurnitureFragment extends Fragment {
 
             ListView listView = (ListView) rootView.findViewById(R.id.lv_my_furniture);
             listView.setAdapter(new CustomListAdapter(getActivity().getApplicationContext(), list));
+        } else {
+            textView.setVisibility(View.VISIBLE);
         }
         return rootView;
     }

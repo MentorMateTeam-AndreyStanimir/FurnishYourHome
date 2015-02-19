@@ -30,6 +30,7 @@ public class MyRoomFragment extends Fragment {
 
     ArrayList<CustomBitmap> arrayList;
     ArrayList<CustomListItem> listItems;
+    ArrayList<CustomListItem> chosenItems;
     private CanvasView customCanvas;
 
     int oldh;
@@ -70,6 +71,7 @@ public class MyRoomFragment extends Fragment {
         outState.putParcelableArrayList("savedBitmaps", customCanvas.getAddedBitmaps());
         outState.putInt("oldw", customCanvas.getWidth());
         outState.putInt("oldh", customCanvas.getHeight());
+        outState.putParcelableArrayList("chosenItems", chosenItems);
         super.onSaveInstanceState(outState);
     }
 
@@ -79,6 +81,8 @@ public class MyRoomFragment extends Fragment {
 
         customCanvas = (CanvasView) rootView.findViewById(R.id.cv_room_canvas);
         customCanvas.setBackgroundResource(R.drawable.bedroom);
+
+        chosenItems = new ArrayList<>();
 
         Bundle bundle = getArguments(); // TODO: get parameters for horizontal list view
 
@@ -90,8 +94,9 @@ public class MyRoomFragment extends Fragment {
                 CustomListItem item = (CustomListItem) parent.getItemAtPosition(position);
                 customCanvas.addNewElement(item.getBitmap());
 
+                chosenItems.add(listItems.get(position));
                 Bundle args = new Bundle();
-                args.putParcelableArrayList("chosenItems", listItems);// TODO: NEED FIX, put the correct data
+                args.putParcelableArrayList("chosenItems", chosenItems);
 
                 FragmentTransaction tr = getActivity().getSupportFragmentManager().beginTransaction();
                 tr.replace(R.id.container_my_furniture, MyFurnitureFragment.newInstance(args));
@@ -103,6 +108,7 @@ public class MyRoomFragment extends Fragment {
             if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 arrayList = savedInstanceState.getParcelableArrayList("savedBitmaps");
                 this.customCanvas.setAddedBitmaps(this.arrayList);
+                this.chosenItems = savedInstanceState.getParcelableArrayList("chosenItems");
             } else {
                 oldw = savedInstanceState.getInt("oldw");
                 oldh = savedInstanceState.getInt("oldh");

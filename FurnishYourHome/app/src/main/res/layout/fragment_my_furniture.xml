@@ -12,7 +12,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="List is empty"
         android:layout_gravity="center"
-        android:visibility="visible"/>
+        android:visibility="invisible"/>
 
     <ListView
         android:id="@+id/lv_my_furniture"
