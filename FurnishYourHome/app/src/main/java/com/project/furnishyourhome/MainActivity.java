@@ -1,11 +1,16 @@
 package com.project.furnishyourhome;
 
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.provider.Settings;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -23,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -30,6 +36,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.project.furnishyourhome.adapters.CustomListAdapter;
 import com.project.furnishyourhome.adapters.ViewPagerAdapter;
+import com.project.furnishyourhome.dialogs.NetworkDialog;
 import com.project.furnishyourhome.fragments.MyRoomFragment;
 import com.project.furnishyourhome.fragments.NavDrawerRightFragment;
 import com.project.furnishyourhome.interfaces.IGestureListener;
@@ -49,6 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable {
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     private final int Numboftabs = 3;
     private static boolean isFirstTime = true;
@@ -71,9 +79,33 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private boolean mTwoPane; // check is in Landscape mode
     private boolean swipeable;
 
+    ProgressDialog progressDialog;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        //MAZALO BEGIN
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Loading data");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setIndeterminate(true);
+        Log.d(TAG, "loading data");
+        progressDialog.show();
+
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (mWifi.isConnected()) {
+            Log.d(TAG, "wifi is ON");
+        } else {
+            Log.d(TAG, "wifi is OFF");
+            DialogFragment dialog = new NetworkDialog();
+            dialog.show(getSupportFragmentManager(), "NetworkDialog");
+        }
+        //MAZALO END :d
+
         // Enable Local Datastore.
         if(isFirstTime) {
             Parse.enableLocalDatastore(this);
@@ -83,13 +115,11 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         ParseObject.registerSubclass(TableParse.class);
         Parse.initialize(this, "ueFuNcN0Cx1xgBzycLJOgwqGqLwDzlt9zJEHulqJ", "s1vnSldgEhOfOMyBfIXSnKsl8F7YHuGNXisSr2jM");
 
-
        if(isFirstTime) {
            this.leftNavDrawerItems = new ArrayList<CustomListItem>();
            loadData();
            isFirstTime = false;
         }
-        setContentView(R.layout.activity_main);
 
         this.detector = new SimpleGestureFilter(this,this);
         this.swipeable = true;
@@ -101,6 +131,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        Log.d(TAG, "loading myRoomFragment");
+        //progressDialog.dismiss();
         myRoomFragment = MyRoomFragment.newInstance(this.furnitures);
 
     }
@@ -198,7 +230,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             stores.add(store.getStore());
         }
 
-        Log.d("SUCCESS", "Success");
+        Log.d(TAG, "Success");
+        progressDialog.dismiss();
+
     }
 
     private void setActionBarTabs() {
@@ -238,7 +272,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         pro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                Toast.makeText(getApplicationContext(), "Clicked",                                                                                    Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
             }
         });
         this.mDrawerLeftList.addHeaderView(header);
