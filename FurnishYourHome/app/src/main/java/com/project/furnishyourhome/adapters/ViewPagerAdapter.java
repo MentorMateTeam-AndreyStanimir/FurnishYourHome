@@ -30,37 +30,17 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     //This method return the fragment for the every position in the View Pager
     @Override
     public Fragment getItem(int position) {
-
-        if(position == 0) // if the position is 0 we are returning the First tab
-        {
-            MyRoomFragment myRoomFragment = MyRoomFragment.newInstance();
-            return myRoomFragment;
-        }
-        else if(position == 1)
-        {
-           /* //debug
-            ArrayList<CustomListItem> list = new ArrayList<>();
-            list.add(new CustomListItem("table1", R.drawable.ic_launcher));
-            list.add(new CustomListItem("table2", R.drawable.ic_launcher));
-            list.add(new CustomListItem("table3", R.drawable.ic_launcher));
-            Bundle b = new Bundle();
-            b.putParcelableArrayList("chosenItems", list);
-            MyFurnitureFragment myFurnitureFragment = MyFurnitureFragment.newInstance(b);
-            //#############################################################*/
-
-            Fragment fragment = null;
-
-            if(this.numbOfTabs == 3) {
-                fragment = MyFurnitureFragment.newInstance();
-            } else {
-                fragment = MapFragment.newInstance();
-            }
-            return fragment;
-        }
-        else            // As we are having 3 tabs if the position is not 0 or 1 it must be 2 so we are returning third tab
-        {
-            MapFragment mapFragment = MapFragment.newInstance();
-            return mapFragment;
+        switch (position) {
+            case 0:
+                return MyRoomFragment.newInstance();
+            case 1:
+                if(this.numbOfTabs == 3) {
+                    return MyFurnitureFragment.newInstance();
+                } else {
+                    return MapFragment.newInstance();
+                }
+            default:
+                return MapFragment.newInstance();
         }
     }
 
