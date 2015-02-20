@@ -16,8 +16,11 @@
         <item name="android:textColor">#FF0000</item>
     </style>
 
-    <style name="TwoWayView">
+    <style name="TwoWayViewHorizontal">
         <item name="android:orientation">horizontal</item>
+    </style>
+    <style name="TwoWayViewVertical">
+        <item name="android:orientation">vertical</item>
     </style>
 
 </resources>

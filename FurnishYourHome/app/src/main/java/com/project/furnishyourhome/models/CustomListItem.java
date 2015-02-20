@@ -13,7 +13,7 @@ import java.io.ByteArrayOutputStream;
 public class CustomListItem implements Parcelable {
     private String title;
     private Bitmap bitmap;
-    byte[] byteArray;
+    private byte[] byteArray;
 
     public CustomListItem(){}
 

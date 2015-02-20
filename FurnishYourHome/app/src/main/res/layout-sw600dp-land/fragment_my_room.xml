@@ -2,25 +2,25 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/container_my_room"
+    android:id="@+id/container_my_room_left"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_centerVertical="true"
     android:layout_centerHorizontal="true" >
 
     <com.project.furnishyourhome.models.CanvasView
         android:id="@+id/cv_room_canvas"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="7" />
 
 
     <org.lucasr.twowayview.TwoWayView
         android:id="@+id/twv_furniture"
-        style="@style/TwoWayViewHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        style="@style/TwoWayViewVertical"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="2"
         android:drawSelectorOnTop="false"
         android:background="@color/list_background"/>
