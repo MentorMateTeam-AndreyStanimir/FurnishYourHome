@@ -20,6 +20,10 @@ import java.util.ArrayList;
  */
 public class MyFurnitureFragment extends Fragment {
 
+    private ArrayList <CustomListItem> chosenItems;
+    TextView textView;
+    ListView listView;
+
     public static MyFurnitureFragment newInstance(Bundle args) {
         MyFurnitureFragment f = new MyFurnitureFragment();
         f.setArguments(args);
@@ -27,26 +31,40 @@ public class MyFurnitureFragment extends Fragment {
     }
 
     public static MyFurnitureFragment newInstance() {
-        MyFurnitureFragment f = new MyFurnitureFragment();
-        return f;
+        return new MyFurnitureFragment();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("chosenItems", chosenItems);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_my_furniture, container, false);
 
-        TextView textView = (TextView) rootView.findViewById(R.id.tv_empty_list_info);
+        textView = (TextView) rootView.findViewById(R.id.tv_empty_list_info);
 
-        if(getArguments() != null) {
+        chosenItems = new ArrayList<>();
+        if(savedInstanceState != null) {
+            textView.setText("");
             textView.setVisibility(View.GONE);
-
-            ArrayList <CustomListItem> list = getArguments().getParcelableArrayList("chosenItems");
-
-            ListView listView = (ListView) rootView.findViewById(R.id.lv_my_furniture);
-            listView.setAdapter(new CustomListAdapter(getActivity().getApplicationContext(), R.layout.drawer_list_item, list));
-        } else {
-            textView.setVisibility(View.VISIBLE);
+            chosenItems = savedInstanceState.getParcelableArrayList("chosenItems");
         }
+
+        listView = (ListView) rootView.findViewById(R.id.lv_my_furniture);
+
+        if(chosenItems.isEmpty() && getArguments()!=null) {
+            textView.setText("");
+            textView.setVisibility(View.GONE);
+            chosenItems = getArguments().getParcelableArrayList("chosenItems");
+        } else {
+
+            textView.setText("List is empty.");
+        }
+
+        listView.setAdapter(new CustomListAdapter(getActivity().getApplicationContext(), R.layout.drawer_list_item, chosenItems));
         return rootView;
     }
 }
