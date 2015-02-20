@@ -33,9 +33,14 @@
     <string name="meters">meters</string>
     <!-- activity_add_room items -->
 
-    <array name="tabs">
+    <array name="tabs_three">
         <item>My Room</item>
         <item>My furniture</item>
+        <item>Map</item>
+    </array>
+
+    <array name="tabs_two">
+        <item>My Room</item>
         <item>Map</item>
     </array>
 </resources>

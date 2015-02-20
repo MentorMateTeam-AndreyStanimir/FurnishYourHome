@@ -30,9 +30,9 @@ import java.util.ArrayList;
 public class MyRoomFragment extends Fragment {
     private static MyRoomFragment instance = null;
 
-    ArrayList<CustomBitmap> arrayList;
-    ArrayList<CustomListItem> listItems;
-    ArrayList<CustomListItem> chosenItems;
+    private ArrayList<CustomBitmap> arrayList;
+    private ArrayList<CustomListItem> listItems;
+    private ArrayList<CustomListItem> chosenItems;
     private CanvasView customCanvas;
 
     int oldh;

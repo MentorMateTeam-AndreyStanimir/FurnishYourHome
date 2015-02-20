@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,7 +51,6 @@ import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable {
 
-    private final int Numboftabs = 3;
     private static boolean isFirstTime = true;
     private static ArrayList<Furniture> furnitures;
     private static ArrayList<Store> stores;
@@ -203,8 +203,17 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     private void setActionBarTabs() {
 
+        int orientation = getResources().getConfiguration().orientation;
+        int tabsNumber = 3;
+        CharSequence[] titles = getResources().getStringArray(R.array.tabs_three);
+
+        if(this.checkIsTablet() && orientation == Configuration.ORIENTATION_LANDSCAPE){
+            tabsNumber = 2;
+            getResources().getStringArray(R.array.tabs_two);
+        }
+
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
-        adapterViewPager =  new ViewPagerAdapter(getSupportFragmentManager(), getResources().getStringArray(R.array.tabs), Numboftabs);
+        adapterViewPager =  new ViewPagerAdapter(getSupportFragmentManager(), titles, tabsNumber);
 
         // Assigning ViewPager View and setting the adapter
         pager = (CustomViewPager) findViewById(R.id.pager);
@@ -227,6 +236,29 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     }
 
+    private boolean checkIsTablet() {
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int widthPixels = metrics.widthPixels;
+        int heightPixels = metrics.heightPixels;
+        float widthDpi = metrics.xdpi;
+        float heightDpi = metrics.ydpi;
+        float widthInches = widthPixels / widthDpi;
+        float heightInches = heightPixels / heightDpi;
+
+        double diagonalInches = Math.sqrt(
+                (widthInches * widthInches) +
+                        (heightInches * heightInches)
+        );
+        if (diagonalInches >= 6){
+            //Device is a 6" tablet
+            return true;
+        }
+
+        return false;
+    }
+
     private void setLeftDrawer() {
 
         //Initialize left menu
@@ -238,7 +270,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         pro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                Toast.makeText(getApplicationContext(), "Clicked",                                                                                    Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
             }
         });
         this.mDrawerLeftList.addHeaderView(header);

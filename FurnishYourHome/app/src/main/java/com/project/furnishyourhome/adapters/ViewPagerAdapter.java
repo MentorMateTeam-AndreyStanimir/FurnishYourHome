@@ -1,18 +1,12 @@
 package com.project.furnishyourhome.adapters;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.project.furnishyourhome.R;
 import com.project.furnishyourhome.fragments.MapFragment;
 import com.project.furnishyourhome.fragments.MyFurnitureFragment;
 import com.project.furnishyourhome.fragments.MyRoomFragment;
-import com.project.furnishyourhome.models.CustomListItem;
-
-import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * Created by Andrey on 11.2.2015 г..
@@ -21,15 +15,15 @@ import java.util.Map;
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
     CharSequence Titles[]; // This will Store the Titles of the Tabs which are Going to be passed when ViewPagerAdapter is created
-    int NumbOfTabs; // Store the number of tabs, this will also be passed when the ViewPagerAdapter is created
+    int numbOfTabs; // Store the number of tabs, this will also be passed when the ViewPagerAdapter is created
 
 
     // Build a Constructor and assign the passed Values to appropriate values in the class
-    public ViewPagerAdapter(FragmentManager fm,CharSequence mTitles[], int mNumbOfTabsumb) {
+    public ViewPagerAdapter(FragmentManager fm,CharSequence mTitles[], int mNumbOfTabs) {
         super(fm);
 
         this.Titles = mTitles;
-        this.NumbOfTabs = mNumbOfTabsumb;
+        this.numbOfTabs = mNumbOfTabs;
 
     }
 
@@ -54,16 +48,20 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
             MyFurnitureFragment myFurnitureFragment = MyFurnitureFragment.newInstance(b);
             //#############################################################*/
 
-            MyFurnitureFragment myFurnitureFragment = MyFurnitureFragment.newInstance();
-            return myFurnitureFragment;
+            Fragment fragment = null;
+
+            if(this.numbOfTabs == 3) {
+                fragment = MyFurnitureFragment.newInstance();
+            } else {
+                fragment = MapFragment.newInstance();
+            }
+            return fragment;
         }
         else            // As we are having 3 tabs if the position is not 0 or 1 it must be 2 so we are returning third tab
         {
             MapFragment mapFragment = MapFragment.newInstance();
             return mapFragment;
         }
-
-
     }
 
     // This method return the titles for the Tabs in the Tab Strip
@@ -77,6 +75,6 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return NumbOfTabs;
+        return numbOfTabs;
     }
 }

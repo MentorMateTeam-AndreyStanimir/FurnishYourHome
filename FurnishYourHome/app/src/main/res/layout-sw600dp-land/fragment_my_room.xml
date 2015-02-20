@@ -1,28 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/container_my_room_left"
-    android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:layout_centerVertical="true"
-    android:layout_centerHorizontal="true" >
+    android:id="@+id/container_my_room_land">
 
-    <com.project.furnishyourhome.models.CanvasView
-        android:id="@+id/cv_room_canvas"
+    <LinearLayout
+        android:id="@+id/container_my_room"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="7" />
+        android:orientation="horizontal"
+        android:layout_weight="2">
+
+        <com.project.furnishyourhome.models.CanvasView
+            android:id="@+id/cv_room_canvas"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="7" />
 
 
-    <org.lucasr.twowayview.TwoWayView
-        android:id="@+id/twv_furniture"
-        style="@style/TwoWayViewVertical"
+        <org.lucasr.twowayview.TwoWayView
+            android:id="@+id/twv_furniture"
+            style="@style/TwoWayViewVertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:drawSelectorOnTop="false"
+            android:background="@color/list_background"/>
+
+    </LinearLayout>
+    <fragment
+        android:id="@+id/fragment_my_room_right"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="2"
-        android:drawSelectorOnTop="false"
-        android:background="@color/list_background"/>
+        android:layout_weight="1"
+        android:name="com.project.furnishyourhome.fragments.MyFurnitureFragment"
+        tools:layout="@layout/fragment_my_furniture">
 
+        </fragment>
 </LinearLayout>
