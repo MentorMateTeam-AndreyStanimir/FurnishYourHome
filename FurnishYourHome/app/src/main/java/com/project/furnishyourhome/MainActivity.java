@@ -1,15 +1,17 @@
 package com.project.furnishyourhome;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.provider.Settings;
+import android.os.AsyncTask;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
@@ -29,7 +31,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -53,12 +54,12 @@ import com.project.furnishyourhome.models.parse.StoreParse;
 import com.project.furnishyourhome.models.parse.TableParse;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable {
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private Context context;
     private static boolean isFirstTime = true;
     private static ArrayList<Furniture> furnitures;
     private static ArrayList<Store> stores;
@@ -76,7 +77,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private ViewPagerAdapter adapterViewPager;
     private SlidingTabLayout tabs;
 
-    private boolean mTwoPane; // check is in Landscape mode
     private boolean swipeable;
 
     ProgressDialog progressDialog;
@@ -87,13 +87,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //MAZALO BEGIN
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Loading data");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setIndeterminate(true);
-        Log.d(TAG, "loading data");
-        progressDialog.show();
+        this.context = this;
 
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -104,7 +98,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             DialogFragment dialog = new NetworkDialog();
             dialog.show(getSupportFragmentManager(), "NetworkDialog");
         }
-        //MAZALO END :d
 
         // Enable Local Datastore.
         if(isFirstTime) {
@@ -117,9 +110,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
        if(isFirstTime) {
            this.leftNavDrawerItems = new ArrayList<CustomListItem>();
-           loadData();
-           isFirstTime = false;
-        }
+           this.furnitures = new ArrayList<Furniture>();
+           stores = new ArrayList<Store>();
+       }
 
         this.detector = new SimpleGestureFilter(this,this);
         this.swipeable = true;
@@ -131,10 +124,14 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Log.d(TAG, "loading myRoomFragment");
-        //progressDialog.dismiss();
-        myRoomFragment = MyRoomFragment.newInstance(this.furnitures);
+        if(isFirstTime && mWifi.isConnected()){
+            loadData();
 
+            isFirstTime = false;
+        }
+        Log.d(TAG, "loading myRoomFragment");
+
+        this.myRoomFragment = MyRoomFragment.newInstance(this.furnitures);
     }
 
     private void setCustomToolbar() {
@@ -151,88 +148,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     }
 
     private void loadData() {
-
-        furnitures = new ArrayList<Furniture>();
-        stores = new ArrayList<Store>();
-
-        try {
-            final ParseQuery<ParseObject> typesQuery = ParseQuery.getQuery("Furniture");
-            List<ParseObject> parseObjects = typesQuery.find();
-
-            for (ParseObject obj : parseObjects){
-                String type = obj.getString("type");
-                ParseFile imgParse = obj.getParseFile("icon");
-                byte[] imageByte = new byte[0];
-                try {
-                    imageByte = imgParse.getData();
-                } catch (ParseException e1) {
-                    e1.printStackTrace();
-                }
-
-                Bitmap icon = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length);
-                CustomListItem item = new CustomListItem(type, icon);
-                leftNavDrawerItems.add(item);
-            }
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        for (CustomListItem item : leftNavDrawerItems) {
-
-            String type = item.getTitle();
-
-            if(type.equals("Table")) {
-                final ParseQuery<TableParse> query = ParseQuery.getQuery(TableParse.class);
-                List<TableParse> tables = null;
-
-                try {
-                    tables = query.find();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                if (tables != null) {
-
-                    for (TableParse table : tables) {
-                        furnitures.add(table.getTable());
-                    }
-                }
-
-            } else if (type.equals("Sofa")) {
-                final ParseQuery<SofaParse> query = ParseQuery.getQuery(SofaParse.class);
-                List<SofaParse> sofas = null;
-
-                try {
-                    sofas = query.find();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                if(sofas != null) {
-
-                    for (SofaParse sofa : sofas) {
-                        furnitures.add(sofa.getSofa());
-                    }
-                }
-            }
-        }
-
-        final ParseQuery<StoreParse> storeQuery = ParseQuery.getQuery(StoreParse.class);
-        List<StoreParse> storesList = null;
-        try{
-            storesList = storeQuery.find();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        for (StoreParse store : storesList){
-            stores.add(store.getStore());
-        }
-
-        Log.d(TAG, "Success");
-        progressDialog.dismiss();
-
+        (new GetAsyncResult()).execute();
     }
 
     private void setActionBarTabs() {
@@ -447,5 +363,118 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     @Override
     public void setSwipeable(boolean swipeable) {
         this.swipeable = swipeable;
+    }
+
+    private class GetAsyncResult extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                final ParseQuery<ParseObject> typesQuery = ParseQuery.getQuery("Furniture");
+                List<ParseObject> parseObjects = typesQuery.find();
+
+                for (ParseObject obj : parseObjects) {
+                    String type = obj.getString("type");
+                    ParseFile imgParse = obj.getParseFile("icon");
+                    byte[] imageByte = new byte[0];
+                    try {
+                        imageByte = imgParse.getData();
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+
+                    Bitmap icon = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length);
+                    CustomListItem item = new CustomListItem(type, icon);
+                    leftNavDrawerItems.add(item);
+                }
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            for (CustomListItem item : leftNavDrawerItems) {
+
+                String type = item.getTitle();
+
+                if (type.equals("Table")) {
+                    final ParseQuery<TableParse> query = ParseQuery.getQuery(TableParse.class);
+                    List<TableParse> tables = null;
+
+                    try {
+                        tables = query.find();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (tables != null) {
+
+                        for (TableParse table : tables) {
+                            furnitures.add(table.getTable());
+                        }
+                    }
+
+                } else if (type.equals("Sofa")) {
+                    final ParseQuery<SofaParse> query = ParseQuery.getQuery(SofaParse.class);
+                    List<SofaParse> sofas = null;
+
+                    try {
+                        sofas = query.find();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (sofas != null) {
+
+                        for (SofaParse sofa : sofas) {
+                            furnitures.add(sofa.getSofa());
+                        }
+                    }
+                }
+            }
+
+            final ParseQuery<StoreParse> storeQuery = ParseQuery.getQuery(StoreParse.class);
+            List<StoreParse> storesList = null;
+            try {
+                storesList = storeQuery.find();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            for (StoreParse store : storesList) {
+                stores.add(store.getStore());
+            }
+
+            Log.d(TAG, "Success");
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = new ProgressDialog(context);
+            progressDialog.setTitle("Loading data");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.setIndeterminate(true);
+            Log.d(TAG, "loading data");
+            progressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            myRoomFragment = MyRoomFragment.newInstance(furnitures);
+            progressDialog.dismiss();
+
+            //myRoomFragment.onResume();  // not working
+            Activity activity = (Activity) context;
+            int orientation = activity.getResources().getConfiguration().orientation;
+
+            // for now the only way it works
+            if(orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            } else {
+                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            }
+        }
     }
 }
