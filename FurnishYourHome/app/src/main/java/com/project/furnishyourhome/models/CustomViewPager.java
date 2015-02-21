@@ -28,7 +28,6 @@ public class CustomViewPager extends ViewPager implements ISwipeable {
     public CustomViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-
         initializeElements(context);
     }
 

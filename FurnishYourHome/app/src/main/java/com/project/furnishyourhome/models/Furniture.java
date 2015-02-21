@@ -8,15 +8,15 @@ import java.io.ByteArrayOutputStream;
  * Created by Andrey on 18.2.2015 г..
  */
 public abstract class Furniture {
-    private String dimensions;
-    private Bitmap drawable;
-    private String info;
-    private String material;
-    private String name;
-    private double price;
-    private Store store;
-    private String storeId;
-    private String objectId;
+    protected String dimensions;
+    protected Bitmap drawable;
+    protected String info;
+    protected String material;
+    protected String name;
+    protected double price;
+    protected Store store;
+    protected String storeId;
+    protected String objectId;
 
     public String getDimensions() {
         return dimensions;
@@ -26,7 +26,6 @@ public abstract class Furniture {
     }
 
     public Furniture(String storeId) {
-        super();
         this.storeId = storeId;
     }
 

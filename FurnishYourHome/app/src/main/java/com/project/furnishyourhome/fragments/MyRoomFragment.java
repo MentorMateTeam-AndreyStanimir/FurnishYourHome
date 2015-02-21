@@ -64,6 +64,7 @@ public class MyRoomFragment extends Fragment {
             CustomListItem listItem = new CustomListItem();
             listItem.setTitle(item.getName());
             listItem.setBitmap(item.getDrawable());
+            listItem.setStore(item.getStore());
             f.listItems.add(listItem);
         }
     }

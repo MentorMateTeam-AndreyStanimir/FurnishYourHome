@@ -10,12 +10,14 @@ import java.io.ByteArrayOutputStream;
 /**
  * Created by Andrey on 10.2.2015 г..
  */
-public class CustomListItem implements Parcelable {
+public class CustomListItem extends Furniture implements Parcelable {
     private String title;
     private Bitmap bitmap;
     private byte[] byteArray;
 
-    public CustomListItem(){}
+    public CustomListItem(){
+        super();
+    }
 
     public CustomListItem(String title, Bitmap bitmap){
         this.title = title;
@@ -26,6 +28,7 @@ public class CustomListItem implements Parcelable {
         this.title = in.readString();
         in.readByteArray(byteArray);
         this.bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+        this.store = in.readParcelable(Store.class.getClassLoader());
     }
 
     @Override
@@ -45,6 +48,8 @@ public class CustomListItem implements Parcelable {
         this.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] byteArray = stream.toByteArray();
         out.writeByteArray(byteArray);
+
+        out.writeParcelable(this.store, 0);
     }
 
     public static final Parcelable.Creator<CustomListItem> CREATOR = new Parcelable.Creator<CustomListItem>() {
@@ -71,5 +76,15 @@ public class CustomListItem implements Parcelable {
 
     public void setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
+    }
+
+    @Override
+    public Store getStore() {
+        return store;
+    }
+
+    @Override
+    public void setStore(Store store) {
+        this.store = store;
     }
 }

@@ -27,6 +27,13 @@ public class MapFragment extends Fragment {
         return instance;
     }
 
+    public static MapFragment instance (Bundle args){
+        instance = MapFragment.newInstance();
+        instance.setArguments(args);
+
+        return instance;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_map,container,false);

@@ -2,10 +2,12 @@ package com.project.furnishyourhome.models.parse;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.project.furnishyourhome.models.Store;
 import com.project.furnishyourhome.models.Table;
@@ -20,13 +22,6 @@ import java.io.ByteArrayOutputStream;
 public class StoreParse extends ParseObject {
 
     private String objectId;
-    private String address;
-    private String customersPhone;
-    private String email;
-    private ParseFile logo;
-    private String name;
-    private String webpage;
-    private String workingHours;
 
     public StoreParse(){
     }
@@ -101,6 +96,19 @@ public class StoreParse extends ParseObject {
         put("workingHours", workingHours);
     }
 
+    public Location getLocation() {
+        ParseGeoPoint geoPoint = getParseGeoPoint("location");
+        Location location = new Location("");
+
+        location.setLatitude(geoPoint.getLatitude());
+        location.setLongitude(geoPoint.getLongitude());
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        put("location", new ParseGeoPoint(location.getLatitude(), location.getLongitude()));
+    }
+
     public Store getStore(){
         Store store = new Store();
 
@@ -112,6 +120,7 @@ public class StoreParse extends ParseObject {
         store.setWorkingHours(this.getWorkingHours());
         store.setLogo(this.getLogo());
         store.setObjectId(this.getObjectId());
+        store.setLocation(this.getLocation());
 
         return store;
     }
