@@ -20,7 +20,6 @@ import java.io.ByteArrayOutputStream;
 @ParseClassName("Table")
 public class TableParse extends FurnitureParse {
 
-
     public Table getTable(){
         Table table = new Table(this.storeId);
 

@@ -1,9 +1,7 @@
 package com.project.furnishyourhome.models;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
@@ -13,7 +11,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import com.project.furnishyourhome.MainActivity;
 import com.project.furnishyourhome.interfaces.ISwipeable;
 
 import java.util.ArrayList;
@@ -129,8 +126,8 @@ public class CanvasView extends View
 
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        Bitmap mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        Canvas mCanvas = new Canvas(mBitmap);
+        //Bitmap mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        //Canvas mCanvas = new Canvas(mBitmap);
         canvasX = getX();
         canvasXend = (canvasX + w);
         canvasY = getY();

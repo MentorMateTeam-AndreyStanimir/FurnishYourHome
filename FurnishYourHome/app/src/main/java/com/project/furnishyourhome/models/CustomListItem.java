@@ -7,17 +7,19 @@ import android.os.Parcelable;
 
 import java.io.ByteArrayOutputStream;
 
-/**
- * Created by Andrey on 10.2.2015 г..
- */
-public class CustomListItem extends Furniture implements Parcelable {
+public class CustomListItem implements Parcelable {
     private String title;
     private Bitmap bitmap;
     private byte[] byteArray;
+    private double price;
+    private String dimensions;
+    private String material;
+    private String info;
 
-    public CustomListItem(){
-        super();
-    }
+    private Store store;
+    private String storeId;
+
+    public CustomListItem(){}
 
     public CustomListItem(String title, Bitmap bitmap){
         this.title = title;
@@ -28,7 +30,6 @@ public class CustomListItem extends Furniture implements Parcelable {
         this.title = in.readString();
         in.readByteArray(byteArray);
         this.bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-        this.store = in.readParcelable(Store.class.getClassLoader());
     }
 
     @Override
@@ -46,10 +47,8 @@ public class CustomListItem extends Furniture implements Parcelable {
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         this.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
+        byteArray = stream.toByteArray();
         out.writeByteArray(byteArray);
-
-        out.writeParcelable(this.store, 0);
     }
 
     public static final Parcelable.Creator<CustomListItem> CREATOR = new Parcelable.Creator<CustomListItem>() {
@@ -78,13 +77,51 @@ public class CustomListItem extends Furniture implements Parcelable {
         this.bitmap = bitmap;
     }
 
-    @Override
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public String getDimensions() {
+        return dimensions;
+    }
+
+    public void setDimensions(String dimensions) {
+        this.dimensions = dimensions;
+    }
+
+    public String getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(String material) {
+        this.material = material;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
+    }
+
     public Store getStore() {
         return store;
     }
 
-    @Override
     public void setStore(Store store) {
         this.store = store;
+    }
+
+    public String getStoreId() {
+        return storeId;
+    }
+
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
     }
 }
