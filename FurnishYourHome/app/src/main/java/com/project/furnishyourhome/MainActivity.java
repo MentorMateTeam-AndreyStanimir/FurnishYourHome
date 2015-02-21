@@ -169,6 +169,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         // Assigning ViewPager View and setting the adapter
         pager = (CustomViewPager) findViewById(R.id.pager);
+        pager.setOffscreenPageLimit(2);
         pager.setAdapter(adapterViewPager);
 
         // Assiging the Sliding Tab Layout View
