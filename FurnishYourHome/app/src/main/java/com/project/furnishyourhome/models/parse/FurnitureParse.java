@@ -28,7 +28,7 @@ public abstract class FurnitureParse extends ParseObject {
     }
 
     public String getDimension() {
-        this.dimensions = getString("dimentions");
+        this.dimensions = getString("dimensions");
 
         return this.dimensions;
     }

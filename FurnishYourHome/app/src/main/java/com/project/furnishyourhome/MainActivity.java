@@ -15,6 +15,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
@@ -63,6 +64,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
+    public static ArrayList<CustomListItem> horizontalListViewInMyRoomFragment;
+    public static ArrayList<CustomListItem> chosenItemsInMyRoomFragment;
+
     private Context context;
     private static boolean isFirstTime = true;
     private static ArrayList<Furniture> furnitures;
@@ -74,7 +78,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private ListView mDrawerLeftList;
     private CustomListAdapter adapter;
     private SimpleGestureFilter detector;
-    private MyRoomFragment myRoomFragment;
+    //private MyRoomFragment myRoomFragment;
 
     private Toolbar toolbar;
     private CustomViewPager pager;
@@ -83,16 +87,11 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     private boolean swipeable;
 
-    ProgressDialog progressDialog;
-
+    private ProgressDialog progressDialog;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        this.context = this;
-
+    protected void onResume() {
+        super.onResume();
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         if (mWifi.isConnected()) {
@@ -103,20 +102,30 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             dialog.show(getSupportFragmentManager(), "NetworkDialog");
         }
 
+        if(isFirstTime && mWifi.isConnected()){
+            loadData();
+            isFirstTime = false;
+        }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        this.context = this;
+
         // Enable Local Datastore.
         if(isFirstTime) {
             Parse.enableLocalDatastore(this);
+            leftNavDrawerItems = new ArrayList<>();
+            furnitures = new ArrayList<>();
+            stores = new ArrayList<>();
         }
         ParseObject.registerSubclass(SofaParse.class);
         ParseObject.registerSubclass(StoreParse.class);
         ParseObject.registerSubclass(TableParse.class);
         Parse.initialize(this, "ueFuNcN0Cx1xgBzycLJOgwqGqLwDzlt9zJEHulqJ", "s1vnSldgEhOfOMyBfIXSnKsl8F7YHuGNXisSr2jM");
-
-       if(isFirstTime) {
-           this.leftNavDrawerItems = new ArrayList<CustomListItem>();
-           this.furnitures = new ArrayList<Furniture>();
-           stores = new ArrayList<Store>();
-       }
 
         this.detector = new SimpleGestureFilter(this,this);
         this.swipeable = true;
@@ -128,14 +137,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        if(isFirstTime && mWifi.isConnected()){
-            loadData();
-
-            isFirstTime = false;
-        }
-        Log.d(TAG, "loading myRoomFragment");
-
-        this.myRoomFragment = MyRoomFragment.newInstance(this.furnitures);
+        //this.myRoomFragment = MyRoomFragment.newInstance(furnitures);
     }
 
     private void setCustomToolbar() {
@@ -171,6 +173,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         // Assigning ViewPager View and setting the adapter
         pager = (CustomViewPager) findViewById(R.id.pager);
+        pager.setOffscreenPageLimit(2);
         pager.setAdapter(adapterViewPager);
 
         // Assiging the Sliding Tab Layout View
@@ -205,12 +208,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                 (widthInches * widthInches) +
                         (heightInches * heightInches)
         );
-        if (diagonalInches >= 6){
-            //Device is a 6" tablet
-            return true;
-        }
-
-        return false;
+        return (diagonalInches >= 6);
     }
 
     private void setLeftDrawer() {
@@ -219,9 +217,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         this.mDrawerLeftList = (ListView) findViewById(R.id.left_drawer);
 
         // adding header to listView
-        View header=getLayoutInflater().inflate(R.layout.header, null);
-        ImageView pro=(ImageView)header.findViewById(R.id.profile_image);
-        pro.setOnClickListener(new View.OnClickListener() {
+        View header = getLayoutInflater().inflate(R.layout.header, null);
+        ImageView ivProfile =(ImageView)header.findViewById(R.id.profile_image);
+        ivProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
                 Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
@@ -230,6 +228,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         this.mDrawerLeftList.addHeaderView(header);
 
         // Set the adapter
+        Log.d(TAG, "leftNavDrawerItems.size():"+leftNavDrawerItems.size());
         adapter = new CustomListAdapter(this, R.layout.drawer_list_item, leftNavDrawerItems);
         mDrawerLeftList.setAdapter(adapter);
         mDrawerLeftList.setOnItemClickListener(MainActivity.this);
@@ -336,7 +335,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     }
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent me){
+    public boolean dispatchTouchEvent(@NonNull MotionEvent me){
         // Call onTouchEvent of SimpleGestureFilter class
         this.detector.onTouchEvent(me);
         return super.dispatchTouchEvent(me);
@@ -391,13 +390,11 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                     CustomListItem item = new CustomListItem(type, icon);
                     leftNavDrawerItems.add(item);
                 }
-
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 
             for (CustomListItem item : leftNavDrawerItems) {
-
                 String type = item.getTitle();
 
                 if (type.equals("Table")) {
@@ -411,12 +408,10 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                     }
 
                     if (tables != null) {
-
                         for (TableParse table : tables) {
                             furnitures.add(table.getTable());
                         }
                     }
-
                 } else if (type.equals("Sofa")) {
                     final ParseQuery<SofaParse> query = ParseQuery.getQuery(SofaParse.class);
                     List<SofaParse> sofas = null;
@@ -428,7 +423,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                     }
 
                     if (sofas != null) {
-
                         for (SofaParse sofa : sofas) {
                             furnitures.add(sofa.getSofa());
                         }
@@ -444,8 +438,10 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                 e.printStackTrace();
             }
 
-            for (StoreParse store : storesList) {
-                stores.add(store.getStore());
+            if(storesList != null) {
+                for (StoreParse store : storesList) {
+                    stores.add(store.getStore());
+                }
             }
 
             Log.d(TAG, "Success");
@@ -464,10 +460,31 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            myRoomFragment = MyRoomFragment.newInstance(furnitures);
+            //myRoomFragment = MyRoomFragment.newInstance(furnitures);
+            Bundle args = new Bundle();
+            ArrayList<CustomListItem> listItems = new ArrayList<>();
+            for (int i = 0; i<furnitures.size(); i++) {
+                CustomListItem item = new CustomListItem();
+                item.setTitle(furnitures.get(i).getName());
+                item.setBitmap(furnitures.get(i).getDrawable());
+                item.setPrice(furnitures.get(i).getPrice());
+                item.setDimensions(furnitures.get(i).getDimensions());
+                item.setMaterial(furnitures.get(i).getMaterial());
+                item.setInfo(furnitures.get(i).getInfo());
+                item.setStore(furnitures.get(i).getStore());
+                listItems.add(item);
+            }
+            args.putParcelableArrayList("horizontalListItems", listItems);
+
+            Log.d(TAG, "loading MyRoomFragment.newInstance(args)");
+            FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+            tr.replace(R.id.container_my_room, MyRoomFragment.newInstance(args));
+            //tr.replace(R.id.container_my_room, MyRoomFragment.newInstance(args), "MyRoomFragment");
+            tr.commit();
+
             progressDialog.dismiss();
 
-            //myRoomFragment.onResume();  // not working
+            /*//myRoomFragment.onResume();  // not working
             Activity activity = (Activity) context;
             int orientation = activity.getResources().getConfiguration().orientation;
 
@@ -478,7 +495,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             } else {
                 activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-            }
+            }*/
         }
     }
 }

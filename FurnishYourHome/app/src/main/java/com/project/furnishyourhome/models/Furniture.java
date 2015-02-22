@@ -1,26 +1,24 @@
 package com.project.furnishyourhome.models;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.io.ByteArrayOutputStream;
 
-/**
- * Created by Andrey on 18.2.2015 г..
- */
-public abstract class Furniture {
-    protected String dimensions;
-    protected Bitmap drawable;
-    protected String info;
-    protected String material;
-    protected String name;
-    protected double price;
-    protected Store store;
-    protected String storeId;
-    protected String objectId;
+public abstract class Furniture implements Parcelable {
 
-    public String getDimensions() {
-        return dimensions;
-    }
+    private String objectId;
+    private String name;
+    private Bitmap drawable;
+    private byte[] byteArray;
+    private double price;
+    private String dimensions;
+    private String material;
+    private String info;
+    private Store store;
+    private String storeId;
 
     public Furniture(){
     }
@@ -28,6 +26,73 @@ public abstract class Furniture {
     public Furniture(String storeId) {
         this.storeId = storeId;
     }
+
+    protected Furniture(Parcel in) {
+        super();
+        objectId = in.readString();
+        name = in.readString();
+
+        in.readByteArray(byteArray);
+        drawable = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+
+        price = in.readDouble();
+        dimensions = in.readString();
+        material = in.readString();
+        info = in.readString();
+        store = in.readParcelable(Store.class.getClassLoader());
+        storeId = in.readString();
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeString(objectId);
+        out.writeString(name);
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        drawable.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        out.writeByteArray(byteArray);
+
+        out.writeDouble(price);
+        out.writeString(dimensions);
+        out.writeString(material);
+        out.writeString(info);
+        out.writeParcelable(store,flags);
+        out.writeString(storeId);
+    }
+
+    public static final Parcelable.Creator<Furniture> CREATOR = new Parcelable.Creator<Furniture>() {
+        public Furniture createFromParcel(Parcel in) {
+            String type = in.readString();
+            Furniture furniture = null;
+
+            if(type.equals("Sofa")) {
+                furniture = new Sofa(in);
+            }
+
+            if(type.equals("Table")) {
+                furniture = new Table(in);
+            }
+
+            return furniture;
+        }
+
+        public Furniture[] newArray(int size) {
+
+            return new Furniture[size];
+        }
+    };
+
+
 
     public String getObjectId() {
         return objectId;
@@ -43,6 +108,10 @@ public abstract class Furniture {
 
     public void setStoreId(String storeId) {
         this.storeId = storeId;
+    }
+
+    public String getDimensions() {
+        return dimensions;
     }
 
     public void setDimensions(String dimensions) {
@@ -101,7 +170,8 @@ public abstract class Furniture {
     public byte[] getImageAsByteArray (){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         getDrawable().compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
+        //byte[] byteArray = stream.toByteArray();
+        byteArray = stream.toByteArray(); // TODO: CHANGED
 
         return byteArray;
     }

@@ -7,35 +7,34 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 
-/**
- * Created by Andrey on 18.2.2015 г..
- */
-public class Store implements Parcelable{
+public class Store implements Parcelable {
     private String objectId;
+    private String name;
+    private Bitmap logo;
+    private byte[] byteArray;
+    private String workingHours;
+    private String email;
     private String address;
     private String customersPhone;
-    private String email;
-    private Bitmap logo;
-    private String name;
     private String webpage;
-    private String workingHours;
     private Location location;
-    private byte[] byteArray;
 
     public Store (){}
 
     public Store (Parcel in){
-        ArrayList<String> strings = new ArrayList<String>();
-        in.readStringList(strings);
-        this.setAddress(strings.get(0));
-        this.setCustomersPhone(strings.get(1));
-        this.setEmail(strings.get(2));
-        this.setName(strings.get(3));
-        this.setWebpage(strings.get(4));
-        this.setWorkingHours(strings.get(5));
+         super();
+        objectId 		= in.readString();
+        name 			= in.readString();
+
+        in.readByteArray(byteArray);
+        logo 			= BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+
+        workingHours 	= in.readString();
+        email 			= in.readString();
+        address 		= in.readString();
+        customersPhone 	= in.readString();
+        webpage			= in.readString();
 
         double[] doubleArray = new double[2];
         in.readDoubleArray(doubleArray);
@@ -43,11 +42,13 @@ public class Store implements Parcelable{
         newLocation.setLatitude(doubleArray[0]);
         newLocation.setLongitude(doubleArray[1]);
         this.setLocation(newLocation);
-
-        in.readByteArray(byteArray);
-        this.setLogo(BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length));
-
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -55,25 +56,25 @@ public class Store implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        out.writeStringList(new ArrayList<String>(
-                Arrays.asList(this.getAddress(),
-                        this.getCustomersPhone(),
-                        this.getEmail(),
-                        this.getName(),
-                        this.getWebpage(),
-                        this.getWorkingHours())));
+        out.writeString(objectId);
+        out.writeString(name);
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        logo.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        out.writeByteArray(byteArray);
+
+        out.writeString(workingHours);
+        out.writeString(email);
+        out.writeString(address);
+        out.writeString(customersPhone);
+        out.writeString(webpage);
 
         Location loc = getLocation();
         out.writeDoubleArray(new double[]{
                 loc.getLatitude(),
                 loc.getLongitude()
         });
-
-        Bitmap parcelLogo = this.getLogo();
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        parcelLogo.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-        out.writeByteArray(byteArray);
     }
 
     public static final Parcelable.Creator<Store> CREATOR = new Creator<Store>(){

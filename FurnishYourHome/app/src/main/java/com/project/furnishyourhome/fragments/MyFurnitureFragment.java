@@ -6,8 +6,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.project.furnishyourhome.R;
 import com.project.furnishyourhome.adapters.CustomListAdapter;
@@ -60,11 +62,21 @@ public class MyFurnitureFragment extends Fragment {
             textView.setVisibility(View.GONE);
             chosenItems = getArguments().getParcelableArrayList("chosenItems");
         } else {
-
             textView.setText("List is empty.");
         }
 
-        listView.setAdapter(new CustomListAdapter(getActivity().getApplicationContext(), R.layout.drawer_list_item, chosenItems));
+        listView.setAdapter(new CustomListAdapter(getActivity().getApplicationContext(), R.layout.favourites_list_item, chosenItems));
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(
+                        getActivity(),
+                        "store location: lat "
+                                +chosenItems.get(position).getStore().getLocation().getLatitude()
+                                +" lon "+chosenItems.get(position).getStore().getLocation().getLongitude(),
+                        Toast.LENGTH_LONG).show();
+            }
+        });
         return rootView;
     }
 }

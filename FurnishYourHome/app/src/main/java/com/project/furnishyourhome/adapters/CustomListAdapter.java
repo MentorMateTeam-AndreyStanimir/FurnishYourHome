@@ -31,12 +31,12 @@ public class CustomListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return this.listItems.size();
+        return listItems.size();
     }
 
     @Override
     public CustomListItem getItem(int position) {
-        return this.listItems.get(position);
+        return listItems.get(position);
     }
 
     @Override
@@ -51,13 +51,17 @@ public class CustomListAdapter extends BaseAdapter {
             convertView = mInflater.inflate(layoutID, null);
         }
 
-        ImageView imgIcon = (ImageView) convertView.findViewById(R.id.iconMenu);
-        TextView txtTitle = (TextView) convertView.findViewById(R.id.titleMenu);
+        ImageView ivIcon = (ImageView) convertView.findViewById(R.id.iv_icon_menu);
+        TextView tvTitle = (TextView) convertView.findViewById(R.id.tv_title_menu);
+        if(layoutID == R.layout.favourites_list_item) {
+            TextView tvInfo = (TextView) convertView.findViewById(R.id.tv_extra_info_menu);
+            tvInfo.setText("Store: "+listItems.get(position).getStore().getName()); // TODO: need to be the store
+        }
 
-        Bitmap bitmap = this.getItem(position).getBitmap();
+        Bitmap bitmap = listItems.get(position).getBitmap();
 
-        imgIcon.setImageBitmap(bitmap);
-        txtTitle.setText(this.listItems.get(position).getTitle());
+        ivIcon.setImageBitmap(bitmap);
+        tvTitle.setText(listItems.get(position).getTitle());
 
         return convertView;
     }

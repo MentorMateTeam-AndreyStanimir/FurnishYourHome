@@ -6,7 +6,7 @@
     android:background="@drawable/list_selector">
 
     <ImageView
-        android:id="@+id/iconMenu"
+        android:id="@+id/iv_icon_menu"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="5dp"
@@ -15,7 +15,7 @@
         android:layout_gravity="center_vertical"/>
 
     <TextView
-        android:id="@+id/titleMenu"
+        android:id="@+id/tv_title_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Text menu"
