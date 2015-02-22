@@ -11,7 +11,6 @@ import com.project.furnishyourhome.fragments.MyFurnitureFragment;
 import com.project.furnishyourhome.fragments.MyRoomFragment;
 import com.project.furnishyourhome.location.MyLocationListener;
 
-import java.util.ArrayList;
 
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     private static final String TAG = ViewPagerAdapter.class.getSimpleName();
@@ -38,18 +37,8 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
         switch (position) {
             case 0:
-               /* if(fragmentManager.findFragmentByTag("MyRoomFragment") != null) {
-                    MyRoomFragment fragment = (MyRoomFragment) fragmentManager.findFragmentByTag("MyRoomFragment");
-                    ArrayList<CustomListItem> horizontalListItems = fragment.getHorizontalListItems();
-                    ArrayList<CustomListItem> chosenItems = fragment.getChosenItems();
-                    MyRoomFragment newFragment = MyRoomFragment.newInstance();
-                    newFragment.setChosenItems(chosenItems);
-                    newFragment.setHorizontalListItems(horizontalListItems);
-                    return newFragment;
-                }*/
-
                 Log.d(TAG, "loading MyRoomFragment.newInstance()");
-                return MyRoomFragment.newInstance(); // TODO: PROBLEM
+                return MyRoomFragment.newInstance();
             case 1:
                 if(this.numbOfTabs == 3) {
                     Log.d(TAG, "loading MyFurnitureFragment.newInstance()");
@@ -65,14 +54,12 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     // This method return the titles for the Tabs in the Tab Strip
-
     @Override
     public CharSequence getPageTitle(int position) {
         return Titles[position];
     }
 
     // This method return the Number of tabs for the tabs Strip
-
     @Override
     public int getCount() {
         return numbOfTabs;

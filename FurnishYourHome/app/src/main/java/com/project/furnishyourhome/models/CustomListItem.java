@@ -17,7 +17,6 @@ public class CustomListItem implements Parcelable {
     private String info;
 
     private Store store;
-    private String storeId;
 
     public CustomListItem(){}
 
@@ -115,13 +114,5 @@ public class CustomListItem implements Parcelable {
 
     public void setStore(Store store) {
         this.store = store;
-    }
-
-    public String getStoreId() {
-        return storeId;
-    }
-
-    public void setStoreId(String storeId) {
-        this.storeId = storeId;
     }
 }

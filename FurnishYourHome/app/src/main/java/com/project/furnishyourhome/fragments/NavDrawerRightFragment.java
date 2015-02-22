@@ -49,7 +49,7 @@ public class NavDrawerRightFragment extends Fragment {
 
         Bundle bundle = getArguments();
         if(bundle == null) {
-            iv.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_launcher));
+            iv.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_no_preview));
             tvTitle.setText("no item selected");
             tvPrice.setText("");
             tvDimensions.setText("");

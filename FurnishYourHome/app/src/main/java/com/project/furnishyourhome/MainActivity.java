@@ -1,22 +1,19 @@
 package com.project.furnishyourhome;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -51,7 +48,9 @@ import com.project.furnishyourhome.models.CustomListItem;
 import com.project.furnishyourhome.models.CustomViewPager;
 import com.project.furnishyourhome.models.Furniture;
 import com.project.furnishyourhome.models.SimpleGestureFilter;
+import com.project.furnishyourhome.models.Sofa;
 import com.project.furnishyourhome.models.Store;
+import com.project.furnishyourhome.models.Table;
 import com.project.furnishyourhome.models.parse.SofaParse;
 import com.project.furnishyourhome.models.parse.StoreParse;
 import com.project.furnishyourhome.models.parse.TableParse;
@@ -60,30 +59,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable{
-
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
-    public static ArrayList<CustomListItem> horizontalListViewInMyRoomFragment;
-    public static ArrayList<CustomListItem> chosenItemsInMyRoomFragment;
+    private static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
     private Context context;
     private static boolean isFirstTime = true;
-    private static ArrayList<Furniture> furnitures;
+    private static ArrayList<Furniture> furnituresList;
+    private static ArrayList<Sofa> sofasList;
+    private static ArrayList<Table> tablesList;
     private static ArrayList<Store> stores;
     private static ArrayList<CustomListItem> leftNavDrawerItems;
 
     private DrawerLayout leftDrawerLayout;
     private ActionBarDrawerToggle leftDrawerListener;
     private ListView mDrawerLeftList;
-    private CustomListAdapter adapter;
     private SimpleGestureFilter detector;
-    //private MyRoomFragment myRoomFragment;
 
     private Toolbar toolbar;
-    private CustomViewPager pager;
-    private ViewPagerAdapter adapterViewPager;
-    private SlidingTabLayout tabs;
 
     private boolean swipeable;
 
@@ -119,8 +112,10 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         if(isFirstTime) {
             Parse.enableLocalDatastore(this);
             leftNavDrawerItems = new ArrayList<>();
-            furnitures = new ArrayList<>();
-            stores = new ArrayList<>();
+            furnituresList  = new ArrayList<>();
+            sofasList       = new ArrayList<>();
+            tablesList      = new ArrayList<>();
+            stores          = new ArrayList<>();
         }
         ParseObject.registerSubclass(SofaParse.class);
         ParseObject.registerSubclass(StoreParse.class);
@@ -136,8 +131,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        //this.myRoomFragment = MyRoomFragment.newInstance(furnitures);
     }
 
     private void setCustomToolbar() {
@@ -169,15 +162,15 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         }
 
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
-        adapterViewPager =  new ViewPagerAdapter(this, getSupportFragmentManager(), titles, tabsNumber);
+        ViewPagerAdapter adapterViewPager = new ViewPagerAdapter(this, getSupportFragmentManager(), titles, tabsNumber);
 
         // Assigning ViewPager View and setting the adapter
-        pager = (CustomViewPager) findViewById(R.id.pager);
+        CustomViewPager pager = (CustomViewPager) findViewById(R.id.pager);
         pager.setOffscreenPageLimit(2);
         pager.setAdapter(adapterViewPager);
 
         // Assiging the Sliding Tab Layout View
-        tabs = (SlidingTabLayout) findViewById(R.id.tabs);
+        SlidingTabLayout tabs = (SlidingTabLayout) findViewById(R.id.tabs);
         tabs.setDistributeEvenly(true); // To make the Tabs Fixed set this true, This makes the tabs Space Evenly in Available width
 
         // Setting Custom Color for the Scroll bar indicator of the Tab View
@@ -229,9 +222,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         // Set the adapter
         Log.d(TAG, "leftNavDrawerItems.size():"+leftNavDrawerItems.size());
-        adapter = new CustomListAdapter(this, R.layout.drawer_list_item, leftNavDrawerItems);
+        CustomListAdapter adapter = new CustomListAdapter(this, R.layout.drawer_list_item, leftNavDrawerItems);
         mDrawerLeftList.setAdapter(adapter);
-        mDrawerLeftList.setOnItemClickListener(MainActivity.this);
+        mDrawerLeftList.setOnItemClickListener(this);
 
         // set left drawer layout
         leftDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -310,28 +303,58 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if(parent.getId() == R.id.left_drawer) {
-
-            //TODO: Change onClick event
-            if(position == 0){
-                Toast.makeText(this, getResources().getString(R.string.app_name), Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, leftNavDrawerItems.get(position -1).getTitle(), Toast.LENGTH_SHORT).show();
-            }
-
             selectItem(position);
             leftDrawerLayout.closeDrawers();
         }
     }
 
     private void selectItem(int position) {
-        mDrawerLeftList.setItemChecked(position, true);
+        MyRoomFragment fragment = (MyRoomFragment) getSupportFragmentManager().findFragmentByTag("MyRoomFragment");
+        Fragment.SavedState myFragmentState = getSupportFragmentManager().saveFragmentInstanceState(fragment);
+        Bundle args = new Bundle();
 
-        if(position == 0){
+        if(position == 0) {
+            Toast.makeText(this, getResources().getString(R.string.app_name), Toast.LENGTH_SHORT).show();
             setTitle(getResources().getString(R.string.app_name));
+            ArrayList<CustomListItem> allListItems = covertFurnitureToListItem(furnituresList);
+            args.putParcelableArrayList("horizontalListItems", allListItems);
         } else {
+            Toast.makeText(this, leftNavDrawerItems.get(position - 1).getTitle(), Toast.LENGTH_SHORT).show();
             setTitle(leftNavDrawerItems.get(position - 1).getTitle());
-//        getSupportActionBar().setTitle(mLeftDrawerMenu[position]);
+            mDrawerLeftList.setItemChecked(position, true);
+            switch (position) {
+                case 1:
+                    ArrayList<CustomListItem> sofasListItems = covertFurnitureToListItem(sofasList);
+                    args.putParcelableArrayList("horizontalListItems", sofasListItems);
+                    break;
+                case 2:
+                    ArrayList<CustomListItem> tablesListItems = covertFurnitureToListItem(tablesList);
+                    args.putParcelableArrayList("horizontalListItems", tablesListItems);
+                    break;
+            }
         }
+
+        FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+        MyRoomFragment newFragment = MyRoomFragment.newInstance(args);
+        newFragment.setInitialSavedState(myFragmentState);
+        tr.replace(R.id.container_my_room, newFragment, "MyRoomFragment");
+        tr.commit();
+    }
+
+    private ArrayList<CustomListItem> covertFurnitureToListItem(ArrayList<? extends Furniture> furniture) {
+        ArrayList<CustomListItem> listItems = new ArrayList<>();
+        for (int i = 0; i<furniture.size(); i++) {
+            CustomListItem item = new CustomListItem();
+            item.setTitle(furniture.get(i).getName());
+            item.setBitmap(furniture.get(i).getDrawable());
+            item.setPrice(furniture.get(i).getPrice());
+            item.setDimensions(furniture.get(i).getDimensions());
+            item.setMaterial(furniture.get(i).getMaterial());
+            item.setInfo(furniture.get(i).getInfo());
+            item.setStore(furniture.get(i).getStore());
+            listItems.add(item);
+        }
+        return listItems;
     }
 
     @Override
@@ -351,7 +374,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                     getSupportActionBar().show();
                     break;
                 case SimpleGestureFilter.SWIPE_UP:
-//                    toolbar.animate().translationY(-toolbar.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
+                    //toolbar.animate().translationY(-toolbar.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
                     getSupportActionBar().hide();
                     break;
             }
@@ -373,6 +396,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         @Override
         protected Void doInBackground(Void... params) {
             try {
+                //menu items for left drawer
                 final ParseQuery<ParseObject> typesQuery = ParseQuery.getQuery("Furniture");
                 List<ParseObject> parseObjects = typesQuery.find();
 
@@ -397,6 +421,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             for (CustomListItem item : leftNavDrawerItems) {
                 String type = item.getTitle();
 
+                //need to be added more tabels
                 if (type.equals("Table")) {
                     final ParseQuery<TableParse> query = ParseQuery.getQuery(TableParse.class);
                     List<TableParse> tables = null;
@@ -409,7 +434,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
                     if (tables != null) {
                         for (TableParse table : tables) {
-                            furnitures.add(table.getTable());
+                            furnituresList.add(table.getTable());
+                            tablesList.add(table.getTable());
                         }
                     }
                 } else if (type.equals("Sofa")) {
@@ -424,12 +450,14 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
                     if (sofas != null) {
                         for (SofaParse sofa : sofas) {
-                            furnitures.add(sofa.getSofa());
+                            furnituresList.add(sofa.getSofa());
+                            sofasList.add(sofa.getSofa());
                         }
                     }
                 }
             }
 
+            //items in STORE table
             final ParseQuery<StoreParse> storeQuery = ParseQuery.getQuery(StoreParse.class);
             List<StoreParse> storesList = null;
             try {
@@ -460,26 +488,14 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            //myRoomFragment = MyRoomFragment.newInstance(furnitures);
+
             Bundle args = new Bundle();
-            ArrayList<CustomListItem> listItems = new ArrayList<>();
-            for (int i = 0; i<furnitures.size(); i++) {
-                CustomListItem item = new CustomListItem();
-                item.setTitle(furnitures.get(i).getName());
-                item.setBitmap(furnitures.get(i).getDrawable());
-                item.setPrice(furnitures.get(i).getPrice());
-                item.setDimensions(furnitures.get(i).getDimensions());
-                item.setMaterial(furnitures.get(i).getMaterial());
-                item.setInfo(furnitures.get(i).getInfo());
-                item.setStore(furnitures.get(i).getStore());
-                listItems.add(item);
-            }
+            ArrayList<CustomListItem> listItems = covertFurnitureToListItem(furnituresList);
             args.putParcelableArrayList("horizontalListItems", listItems);
 
             Log.d(TAG, "loading MyRoomFragment.newInstance(args)");
             FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-            tr.replace(R.id.container_my_room, MyRoomFragment.newInstance(args));
-            //tr.replace(R.id.container_my_room, MyRoomFragment.newInstance(args), "MyRoomFragment");
+            tr.replace(R.id.container_my_room, MyRoomFragment.newInstance(args), "MyRoomFragment");
             tr.commit();
 
             progressDialog.dismiss();

@@ -23,8 +23,6 @@ import java.util.ArrayList;
 public class MyFurnitureFragment extends Fragment {
 
     private ArrayList <CustomListItem> chosenItems;
-    TextView textView;
-    ListView listView;
 
     public static MyFurnitureFragment newInstance(Bundle args) {
         MyFurnitureFragment f = new MyFurnitureFragment();
@@ -46,7 +44,7 @@ public class MyFurnitureFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_my_furniture, container, false);
 
-        textView = (TextView) rootView.findViewById(R.id.tv_empty_list_info);
+        TextView textView = (TextView) rootView.findViewById(R.id.tv_empty_list_info);
 
         chosenItems = new ArrayList<>();
         if(savedInstanceState != null) {
@@ -55,7 +53,7 @@ public class MyFurnitureFragment extends Fragment {
             chosenItems = savedInstanceState.getParcelableArrayList("chosenItems");
         }
 
-        listView = (ListView) rootView.findViewById(R.id.lv_my_furniture);
+        ListView listView = (ListView) rootView.findViewById(R.id.lv_my_furniture);
 
         if(chosenItems.isEmpty() && getArguments()!=null) {
             textView.setText("");
@@ -72,8 +70,8 @@ public class MyFurnitureFragment extends Fragment {
                 Toast.makeText(
                         getActivity(),
                         "store location: lat "
-                                +chosenItems.get(position).getStore().getLocation().getLatitude()
-                                +" lon "+chosenItems.get(position).getStore().getLocation().getLongitude(),
+                                + chosenItems.get(position).getStore().getLocation().getLatitude()
+                                + " lon " + chosenItems.get(position).getStore().getLocation().getLongitude(),
                         Toast.LENGTH_LONG).show();
             }
         });

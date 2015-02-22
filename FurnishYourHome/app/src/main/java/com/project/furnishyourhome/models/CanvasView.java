@@ -87,7 +87,7 @@ public class CanvasView extends View
     private void endTouch() {
         hasItemOnFocus = false;
         if (!addedBitmaps.isEmpty()) {
-            Toast.makeText(this.context, "Bitmap " + itemOnFocus + " set on cords X: " + addedBitmaps.get(itemOnFocus).getX() + " Y: " + addedBitmaps.get(this.itemOnFocus).getY(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.context, "Bitmap " + itemOnFocus + " set on cords ic_no_preview: " + addedBitmaps.get(itemOnFocus).getX() + " Y: " + addedBitmaps.get(this.itemOnFocus).getY(), Toast.LENGTH_SHORT).show();
         }
         itemOnFocus = 0;
         pager.setSwipeable(true);

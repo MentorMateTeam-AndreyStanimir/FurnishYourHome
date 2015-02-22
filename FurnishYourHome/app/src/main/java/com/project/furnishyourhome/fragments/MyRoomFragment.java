@@ -12,13 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
-import com.project.furnishyourhome.MainActivity;
 import com.project.furnishyourhome.R;
 import com.project.furnishyourhome.adapters.CustomListAdapter;
 import com.project.furnishyourhome.models.CanvasView;
 import com.project.furnishyourhome.models.CustomBitmap;
 import com.project.furnishyourhome.models.CustomListItem;
-import com.project.furnishyourhome.models.Furniture;
 import com.project.furnishyourhome.models.Store;
 
 import org.lucasr.twowayview.TwoWayView;
@@ -31,10 +29,9 @@ import java.util.ArrayList;
  */
 public class MyRoomFragment extends Fragment {
     private static final String TAG = MyRoomFragment.class.getSimpleName();
-    //private static MyRoomFragment instance = null;
 
     private ArrayList<CustomBitmap> arrayList;
-    private ArrayList<Store> stores;        // не се стресирвай само за проба e :)
+    private ArrayList<Store> stores;        // не се стресирвай само за проба e :) eeee LOL
     private ArrayList<CustomListItem> horizontalListItems;
     private ArrayList<CustomListItem> chosenItems;
     private CanvasView customCanvas;
@@ -44,41 +41,15 @@ public class MyRoomFragment extends Fragment {
 
 
     public static MyRoomFragment newInstance() {
-        /*if(instance == null) {
-            instance = new MyRoomFragment();
-        }
-        return instance;*/
         return new MyRoomFragment();
 
     }
 
     public static MyRoomFragment newInstance(Bundle args) {
-        /*instance = MyRoomFragment.newInstance();
-        instance.setArguments(args);
-        return instance;*/
         MyRoomFragment f = new MyRoomFragment();
         f.setArguments(args);
         return f;
     }
-
-    /*public static MyRoomFragment newInstance(ArrayList<Furniture> horizontalListItems) {
-        MyRoomFragment f = MyRoomFragment.newInstance();
-        setListItems(horizontalListItems, f);
-        return f;
-    }
-
-    private static void setListItems(ArrayList<Furniture> horizontalListItems, MyRoomFragment f) {
-        f.horizontalListItems = new ArrayList<CustomListItem>();
-
-        for (Furniture item : horizontalListItems){
-            CustomListItem listItem = new CustomListItem();
-            listItem.setTitle(item.getName());
-            listItem.setBitmap(item.getDrawable());
-            listItem.setStore(item.getStore());
-            f.listItems.add(listItem);
-            f.horizontalListItems.add(listItem);
-        }
-    }*/
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -86,6 +57,9 @@ public class MyRoomFragment extends Fragment {
         outState.putInt("oldh", customCanvas.getHeight());
         outState.putParcelableArrayList("savedBitmaps", customCanvas.getAddedBitmaps()); //items inside the canvas
         outState.putParcelableArrayList("chosenItems", chosenItems); //items for second fragment
+        if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+        }
         Log.d(TAG, "horizontalListItems.size() in outState is: "+horizontalListItems.size());
         outState.putParcelableArrayList("horizontalListItems", horizontalListItems); //items for horizontal listView
         super.onSaveInstanceState(outState);
@@ -100,13 +74,13 @@ public class MyRoomFragment extends Fragment {
 
         chosenItems = new ArrayList<>();
         stores = new ArrayList<Store>();
-        //chosenItems = MainActivity.chosenItemsInMyRoomFragment;
         horizontalListItems = new ArrayList<>();
-        //horizontalListItems = MainActivity.horizontalListViewInMyRoomFragment;
+
         Bundle bundle = getArguments();
         if(savedInstanceState != null){
             arrayList = savedInstanceState.getParcelableArrayList("savedBitmaps");
             if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                // TODO: this fucking recalculation
                 /*recalculateCoordinates(
                         savedInstanceState.getInt("oldw"),
                         savedInstanceState.getInt("oldh"),
@@ -120,18 +94,22 @@ public class MyRoomFragment extends Fragment {
             Log.d(TAG, "got items from savedInstanceState");
             Log.d(TAG, "horizontalListItems.size() "+horizontalListItems.size());
 
+            if(bundle != null) {
+                horizontalListItems = bundle.getParcelableArrayList("horizontalListItems");
+                Log.d(TAG, "GOT items from bundle, overriding savedState");
+                Log.d(TAG, "horizontalListItems.size() from bundle: "+horizontalListItems.size());
+            }
+
         } else {
             if(bundle != null) {
                 horizontalListItems = bundle.getParcelableArrayList("horizontalListItems");
                 //MainActivity.horizontalListViewInMyRoomFragment = horizontalListItems;
-                Log.d(TAG, "got items from bundle");
+                Log.d(TAG, "GOT items from bundle");
                 Log.d(TAG, "horizontalListItems.size() from bundle: "+horizontalListItems.size());
-            } else {
-                //horizontalListItems.add(new CustomListItem()); // TODO: WORKAROUND
-                //Log.d(TAG, "add empty Item");
             }
         }
 
+        // TODO: THIS LIST VIEW NOT LOADING ON API 16
         TwoWayView twoWayView = (TwoWayView) rootView.findViewById(R.id.twv_furniture);
         twoWayView.setAdapter(new CustomListAdapter(getActivity().getBaseContext(), R.layout.horizontal_list_item, horizontalListItems));
         twoWayView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -139,8 +117,8 @@ public class MyRoomFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 CustomListItem item = horizontalListItems.get(position);
 
+                //its not the best but work stable
                 Bundle args = new Bundle();
-                //args.putParcelable("item", item);
                 args.putString("title", item.getTitle());
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 Bitmap bitmap = item.getBitmap();
@@ -177,18 +155,6 @@ public class MyRoomFragment extends Fragment {
             }
         });
 
-//        if (savedInstanceState != null) {
-//            if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-//                arrayList = savedInstanceState.getParcelableArrayList("savedBitmaps");
-//                this.customCanvas.setAddedBitmaps(this.arrayList);
-//                this.chosenItems = savedInstanceState.getParcelableArrayList("chosenItems");
-//                for(CustomListItem item : this.chosenItems){
-//                    this.stores.add(item.getStore());
-//                }
-//            } else {
-//                oldw = savedInstanceState.getInt("oldw");
-//                oldh = savedInstanceState.getInt("oldh");
-//                arrayList = savedInstanceState.getParcelableArrayList("savedBitmaps");
         return rootView;
     }
 
@@ -205,9 +171,9 @@ public class MyRoomFragment extends Fragment {
 //            Log.d("DIMENTIONS", "h: " + this.customCanvas.getHeight() + " oldh: " + this.oldh + " coef: " + f2);
 
             for (int i = 0; i < arrayList.size(); i++) {
-                CustomBitmap item = arrayList.get(i); // and the problem with X and Y equals 0 disappears :)
+                CustomBitmap item = arrayList.get(i); // and the problem with ic_no_preview and Y equals 0 disappears :)
 
-                float coefficientX = oldw / (item.getX() + item.getHalfWidth()); // add getHalfWidth to find the center X of the image
+                float coefficientX = oldw / (item.getX() + item.getHalfWidth()); // add getHalfWidth to find the center ic_no_preview of the image
                 float coefficientY = oldh / (item.getY() + item.getHalfHeight()); // add getHalfHeight to find the center Y of the image
 
                 Log.d("DIMENTIONS", "w: " + currentWidth + " oldw: " + oldw + " coef: " + coefficientX);
@@ -221,21 +187,5 @@ public class MyRoomFragment extends Fragment {
                 arrayList.set(i, item);
             }
         }
-    }
-
-    public ArrayList<CustomListItem> getHorizontalListItems() {
-        return horizontalListItems;
-    }
-
-    public void setHorizontalListItems(ArrayList<CustomListItem> horizontalListItems) {
-        this.horizontalListItems = horizontalListItems;
-    }
-
-    public ArrayList<CustomListItem> getChosenItems() {
-        return chosenItems;
-    }
-
-    public void setChosenItems(ArrayList<CustomListItem> chosenItems) {
-        this.chosenItems = chosenItems;
     }
 }
