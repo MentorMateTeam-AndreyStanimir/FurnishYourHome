@@ -1,9 +1,11 @@
 package com.project.furnishyourhome;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
-import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +13,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -47,23 +52,23 @@ import com.project.furnishyourhome.materialdesign.SlidingTabLayout;
 import com.project.furnishyourhome.models.CustomListItem;
 import com.project.furnishyourhome.models.CustomViewPager;
 import com.project.furnishyourhome.models.Furniture;
+import com.project.furnishyourhome.models.HolderCount;
 import com.project.furnishyourhome.models.SimpleGestureFilter;
 import com.project.furnishyourhome.models.Sofa;
-import com.project.furnishyourhome.models.Store;
 import com.project.furnishyourhome.models.Table;
 import com.project.furnishyourhome.models.parse.SofaParse;
 import com.project.furnishyourhome.models.parse.StoreParse;
 import com.project.furnishyourhome.models.parse.TableParse;
+import com.project.furnishyourhome.services.DataCountService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable{
+public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //private static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
-    private Context context;
     private static boolean isFirstTime = true;
     private static ArrayList<Furniture> furnituresList;
     private static ArrayList<Sofa> sofasList;
@@ -76,6 +81,12 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private ActionBarDrawerToggle leftDrawerListener;
     private ListView mDrawerLeftList;
     private SimpleGestureFilter detector;
+    private Intent intent;
+    private TaskUpdateList taskUpdateList;
+    private Handler updateListHandler;
+    private HolderCount holderCount = new HolderCount();
+    private int countDataOnServer = 0;
+    public static Context context;
 
     private Toolbar toolbar;
 
@@ -86,6 +97,16 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     @Override
     protected void onResume() {
         super.onResume();
+
+        NetworkInfo mWifi = getNetworkInfo();
+
+        if (isFirstTime && mWifi.isConnected()) {
+            loadData();
+            isFirstTime = false;
+        }
+    }
+
+    private NetworkInfo getNetworkInfo() {
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         if (mWifi.isConnected()) {
@@ -95,11 +116,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             DialogFragment dialog = new NetworkDialog();
             dialog.show(getSupportFragmentManager(), "NetworkDialog");
         }
-
-        if(isFirstTime && mWifi.isConnected()){
-            loadData();
-            isFirstTime = false;
-        }
+        return mWifi;
     }
 
     @Override
@@ -110,12 +127,12 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         this.context = this;
 
         // Enable Local Datastore.
-        if(isFirstTime) {
+        if (isFirstTime) {
             Parse.enableLocalDatastore(this);
             leftNavDrawerItems = new ArrayList<>();
-            furnituresList  = new ArrayList<>();
-            sofasList       = new ArrayList<>();
-            tablesList      = new ArrayList<>();
+            furnituresList = new ArrayList<>();
+            sofasList = new ArrayList<>();
+            tablesList = new ArrayList<>();
             //stores          = new ArrayList<>();
         }
         ParseObject.registerSubclass(SofaParse.class);
@@ -123,7 +140,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         ParseObject.registerSubclass(TableParse.class);
         Parse.initialize(this, "ueFuNcN0Cx1xgBzycLJOgwqGqLwDzlt9zJEHulqJ", "s1vnSldgEhOfOMyBfIXSnKsl8F7YHuGNXisSr2jM");
 
-        this.detector = new SimpleGestureFilter(this,this);
+        this.detector = new SimpleGestureFilter(this, this);
         this.swipeable = true;
         setCustomToolbar();
 
@@ -132,6 +149,81 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        NetworkInfo mWifi = getNetworkInfo();
+
+        if (isFirstTime && mWifi.isConnected()) {
+            loadData();
+            isFirstTime = false;
+        }
+
+        //Start service data counter
+
+        taskUpdateList = new TaskUpdateList();
+        updateListHandler = new Handler();
+        updateListHandler.postDelayed(taskUpdateList, 30000);
+
+        resultReceiver = new MyResultReceiver(null);
+        this.intent = new Intent(this, DataCountService.class);
+        this.intent.putExtra("receiver", resultReceiver);
+        startService(intent);
+    }
+
+    private class TaskUpdateList implements Runnable {
+
+        @Override
+        public void run() {
+            Log.d("checkServerCount", countDataOnServer + "");
+            Log.d("holderCount.count", holderCount.count + "");
+            if (holderCount.count != countDataOnServer) {
+                loadDataSync();
+                Toast.makeText(context, "The data was updated", Toast.LENGTH_LONG).show();
+            }
+            updateListHandler.postDelayed(taskUpdateList, 5000);
+        }
+    }
+
+    MyResultReceiver resultReceiver;
+    private DataCountService dataService;
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        public void onServiceConnected(ComponentName className,
+                                       IBinder binder) {
+            DataCountService.MyBinder dataBinder = (DataCountService.MyBinder) binder;
+            dataService = dataBinder.getService();
+            Toast.makeText(context, "Connected", Toast.LENGTH_SHORT).show();
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            dataService = null;
+        }
+    };
+
+    class UpdateUI implements Runnable {
+        public UpdateUI(int count) {
+            countDataOnServer = count;
+        }
+
+        public void run() {
+            Log.d("activityCount", countDataOnServer + "");
+        }
+    }
+
+    private class MyResultReceiver extends ResultReceiver {
+        public MyResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+            if (resultCode == 100) {
+                try {
+                    ((Activity) context).runOnUiThread(new UpdateUI(resultData.getInt("count")));
+                } catch (Exception e) {
+
+                }
+            }
+        }
     }
 
     private void setCustomToolbar() {
@@ -157,7 +249,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         int tabsNumber = 3;
         CharSequence[] titles = getResources().getStringArray(R.array.tabs_three);
 
-        if(this.checkIsTablet() && orientation == Configuration.ORIENTATION_LANDSCAPE){
+        if (this.checkIsTablet() && orientation == Configuration.ORIENTATION_LANDSCAPE) {
             tabsNumber = 2;
             getResources().getStringArray(R.array.tabs_two);
         }
@@ -212,7 +304,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         // adding header to listView
         View header = getLayoutInflater().inflate(R.layout.header, null);
-        ImageView ivProfile =(ImageView)header.findViewById(R.id.profile_image);
+        ImageView ivProfile = (ImageView) header.findViewById(R.id.profile_image);
         ivProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -222,7 +314,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         this.mDrawerLeftList.addHeaderView(header);
 
         // Set the adapter
-        Log.d(TAG, "leftNavDrawerItems.size():"+leftNavDrawerItems.size());
+        Log.d(TAG, "leftNavDrawerItems.size():" + leftNavDrawerItems.size());
         CustomListAdapter adapter = new CustomListAdapter(this, R.layout.drawer_list_item, leftNavDrawerItems);
         mDrawerLeftList.setAdapter(adapter);
         mDrawerLeftList.setOnItemClickListener(this);
@@ -302,9 +394,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     private ArrayList<Furniture> searchInFor(ArrayList<? extends Furniture> furniture, String query) {
         ArrayList<Furniture> list = new ArrayList<>();
-        for (int i=0; i<furniture.size(); i++) {
+        for (int i = 0; i < furniture.size(); i++) {
             Furniture item = furniture.get(i);
-            if(item.getName().toLowerCase().contains(query.toLowerCase())) {
+            if (item.getName().toLowerCase().contains(query.toLowerCase())) {
                 list.add(item);
             }
         }
@@ -323,7 +415,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                 onSearchRequested();
         }
 
-        if (leftDrawerListener.onOptionsItemSelected(item)){ // TODO: WTF is this
+        if (leftDrawerListener.onOptionsItemSelected(item)) { // TODO: WTF is this
             return true;
         }
 
@@ -338,7 +430,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if(parent.getId() == R.id.left_drawer) {
+        if (parent.getId() == R.id.left_drawer) {
             selectItem(position);
             leftDrawerLayout.closeDrawers();
         }
@@ -350,7 +442,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         Fragment.SavedState myFragmentState = getSupportFragmentManager().saveFragmentInstanceState(fragment);
         Bundle args = new Bundle();
 
-        if(position == 0) {
+        if (position == 0) {
             Toast.makeText(this, getResources().getString(R.string.app_name), Toast.LENGTH_SHORT).show();
             setTitle(getResources().getString(R.string.app_name));
             ArrayList<CustomListItem> allListItems = convertFurnitureToListItem(furnituresList);
@@ -380,7 +472,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     private ArrayList<CustomListItem> convertFurnitureToListItem(ArrayList<? extends Furniture> furniture) {
         ArrayList<CustomListItem> listItems = new ArrayList<>();
-        for (int i = 0; i<furniture.size(); i++) {
+        for (int i = 0; i < furniture.size(); i++) {
             CustomListItem item = new CustomListItem();
             item.setTitle(furniture.get(i).getName());
             item.setBitmap(furniture.get(i).getDrawable());
@@ -395,7 +487,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     }
 
     @Override
-    public boolean dispatchTouchEvent(@NonNull MotionEvent me){
+    public boolean dispatchTouchEvent(@NonNull MotionEvent me) {
         // Call onTouchEvent of SimpleGestureFilter class
         this.detector.onTouchEvent(me);
         return super.dispatchTouchEvent(me);
@@ -404,7 +496,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     @Override
     public void onSwipe(int direction) {
 
-        if(swipeable) {
+        if (swipeable) {
             getSupportActionBar().setShowHideAnimationEnabled(true);
             switch (direction) {
                 case SimpleGestureFilter.SWIPE_DOWN:
@@ -428,73 +520,70 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         this.swipeable = swipeable;
     }
 
-    private class GetAsyncResult extends AsyncTask<Void, Void, Void> {
+    private void downloadData() {
+        try {
+            //menu items for left drawer
+            final ParseQuery<ParseObject> typesQuery = ParseQuery.getQuery("Furniture");
+            List<ParseObject> parseObjects = typesQuery.find();
 
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                //menu items for left drawer
-                final ParseQuery<ParseObject> typesQuery = ParseQuery.getQuery("Furniture");
-                List<ParseObject> parseObjects = typesQuery.find();
-
-                for (ParseObject obj : parseObjects) {
-                    String type = obj.getString("type");
-                    ParseFile imgParse = obj.getParseFile("icon");
-                    byte[] imageByte = new byte[0];
-                    try {
-                        imageByte = imgParse.getData();
-                    } catch (ParseException e1) {
-                        e1.printStackTrace();
-                    }
-
-                    Bitmap icon = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length);
-                    CustomListItem item = new CustomListItem(type, icon);
-                    leftNavDrawerItems.add(item);
+            for (ParseObject obj : parseObjects) {
+                String type = obj.getString("type");
+                ParseFile imgParse = obj.getParseFile("icon");
+                byte[] imageByte = new byte[0];
+                try {
+                    imageByte = imgParse.getData();
+                } catch (ParseException e1) {
+                    e1.printStackTrace();
                 }
-            } catch (ParseException e) {
-                e.printStackTrace();
+
+                Bitmap icon = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length);
+                CustomListItem item = new CustomListItem(type, icon);
+                leftNavDrawerItems.add(item);
             }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
-            for (CustomListItem item : leftNavDrawerItems) {
-                String type = item.getTitle();
+        for (CustomListItem item : leftNavDrawerItems) {
+            String type = item.getTitle();
 
-                //need to be added more tabels
-                if (type.equals("Table")) {
-                    final ParseQuery<TableParse> query = ParseQuery.getQuery(TableParse.class);
-                    List<TableParse> tables = null;
+            //need to be added more tabels
+            if (type.equals("Table")) {
+                final ParseQuery<TableParse> query = ParseQuery.getQuery(TableParse.class);
+                List<TableParse> tables = null;
 
-                    try {
-                        tables = query.find();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
+                try {
+                    tables = query.find();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if (tables != null) {
+                    for (TableParse table : tables) {
+                        furnituresList.add(table.getTable());
+                        tablesList.add(table.getTable());
                     }
+                }
+            } else if (type.equals("Sofa")) {
+                final ParseQuery<SofaParse> query = ParseQuery.getQuery(SofaParse.class);
+                List<SofaParse> sofas = null;
 
-                    if (tables != null) {
-                        for (TableParse table : tables) {
-                            furnituresList.add(table.getTable());
-                            tablesList.add(table.getTable());
-                        }
-                    }
-                } else if (type.equals("Sofa")) {
-                    final ParseQuery<SofaParse> query = ParseQuery.getQuery(SofaParse.class);
-                    List<SofaParse> sofas = null;
+                try {
+                    sofas = query.find();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
-                    try {
-                        sofas = query.find();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
-                    if (sofas != null) {
-                        for (SofaParse sofa : sofas) {
-                            furnituresList.add(sofa.getSofa());
-                            sofasList.add(sofa.getSofa());
-                        }
+                if (sofas != null) {
+                    for (SofaParse sofa : sofas) {
+                        furnituresList.add(sofa.getSofa());
+                        sofasList.add(sofa.getSofa());
                     }
                 }
             }
+        }
 
-            //items in STORE table
+        //items in STORE table
             /*final ParseQuery<StoreParse> storeQuery = ParseQuery.getQuery(StoreParse.class);
             List<StoreParse> storesList = null;
             try {
@@ -508,6 +597,45 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                     stores.add(store.getStore());
                 }
             }*/
+    }
+
+    private void saveDataAfterDownloading() {
+        Bundle args = new Bundle();
+        ArrayList<CustomListItem> listItems = convertFurnitureToListItem(furnituresList);
+        args.putParcelableArrayList("horizontalListItems", listItems);
+
+        Log.d(TAG, "loading MyRoomFragment.newInstance(args)");
+        FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+        tr.replace(R.id.container_my_room, MyRoomFragment.newInstance(args), "MyRoomFragment");
+        tr.commit();
+
+        holderCount.count = countDataOnServer; //ToDo: change to furnitures.size()
+    }
+
+    private void showProgressDialog() {
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setTitle("Loading data");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setIndeterminate(true);
+        Log.d(TAG, "loading data");
+        progressDialog.show();
+    }
+
+    private void loadDataSync (){
+        downloadData();
+
+        Log.d(TAG, "Success");
+
+        saveDataAfterDownloading();
+        mDrawerLeftList.setAdapter(null);
+        setLeftDrawer();
+    }
+
+    private class GetAsyncResult extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            downloadData();
 
             Log.d(TAG, "Success");
             return null;
@@ -515,28 +643,17 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         @Override
         protected void onPreExecute() {
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setTitle("Loading data");
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressDialog.setIndeterminate(true);
-            Log.d(TAG, "loading data");
-            progressDialog.show();
+            showProgressDialog();
+
+            mDrawerLeftList.setAdapter(null);
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
 
-            Bundle args = new Bundle();
-            ArrayList<CustomListItem> listItems = convertFurnitureToListItem(furnituresList);
-            args.putParcelableArrayList("horizontalListItems", listItems);
-
-            Log.d(TAG, "loading MyRoomFragment.newInstance(args)");
-            FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-            tr.replace(R.id.container_my_room, MyRoomFragment.newInstance(args), "MyRoomFragment");
-            tr.commit();
-
+            saveDataAfterDownloading();
+            setLeftDrawer();
             progressDialog.dismiss();
-
         }
     }
 }
