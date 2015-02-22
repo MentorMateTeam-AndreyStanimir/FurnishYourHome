@@ -1,235 +1,170 @@
 package com.project.furnishyourhome.fragments;
 
-import android.location.Criteria;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.project.furnishyourhome.MainActivity;
 import com.project.furnishyourhome.R;
-import com.project.furnishyourhome.location.MyLocationListener;
-import com.project.furnishyourhome.models.Store;
+import com.project.furnishyourhome.models.CustomListItem;
 
 import java.util.ArrayList;
 
-/**
- * Created by Andrey on 11.2.2015 г..
- */
-public class MapFragment extends Fragment implements GoogleMap.OnMyLocationChangeListener {
 
-    private final int TOP_VIEW = 12;
+public class MapFragment extends Fragment {
+    private static final String TAG = MapFragment.class.getSimpleName();
 
-    private static MapFragment instance = null;
-    public static ArrayList<Store> stores = new ArrayList<Store>();
+    private final float TOP_VIEW = 12.0f;
 
-    private MyLocationListener mLocationClient;
-    private View view;
     private GoogleMap map;
-    private boolean isLocationFound;
-    private FragmentActivity activity;
-    private static Fragment fragment;
-    private Marker currentPositionMarker;
-    private Location myLocation;
-    private LatLng latLngLocation;
+
+    LocationManager locationManager;
+    ArrayList<CustomListItem> storesLocations;
 
     public static MapFragment newInstance() {
-
-        if(instance == null) {
-            instance = new MapFragment();
-            instance.view = null;
-            instance.map = null;
-        }
-
-        return instance;
+        return new MapFragment();
     }
 
-    public static MapFragment newInstance (MyLocationListener listener){
-        instance = MapFragment.newInstance();
-        instance.mLocationClient = listener;
+    public static MapFragment newInstance (Bundle args){
+        MapFragment f = new MapFragment();
+        f.setArguments(args);
+        return f;
+    }
 
-        return instance;
+    @Override
+    public void onResume() {
+        Log.d(TAG, "MapFragment resumed");
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            Log.d(TAG, "GPS is ON");
+
+            //myLastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            //showMeOnTheMap(myLastLocation);
+
+            trackMyPosition();
+        }else{
+            //Toast.makeText(getActivity(), "GPS is OFF, please turn it ON if you want to see your current location.", Toast.LENGTH_LONG).show();
+            Log.d(TAG, "GPS is OFF");
+            showGPSDisabledAlertToUser();
+        }
+        super.onResume();
+    }
+
+    private void trackMyPosition() {
+        LocationListener locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                showMeOnTheMap(location);
+            }
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+            @Override
+            public void onProviderEnabled(String provider) {}
+            @Override
+            public void onProviderDisabled(String provider) {}
+        };
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 10f, locationListener);
+    }
+
+    @Override
+    public void onPause() {
+        Log.d(TAG, "MapFragment paused");
+        super.onPause();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (view != null) {
-            ViewGroup parent = (ViewGroup) view.getParent();
-            if (parent != null)
-                parent.removeView(view);
-        }
-        view = inflater.inflate(R.layout.fragment_map,container,false);
 
-//            mMapView = (MapView) view.findViewById(R.id.mapView);
-//            mMapView.onCreate(savedInstanceState);
-//
-//            mMapView.onResume();// needed to get the map to display immediately
-//
-//            try {
-//                MapsInitializer.initialize(getActivity().getApplicationContext());
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//
-//            map = mMapView.getMap();
-        this.activity = (FragmentActivity) getActivity();
+        View rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
-        this.isLocationFound = false;
+        //creating map
+        map = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
+        map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
-        // Така всеки път презарежда отново, вместо цялото да е в един if
-      //  if (map == null) {
-            map = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
-        //}
-
-        if (map != null) {
-            this.setUpMap();
+        storesLocations = new ArrayList<>();
+        Bundle args = getArguments();
+        if(savedInstanceState != null) {
+            storesLocations = savedInstanceState.getParcelableArrayList("storesLocations");
+        } else {
+            if(args != null) {
+                storesLocations = args.getParcelableArrayList("chosenItems");
+                Log.d(TAG, "storesLocations.size(): "+storesLocations.size());
+            }
         }
 
-        onResume();
-
-        return view;
-    }
-
-    private void setUpMap() {
-        // Enable finding location
-        map.setMyLocationEnabled(true);
-        map.setOnMyLocationChangeListener(this);
-
-        // Create a criteria object to retrieve provider
-        Criteria criteria = new Criteria();
-
-        // Get location manager object from System service LOCATION_SERVICE
-        LocationManager locationManager = (LocationManager) activity
-                .getSystemService(activity.LOCATION_SERVICE);
-
-        // Get the name of the best provider
-        String provider = locationManager.getBestProvider(criteria, true);
-        // provider = locationManager.GPS_PROVIDER;
-        // MyLocationListener loc = new MyLocationListener();
-        locationManager.requestLocationUpdates(provider, 5000, 5, mLocationClient);
-
-        // Get current location
-        myLocation = mLocationClient.getMyLocation();
-        if(myLocation == null) {
-            myLocation = locationManager.getLastKnownLocation(provider);
-        }
-        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
-        double latitude = myLocation.getLatitude();
-        double longitude = myLocation.getLongitude();
-
-        latLngLocation = new LatLng(latitude, longitude);
-
-        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(
-                latLngLocation, TOP_VIEW);
-        map.animateCamera(update);
-
-        map.addMarker(new MarkerOptions().position(
-                new LatLng(latitude, longitude)).title(mLocationClient.getCurrentAddress()));
-    }
-
-
-    @Override
-    public void onStart() {
-        super.onStart();
-       // mLocationClient.connect();
-    }
-
-//    /**** The mapfragment's id must be removed from the FragmentManager
-//     **** or else if the same it is passed on the next time then
-//     **** app will crash ****/
-//    @Override
-//    public void onDestroyView() {
-//        super.onDestroyView();
-//        if (map != null) {
-//            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-//            fragmentManager.beginTransaction().remove(fragmentManager.findFragmentById(R.id.map)).commit();
-//            map = null;
-//        }
-//    }
-
-    @Override
-    public void onResume() {
-         super.onResume();
-        this.map.clear();
-
-        this.setStoreMarkers();
-
-        if (this.currentPositionMarker != null) {
-            this.currentPositionMarker.setVisible(false);
-            this.currentPositionMarker.remove();
-        }
-        if(this.latLngLocation != null) {
-            this.currentPositionMarker = map.addMarker(new MarkerOptions().position(this.latLngLocation).title(mLocationClient.getCurrentAddress()));
-        }
-
-        this.map.moveCamera(CameraUpdateFactory.newLatLngZoom(this.latLngLocation, TOP_VIEW));
-    }
-
-    private void setStoreMarkers() {
-        for (Store store : stores) {
-
-            LatLng latLng = new LatLng(store.getLocation().getLatitude(), store.getLocation().getLongitude());
-            this.map.addMarker(new MarkerOptions()
-                    .position(latLng)
-                    .title(store.getAddress())
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-        }
+        return rootView;
     }
 
     @Override
-    public void onStop() {
-        //mLocationClient.disconnect();
-        super.onStop();
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("storesLocations", storesLocations);
+        super.onSaveInstanceState(outState);
     }
 
-    @Override
-    public void onMyLocationChange(Location location) {
-        this.mLocationClient.onLocationChanged(location);
-        this.changeCurrentLocation(location);
-        this.isLocationFound(location);
-    }
+    private void showStoresOnMap() {
+        for(int i=0; i<storesLocations.size(); i++) {
+            double lat = storesLocations.get(i).getStore().getLocation().getLatitude();
+            double lng = storesLocations.get(i).getStore().getLocation().getLongitude();
 
-    public void changeCurrentLocation(Location location) {
-        this.latLngLocation = new LatLng(location.getLatitude(), location.getLongitude());
-    }
-
-    public void isLocationFound(Location location) {
-        if (!this.isLocationFound) {
-            this.getAddress(location);
-            this.onResume();
+            MarkerOptions storeLocation = new MarkerOptions();
+            storeLocation.position(new LatLng(lat, lng));
+            storeLocation.title(storesLocations.get(i).getStore().getName());
+            storeLocation.icon(BitmapDescriptorFactory.fromBitmap(storesLocations.get(i).getStore().getLogo()));
+            map.addMarker(storeLocation);
         }
     }
 
-    public void getAddress(Location location) {
-        this.map.clear();
-
-        this.setStoreMarkers();
-        this.myLocation = this.mLocationClient.getMyLocation();
-        this.latLngLocation = new LatLng(this.myLocation.getLatitude(), this.myLocation.getLongitude());
-
-        this.addMarkerPosition(this.latLngLocation);
+    private void showGPSDisabledAlertToUser(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+        alertDialogBuilder.setMessage("GPS is disabled in your device. Would you like to enable it?");
+        alertDialogBuilder.setCancelable(false);
+        alertDialogBuilder.setPositiveButton("Goto Settings Page To Enable GPS", new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int id){
+                Intent callGPSSettingIntent = new Intent(
+                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(callGPSSettingIntent);
+            }
+        });
+        alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int id){
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
     }
 
-    public void addMarkerPosition(LatLng latLng) {
-        this.map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, TOP_VIEW));
-        this.map.addMarker(new MarkerOptions().position(latLng).title(this.mLocationClient.getCurrentAddress()));
-        this.isLocationFound = true;
+    private void showMeOnTheMap(Location location) {
+        double lat = location.getLatitude();
+        double lng = location.getLongitude();
+        map.clear();
+
+        MarkerOptions myLocation = new MarkerOptions();
+        myLocation.position(new LatLng(lat, lng));
+        myLocation.title("myCurrentLocation");
+        myLocation.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_launcher));
+        map.addMarker(myLocation);
+        map.moveCamera( CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng) , TOP_VIEW) );
+
+        showStoresOnMap();
+
+        Log.d(TAG, lat + " " + lng);
     }
 }

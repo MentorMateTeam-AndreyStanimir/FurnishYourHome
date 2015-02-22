@@ -9,7 +9,6 @@ import android.util.Log;
 import com.project.furnishyourhome.fragments.MapFragment;
 import com.project.furnishyourhome.fragments.MyFurnitureFragment;
 import com.project.furnishyourhome.fragments.MyRoomFragment;
-import com.project.furnishyourhome.location.MyLocationListener;
 
 
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
@@ -45,11 +44,11 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
                     return MyFurnitureFragment.newInstance();
                 } else {
                     Log.d(TAG, "loading MapFragment.newInstance()");
-                    return MapFragment.newInstance(MyLocationListener.instance(this.context));
+                    return MapFragment.newInstance();
                 }
             default:
                 Log.d(TAG, "loading MapFragment.newInstance()");
-                return MapFragment.newInstance(MyLocationListener.instance(this.context));
+                return MapFragment.newInstance();
         }
     }
 

@@ -61,14 +61,14 @@ import java.util.List;
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable{
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+    //private static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
     private Context context;
     private static boolean isFirstTime = true;
     private static ArrayList<Furniture> furnituresList;
     private static ArrayList<Sofa> sofasList;
     private static ArrayList<Table> tablesList;
-    private static ArrayList<Store> stores;
+    //private static ArrayList<Store> stores;
     private static ArrayList<CustomListItem> leftNavDrawerItems;
     private int selectedPosition;
 
@@ -116,7 +116,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             furnituresList  = new ArrayList<>();
             sofasList       = new ArrayList<>();
             tablesList      = new ArrayList<>();
-            stores          = new ArrayList<>();
+            //stores          = new ArrayList<>();
         }
         ParseObject.registerSubclass(SofaParse.class);
         ParseObject.registerSubclass(StoreParse.class);
@@ -254,7 +254,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         // Get the SearchView and set the searchable configuration
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        //SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -495,7 +495,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             }
 
             //items in STORE table
-            final ParseQuery<StoreParse> storeQuery = ParseQuery.getQuery(StoreParse.class);
+            /*final ParseQuery<StoreParse> storeQuery = ParseQuery.getQuery(StoreParse.class);
             List<StoreParse> storesList = null;
             try {
                 storesList = storeQuery.find();
@@ -507,7 +507,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                 for (StoreParse store : storesList) {
                     stores.add(store.getStore());
                 }
-            }
+            }*/
 
             Log.d(TAG, "Success");
             return null;
@@ -537,18 +537,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
             progressDialog.dismiss();
 
-            /*//myRoomFragment.onResume();  // not working
-            Activity activity = (Activity) context;
-            int orientation = activity.getResources().getConfiguration().orientation;
-
-            // for now the only way it works
-            if(orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-            } else {
-                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-            }*/
         }
     }
 }

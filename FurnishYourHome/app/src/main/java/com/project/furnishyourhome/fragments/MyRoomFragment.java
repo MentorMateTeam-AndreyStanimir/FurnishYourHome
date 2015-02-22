@@ -17,7 +17,6 @@ import com.project.furnishyourhome.adapters.CustomListAdapter;
 import com.project.furnishyourhome.models.CanvasView;
 import com.project.furnishyourhome.models.CustomBitmap;
 import com.project.furnishyourhome.models.CustomListItem;
-import com.project.furnishyourhome.models.Store;
 
 import org.lucasr.twowayview.TwoWayView;
 
@@ -31,7 +30,6 @@ public class MyRoomFragment extends Fragment {
     private static final String TAG = MyRoomFragment.class.getSimpleName();
 
     private ArrayList<CustomBitmap> arrayList;
-    private ArrayList<Store> stores;        // не се стресирвай само за проба e :) eeee LOL
     private ArrayList<CustomListItem> horizontalListItems;
     private ArrayList<CustomListItem> chosenItems;
     private CanvasView customCanvas;
@@ -57,9 +55,6 @@ public class MyRoomFragment extends Fragment {
         outState.putInt("oldh", customCanvas.getHeight());
         outState.putParcelableArrayList("savedBitmaps", customCanvas.getAddedBitmaps()); //items inside the canvas
         outState.putParcelableArrayList("chosenItems", chosenItems); //items for second fragment
-        if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-
-        }
         Log.d(TAG, "horizontalListItems.size() in outState is: "+horizontalListItems.size());
         outState.putParcelableArrayList("horizontalListItems", horizontalListItems); //items for horizontal listView
         super.onSaveInstanceState(outState);
@@ -73,7 +68,6 @@ public class MyRoomFragment extends Fragment {
         customCanvas.setBackgroundResource(R.drawable.bedroom);
 
         chosenItems = new ArrayList<>();
-        stores = new ArrayList<Store>();
         horizontalListItems = new ArrayList<>();
 
         Bundle bundle = getArguments();
@@ -143,13 +137,12 @@ public class MyRoomFragment extends Fragment {
                 customCanvas.addNewElement(item.getBitmap());
 
                 chosenItems.add(horizontalListItems.get(position));
-                stores.add(horizontalListItems.get(position).getStore());
-                MapFragment.stores = stores;
                 Bundle args = new Bundle();
                 args.putParcelableArrayList("chosenItems", chosenItems);
 
                 FragmentTransaction tr = getActivity().getSupportFragmentManager().beginTransaction();
                 tr.replace(R.id.container_my_furniture, MyFurnitureFragment.newInstance(args));
+                tr.replace(R.id.container_map, MapFragment.newInstance(args));
                 tr.commit();
                 return false;
             }
