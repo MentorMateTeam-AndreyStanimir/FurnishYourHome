@@ -70,6 +70,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private static ArrayList<Table> tablesList;
     private static ArrayList<Store> stores;
     private static ArrayList<CustomListItem> leftNavDrawerItems;
+    private int selectedPosition;
 
     private DrawerLayout leftDrawerLayout;
     private ActionBarDrawerToggle leftDrawerListener;
@@ -234,10 +235,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         leftDrawerLayout.setDrawerListener(leftDrawerListener);
     }
 
-    private void handleSearch(String query) {
-        //doMySearch(query); //ToDo:
-    }
-
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -267,12 +264,51 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                //handleSearch(newText);
+                handleSearch(newText);
                 return false;
             }
         });
-
         return true;
+    }
+
+    private void handleSearch(String query) {
+        MyRoomFragment fragment = (MyRoomFragment) getSupportFragmentManager().findFragmentByTag("MyRoomFragment");
+        Fragment.SavedState myFragmentState = getSupportFragmentManager().saveFragmentInstanceState(fragment);
+        Bundle args = new Bundle();
+
+        ArrayList<Furniture> tempList = new ArrayList<>();
+        ArrayList<CustomListItem> tempListItems;
+
+        switch (selectedPosition) {
+            case 0:
+                tempList = searchInFor(furnituresList, query);
+                break;
+            case 1:
+                tempList = searchInFor(sofasList, query);
+                break;
+            case 2:
+                tempList = searchInFor(tablesList, query);
+                break;
+        }
+        tempListItems = convertFurnitureToListItem(tempList);
+        args.putParcelableArrayList("horizontalListItems", tempListItems);
+
+        FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+        MyRoomFragment newFragment = MyRoomFragment.newInstance(args);
+        newFragment.setInitialSavedState(myFragmentState);
+        tr.replace(R.id.container_my_room, newFragment, "MyRoomFragment");
+        tr.commit();
+    }
+
+    private ArrayList<Furniture> searchInFor(ArrayList<? extends Furniture> furniture, String query) {
+        ArrayList<Furniture> list = new ArrayList<>();
+        for (int i=0; i<furniture.size(); i++) {
+            Furniture item = furniture.get(i);
+            if(item.getName().toLowerCase().contains(query.toLowerCase())) {
+                list.add(item);
+            }
+        }
+        return list;
     }
 
     @Override
@@ -309,6 +345,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     }
 
     private void selectItem(int position) {
+        selectedPosition = position;
         MyRoomFragment fragment = (MyRoomFragment) getSupportFragmentManager().findFragmentByTag("MyRoomFragment");
         Fragment.SavedState myFragmentState = getSupportFragmentManager().saveFragmentInstanceState(fragment);
         Bundle args = new Bundle();
@@ -316,7 +353,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         if(position == 0) {
             Toast.makeText(this, getResources().getString(R.string.app_name), Toast.LENGTH_SHORT).show();
             setTitle(getResources().getString(R.string.app_name));
-            ArrayList<CustomListItem> allListItems = covertFurnitureToListItem(furnituresList);
+            ArrayList<CustomListItem> allListItems = convertFurnitureToListItem(furnituresList);
             args.putParcelableArrayList("horizontalListItems", allListItems);
         } else {
             Toast.makeText(this, leftNavDrawerItems.get(position - 1).getTitle(), Toast.LENGTH_SHORT).show();
@@ -324,11 +361,11 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             mDrawerLeftList.setItemChecked(position, true);
             switch (position) {
                 case 1:
-                    ArrayList<CustomListItem> sofasListItems = covertFurnitureToListItem(sofasList);
+                    ArrayList<CustomListItem> sofasListItems = convertFurnitureToListItem(sofasList);
                     args.putParcelableArrayList("horizontalListItems", sofasListItems);
                     break;
                 case 2:
-                    ArrayList<CustomListItem> tablesListItems = covertFurnitureToListItem(tablesList);
+                    ArrayList<CustomListItem> tablesListItems = convertFurnitureToListItem(tablesList);
                     args.putParcelableArrayList("horizontalListItems", tablesListItems);
                     break;
             }
@@ -341,7 +378,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         tr.commit();
     }
 
-    private ArrayList<CustomListItem> covertFurnitureToListItem(ArrayList<? extends Furniture> furniture) {
+    private ArrayList<CustomListItem> convertFurnitureToListItem(ArrayList<? extends Furniture> furniture) {
         ArrayList<CustomListItem> listItems = new ArrayList<>();
         for (int i = 0; i<furniture.size(); i++) {
             CustomListItem item = new CustomListItem();
@@ -490,7 +527,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         protected void onPostExecute(Void aVoid) {
 
             Bundle args = new Bundle();
-            ArrayList<CustomListItem> listItems = covertFurnitureToListItem(furnituresList);
+            ArrayList<CustomListItem> listItems = convertFurnitureToListItem(furnituresList);
             args.putParcelableArrayList("horizontalListItems", listItems);
 
             Log.d(TAG, "loading MyRoomFragment.newInstance(args)");
