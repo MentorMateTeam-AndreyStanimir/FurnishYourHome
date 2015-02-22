@@ -18,6 +18,7 @@ import com.project.furnishyourhome.models.CanvasView;
 import com.project.furnishyourhome.models.CustomBitmap;
 import com.project.furnishyourhome.models.CustomListItem;
 import com.project.furnishyourhome.models.Furniture;
+import com.project.furnishyourhome.models.Store;
 
 import org.lucasr.twowayview.TwoWayView;
 
@@ -31,6 +32,7 @@ public class MyRoomFragment extends Fragment {
     private static MyRoomFragment instance = null;
 
     private ArrayList<CustomBitmap> arrayList;
+    private ArrayList<Store> stores;        // не се стресирвай само за проба e :)
     private ArrayList<CustomListItem> listItems;
     private ArrayList<CustomListItem> chosenItems;
     private CanvasView customCanvas;
@@ -91,7 +93,7 @@ public class MyRoomFragment extends Fragment {
         customCanvas.setBackgroundResource(R.drawable.bedroom);
 
         chosenItems = new ArrayList<>();
-
+        stores = new ArrayList<Store>();
         Bundle bundle = getArguments(); // TODO: get parameters for horizontal list view
 
         TwoWayView twoWayView = (TwoWayView) rootView.findViewById(R.id.twv_furniture);
@@ -122,6 +124,8 @@ public class MyRoomFragment extends Fragment {
                 customCanvas.addNewElement(item.getBitmap());
 
                 chosenItems.add(listItems.get(position));
+                stores.add(listItems.get(position).getStore());
+                MapFragment.stores = stores;
                 Bundle args = new Bundle();
                 args.putParcelableArrayList("chosenItems", chosenItems);
 
@@ -137,6 +141,9 @@ public class MyRoomFragment extends Fragment {
                 arrayList = savedInstanceState.getParcelableArrayList("savedBitmaps");
                 this.customCanvas.setAddedBitmaps(this.arrayList);
                 this.chosenItems = savedInstanceState.getParcelableArrayList("chosenItems");
+                for(CustomListItem item : this.chosenItems){
+                    this.stores.add(item.getStore());
+                }
             } else {
                 oldw = savedInstanceState.getInt("oldw");
                 oldh = savedInstanceState.getInt("oldh");

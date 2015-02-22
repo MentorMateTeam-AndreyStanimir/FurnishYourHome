@@ -1,5 +1,6 @@
 package com.project.furnishyourhome.adapters;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -7,6 +8,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import com.project.furnishyourhome.fragments.MapFragment;
 import com.project.furnishyourhome.fragments.MyFurnitureFragment;
 import com.project.furnishyourhome.fragments.MyRoomFragment;
+import com.project.furnishyourhome.location.MyLocationListener;
 
 /**
  * Created by Andrey on 11.2.2015 г..
@@ -14,14 +16,16 @@ import com.project.furnishyourhome.fragments.MyRoomFragment;
 
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
+    Context context;
     CharSequence Titles[]; // This will Store the Titles of the Tabs which are Going to be passed when ViewPagerAdapter is created
     int numbOfTabs; // Store the number of tabs, this will also be passed when the ViewPagerAdapter is created
 
 
     // Build a Constructor and assign the passed Values to appropriate values in the class
-    public ViewPagerAdapter(FragmentManager fm,CharSequence mTitles[], int mNumbOfTabs) {
+    public ViewPagerAdapter(Context context, FragmentManager fm,CharSequence mTitles[], int mNumbOfTabs) {
         super(fm);
 
+        this.context = context;
         this.Titles = mTitles;
         this.numbOfTabs = mNumbOfTabs;
 
@@ -37,10 +41,10 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
                 if(this.numbOfTabs == 3) {
                     return MyFurnitureFragment.newInstance();
                 } else {
-                    return MapFragment.newInstance();
+                    return MapFragment.newInstance(MyLocationListener.instance(this.context));
                 }
             default:
-                return MapFragment.newInstance();
+                return MapFragment.newInstance(MyLocationListener.instance(this.context));
         }
     }
 

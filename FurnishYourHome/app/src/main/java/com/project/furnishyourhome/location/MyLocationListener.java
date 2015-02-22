@@ -9,6 +9,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.project.furnishyourhome.fragments.MapFragment;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -17,8 +19,8 @@ public class MyLocationListener implements LocationListener {
 
     private Context context;
     private Location myLocation;
-    private String latitude;
-    private String longitude;
+    private double latitude;
+    private double longitude;
     private String currentAddress;
 
     public static MyLocationListener myLocationListener = null;
@@ -52,19 +54,19 @@ public class MyLocationListener implements LocationListener {
         this.context = context;
     }
 
-    public String getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    private void setLatitude(String latitude) {
+    private void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public String getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    private void setLongitude(String longitude) {
+    private void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
@@ -79,8 +81,8 @@ public class MyLocationListener implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         Log.d("Location", "Location changed");
-        setLatitude(String.valueOf(location.getLatitude()));
-        setLongitude(String.valueOf(location.getLongitude()));
+        setLatitude(location.getLatitude());
+        setLongitude(location.getLongitude());
         this.setMyLocation(location);
         (new GetAddressTask()).execute(location);
     }
@@ -163,6 +165,9 @@ public class MyLocationListener implements LocationListener {
         @Override
         protected void onPostExecute(String result) {
             setCurrentAddress(result);
+            Log.d("RESULT", String.valueOf(getLatitude()));
+            Log.d("RESULT", String.valueOf(getLongitude()));
+            Log.d("RESULT", result);
 
             super.onPostExecute(result);
         }
