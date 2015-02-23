@@ -45,7 +45,7 @@ public class DataCountService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Parse.initialize(MainActivity.context, "ueFuNcN0Cx1xgBzycLJOgwqGqLwDzlt9zJEHulqJ", "s1vnSldgEhOfOMyBfIXSnKsl8F7YHuGNXisSr2jM");
+        Parse.initialize(MainActivity.context, MainActivity.appId, MainActivity.appKey);
         Log.d("StartService", "counter");
     }
 

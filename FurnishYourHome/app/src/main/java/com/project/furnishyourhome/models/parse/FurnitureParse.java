@@ -11,6 +11,7 @@ import com.project.furnishyourhome.models.Store;
 import com.project.furnishyourhome.models.Table;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 /**
  * Created by Andrey on 18.2.2015 г..
@@ -23,6 +24,8 @@ public abstract class FurnitureParse extends ParseObject {
     protected String name;
     protected double price;
     protected String storeId;
+    protected String type;
+    protected String furnitureId;
 
     public FurnitureParse() {
     }
@@ -99,15 +102,36 @@ public abstract class FurnitureParse extends ParseObject {
         put("price", price);
     }
 
+    public String getType() {
+        ParseObject typeObj = getParseObject("furnitureId");
+        this.furnitureId = typeObj.getObjectId();
+        //String txt = typeObj.getString("type");
+        String fType = "";
+
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("Furniture");
+        try {
+            ParseObject fObj = query.get(this.furnitureId);
+            fType = fObj.getString("type");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return fType;
+    }
+
+    public void setType(String furnitureId) {
+        put("furnitureId", furnitureId);
+    }
+
     public Store getStore() {
         ParseObject store = getParseObject("store");
-        storeId = store.getObjectId();
+        this.storeId = store.getObjectId();
         StoreParse obj = new StoreParse();
 
         ParseQuery<StoreParse> query = ParseQuery.getQuery(StoreParse.class);
         try {
-            obj = query.get(storeId);
-            obj.setObjectId(storeId);
+            obj = query.get(this.storeId);
+            obj.setObjectId(this.storeId);
         } catch (ParseException e) {
             e.printStackTrace();
         }

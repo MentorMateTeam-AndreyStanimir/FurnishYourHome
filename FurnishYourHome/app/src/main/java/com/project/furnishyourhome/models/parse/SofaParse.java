@@ -1,15 +1,7 @@
 package com.project.furnishyourhome.models.parse;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
 import com.parse.ParseClassName;
-import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
 import com.project.furnishyourhome.models.Sofa;
-import com.project.furnishyourhome.models.Store;
-import com.project.furnishyourhome.models.Table;
 
 import java.io.ByteArrayOutputStream;
 

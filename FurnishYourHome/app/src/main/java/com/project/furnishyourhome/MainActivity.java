@@ -56,6 +56,7 @@ import com.project.furnishyourhome.models.HolderCount;
 import com.project.furnishyourhome.models.SimpleGestureFilter;
 import com.project.furnishyourhome.models.Sofa;
 import com.project.furnishyourhome.models.Table;
+import com.project.furnishyourhome.models.parse.FurnitureItemParse;
 import com.project.furnishyourhome.models.parse.SofaParse;
 import com.project.furnishyourhome.models.parse.StoreParse;
 import com.project.furnishyourhome.models.parse.TableParse;
@@ -87,6 +88,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private HolderCount holderCount = new HolderCount();
     private int countDataOnServer = 0;
     public static Context context;
+    public static String appId = "ueFuNcN0Cx1xgBzycLJOgwqGqLwDzlt9zJEHulqJ";
+    public static String appKey = "s1vnSldgEhOfOMyBfIXSnKsl8F7YHuGNXisSr2jM";
 
     private Toolbar toolbar;
 
@@ -138,7 +141,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         ParseObject.registerSubclass(SofaParse.class);
         ParseObject.registerSubclass(StoreParse.class);
         ParseObject.registerSubclass(TableParse.class);
-        Parse.initialize(this, "ueFuNcN0Cx1xgBzycLJOgwqGqLwDzlt9zJEHulqJ", "s1vnSldgEhOfOMyBfIXSnKsl8F7YHuGNXisSr2jM");
+        ParseObject.registerSubclass(FurnitureItemParse.class);
+        Parse.initialize(this, appId, appKey);
 
         this.detector = new SimpleGestureFilter(this, this);
         this.swipeable = true;
@@ -157,8 +161,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             isFirstTime = false;
         }
 
-        //Start service data counter
-
+        // Start service data counter
         taskUpdateList = new TaskUpdateList();
         updateListHandler = new Handler();
         updateListHandler.postDelayed(taskUpdateList, 30000);
@@ -544,41 +547,28 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             e.printStackTrace();
         }
 
-        for (CustomListItem item : leftNavDrawerItems) {
-            String type = item.getTitle();
+        final ParseQuery<FurnitureItemParse> furnitureItems = ParseQuery.getQuery(FurnitureItemParse.class);
+        List<FurnitureItemParse> fItems = null;
 
-            //need to be added more tabels
-            if (type.equals("Table")) {
-                final ParseQuery<TableParse> query = ParseQuery.getQuery(TableParse.class);
-                List<TableParse> tables = null;
+        try {
+            fItems = furnitureItems.find();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
-                try {
-                    tables = query.find();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+        if (fItems != null) {
+            for (FurnitureItemParse fItem : fItems) {
+                String type = fItem.getType();
 
-                if (tables != null) {
-                    for (TableParse table : tables) {
-                        furnituresList.add(table.getTable());
-                        tablesList.add(table.getTable());
-                    }
-                }
-            } else if (type.equals("Sofa")) {
-                final ParseQuery<SofaParse> query = ParseQuery.getQuery(SofaParse.class);
-                List<SofaParse> sofas = null;
+                // Now SofaParse and TableParse became useless
+                if(type.equals("Table")){
 
-                try {
-                    sofas = query.find();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                    this.furnituresList.add(fItem.getTable());
+                    this.tablesList.add(fItem.getTable());
+                }else if (type.equals("Sofa")) {
 
-                if (sofas != null) {
-                    for (SofaParse sofa : sofas) {
-                        furnituresList.add(sofa.getSofa());
-                        sofasList.add(sofa.getSofa());
-                    }
+                    this.furnituresList.add(fItem.getSofa());
+                    this.sofasList.add(fItem.getSofa());
                 }
             }
         }
@@ -645,6 +635,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         protected void onPreExecute() {
             showProgressDialog();
 
+            // Clean Navigation drawer adapter
             mDrawerLeftList.setAdapter(null);
         }
 
