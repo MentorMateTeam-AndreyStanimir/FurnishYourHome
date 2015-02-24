@@ -13,6 +13,7 @@ import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.project.furnishyourhome.MainActivity;
+import com.project.furnishyourhome.models.parse.FurnitureItemParse;
 import com.project.furnishyourhome.models.parse.TableParse;
 
 import java.util.Timer;
@@ -96,7 +97,7 @@ public class DataCountService extends Service {
 
         @Override
         public void run() {
-            final ParseQuery<TableParse> query = ParseQuery.getQuery(TableParse.class);
+            final ParseQuery<FurnitureItemParse> query = ParseQuery.getQuery(FurnitureItemParse.class);
 
             try {
                 count = query.count();

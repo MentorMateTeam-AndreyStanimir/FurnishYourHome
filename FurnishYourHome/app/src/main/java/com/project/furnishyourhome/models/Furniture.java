@@ -19,6 +19,7 @@ public abstract class Furniture implements Parcelable {
     private String info;
     private Store store;
     private String storeId;
+    private String furnitureId;
 
     public Furniture(){
     }
@@ -174,5 +175,13 @@ public abstract class Furniture implements Parcelable {
         byteArray = stream.toByteArray(); // TODO: CHANGED
 
         return byteArray;
+    }
+
+    public void setFurnitureId(String furnitureId) {
+        this.furnitureId = furnitureId;
+    }
+
+    public String getFurnitureId() {
+        return furnitureId;
     }
 }

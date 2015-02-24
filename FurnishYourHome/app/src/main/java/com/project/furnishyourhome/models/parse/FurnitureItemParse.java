@@ -21,7 +21,9 @@ public class FurnitureItemParse extends FurnitureParse {
         sofa.setPrice(this.getPrice());
         sofa.setStore(this.getStore());
         sofa.setDrawable(this.getDrawable());
+        sofa.setStoreId(this.storeId);
         sofa.setObjectId(this.getObjectId());
+        sofa.setFurnitureId(this.getFurnitureId());
 
         return sofa;
     }
@@ -38,6 +40,7 @@ public class FurnitureItemParse extends FurnitureParse {
         table.setDrawable(this.getDrawable());
         table.setStoreId(this.storeId);
         table.setObjectId(this.getObjectId());
+        table.setFurnitureId(this.getFurnitureId());
 
         return table;
     }

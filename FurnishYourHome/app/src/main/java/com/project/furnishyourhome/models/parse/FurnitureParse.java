@@ -104,13 +104,13 @@ public abstract class FurnitureParse extends ParseObject {
 
     public String getType() {
         ParseObject typeObj = getParseObject("furnitureId");
-        this.furnitureId = typeObj.getObjectId();
+        this.setFurnitureId(typeObj.getObjectId());
         //String txt = typeObj.getString("type");
         String fType = "";
 
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("Furniture");
         try {
-            ParseObject fObj = query.get(this.furnitureId);
+            ParseObject fObj = query.get(this.getFurnitureId());
             fType = fObj.getString("type");
         } catch (ParseException e) {
             e.printStackTrace();
@@ -121,6 +121,14 @@ public abstract class FurnitureParse extends ParseObject {
 
     public void setType(String furnitureId) {
         put("furnitureId", furnitureId);
+    }
+
+    public String getFurnitureId() {
+        return furnitureId;
+    }
+
+    public void setFurnitureId(String furnitureId) {
+        this.furnitureId = furnitureId;
     }
 
     public Store getStore() {

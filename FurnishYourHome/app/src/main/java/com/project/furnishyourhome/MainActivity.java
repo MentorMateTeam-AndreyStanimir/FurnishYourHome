@@ -43,6 +43,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.project.furnishyourhome.adapters.CustomListAdapter;
 import com.project.furnishyourhome.adapters.ViewPagerAdapter;
+import com.project.furnishyourhome.database.FYHApp;
 import com.project.furnishyourhome.dialogs.NetworkDialog;
 import com.project.furnishyourhome.fragments.MyRoomFragment;
 import com.project.furnishyourhome.fragments.NavDrawerRightFragment;
@@ -56,6 +57,7 @@ import com.project.furnishyourhome.models.HolderCount;
 import com.project.furnishyourhome.models.SimpleGestureFilter;
 import com.project.furnishyourhome.models.Sofa;
 import com.project.furnishyourhome.models.Table;
+import com.project.furnishyourhome.models.TypeItem;
 import com.project.furnishyourhome.models.parse.FurnitureItemParse;
 import com.project.furnishyourhome.models.parse.SofaParse;
 import com.project.furnishyourhome.models.parse.StoreParse;
@@ -90,6 +92,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     public static Context context;
     public static String appId = "ueFuNcN0Cx1xgBzycLJOgwqGqLwDzlt9zJEHulqJ";
     public static String appKey = "s1vnSldgEhOfOMyBfIXSnKsl8F7YHuGNXisSr2jM";
+    public ArrayList<TypeItem> types;
 
     private Toolbar toolbar;
 
@@ -525,12 +528,15 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     private void downloadData() {
         try {
+            types = new ArrayList<TypeItem>();
+
             //menu items for left drawer
             final ParseQuery<ParseObject> typesQuery = ParseQuery.getQuery("Furniture");
             List<ParseObject> parseObjects = typesQuery.find();
 
             for (ParseObject obj : parseObjects) {
                 String type = obj.getString("type");
+                String id = obj.getObjectId();
                 ParseFile imgParse = obj.getParseFile("icon");
                 byte[] imageByte = new byte[0];
                 try {
@@ -541,6 +547,13 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
                 Bitmap icon = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length);
                 CustomListItem item = new CustomListItem(type, icon);
+
+                TypeItem typeItem = new TypeItem();
+                typeItem.setId(id);
+                typeItem.setType(type);
+                typeItem.setBitmap(icon);
+                this.types.add(typeItem);
+
                 leftNavDrawerItems.add(item);
             }
         } catch (ParseException e) {
@@ -645,6 +658,22 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             saveDataAfterDownloading();
             setLeftDrawer();
             progressDialog.dismiss();
+
+            boolean isSavedTypesIntoDB = ((FYHApp) getApplication()).getUtilitiesDb().addTypes(types);
+            if(isSavedTypesIntoDB){
+                Toast.makeText(context, "Types saved into DB", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Something went wrong (types)!", Toast.LENGTH_SHORT).show();
+            }
+            boolean isSavedItemsIntoDB = ((FYHApp) getApplication()).getUtilitiesDb().addItems(furnituresList);
+            if(isSavedItemsIntoDB){
+                Toast.makeText(context, "Items saved into DB", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Something went wrong )Items)!", Toast.LENGTH_SHORT).show();
+            }
+
+            ArrayList<TypeItem> typesFromDB = ((FYHApp) getApplication()).getUtilitiesDb().getTypes();
+            ArrayList<Furniture> itemsFromDB = ((FYHApp) getApplication()).getUtilitiesDb().getAllItems();
         }
     }
 }
