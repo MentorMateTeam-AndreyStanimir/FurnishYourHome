@@ -14,7 +14,6 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.project.furnishyourhome.MainActivity;
 import com.project.furnishyourhome.models.parse.FurnitureItemParse;
-import com.project.furnishyourhome.models.parse.TableParse;
 
 import java.util.Timer;
 import java.util.TimerTask;

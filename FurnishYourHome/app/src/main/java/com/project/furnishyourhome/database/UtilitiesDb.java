@@ -60,19 +60,6 @@ public class UtilitiesDb{
                     reg.put("furnitureId", furnitureId);
                     reg.put("storeId", storeId);
                     utilityDb.insert(TABLE_FURNITURES, null, reg);
-//                    String sql = "INSERT INTO "
-//                            + TABLE_FURNITURES
-//                            + "(_id,name,material,info,dimensions,price,drawable,furnitureId,storeId) VALUES('"
-//                            + id + "','"
-//                            + name + "','"
-//                            + material + "','"
-//                            + info + "','"
-//                            + dimension + "','"
-//                            + price + "','"
-//                            + imgData + "','"
-//                            + furnitureId + "','"
-//                            + storeId + "');";
-//                    utilityDb.execSQL(sql);
 
                     boolean isStoreAdded = addStore(store);
 
@@ -113,20 +100,6 @@ public class UtilitiesDb{
                 reg.put("latitude", latitude);
                 reg.put("longitude", longitude);
                 utilityDb.insert(TABLE_STORES, null, reg);
-//                String sql = "INSERT INTO "
-//                        + TABLE_STORES
-//                        + "(_id,name,address,email,webpage,customersPhone,workingHours,logo,latitude,longitude) VALUES('"
-//                        + id + "','"
-//                        + store.getName() + "','"
-//                        + store.getAddress() + "','"
-//                        + store.getEmail() + "','"
-//                        + store.getWebpage() + "','"
-//                        + store.getCustomersPhone() + "','"
-//                        + store.getWorkingHours() + "','"
-//                        + storeImgData + "','"
-//                        + latitude + "','"
-//                        + longitude + "');";
-//                utilityDb.execSQL(sql);
             } else {
                 return false;
             }
@@ -152,13 +125,6 @@ public class UtilitiesDb{
                     reg.put("type", type);
                     reg.put("icon", imgData);
                     utilityDb.insert(TABLE_TYPES, null, reg);
-//                    String sql = "INSERT INTO "
-//                            + TABLE_TYPES
-//                            + "(_id,type,icon) VALUES('"
-//                            + id + "','"
-//                            + type + "','"
-//                            + imgData + "');";
-//                    utilityDb.execSQL(sql);
                 } else {
                     return false;
                 }
@@ -258,6 +224,28 @@ public class UtilitiesDb{
         return temp;
     }
 
+    public ArrayList<Store> getStores (){
+        ArrayList<Store> stores  = new ArrayList<Store>();
+
+        if(getTableCount(TABLE_STORES) > 0) {
+
+            String sql = "SELECT * FROM " + TABLE_STORES;
+            Cursor allStores = utilityDb.rawQuery(sql, null);
+
+            while (allStores.moveToNext()) {
+                Store store = new Store();
+                loadStoreData(store, allStores);
+
+                stores.add(store);
+            }
+
+            allStores.close();
+        }
+
+
+        return stores;
+    }
+
     private String getType(String furnitureId) {
 
         if (isIdExist(furnitureId, TABLE_TYPES) == 1) {
@@ -283,36 +271,41 @@ public class UtilitiesDb{
 
             Cursor c = utilityDb.rawQuery(sql, null);
             c.moveToFirst();
-            String id = c.getString(0);
-            String name = c.getString(1);
-            String address = c.getString(2);
-            String email = c.getString(3);
-            String webpage = c.getString(4);
-            String customersPhone = c.getString(5);
-            String workingHours = c.getString(6);
-            String latitude = c.getString(8);
-            String longitude = c.getString(9);
-            byte[] image = c.getBlob(7);
-            Bitmap bitmap = getImage(image);
-            double latDouble = Double.parseDouble(latitude);
-            double lonDouble = Double.parseDouble(longitude);
-            Location location = new Location("");
-            location.setLatitude(latDouble);
-            location.setLongitude(lonDouble);
-
-            store.setObjectId(id);
-            store.setName(name);
-            store.setAddress(address);
-            store.setEmail(email);
-            store.setWebpage(webpage);
-            store.setCustomersPhone(customersPhone);
-            store.setWorkingHours(workingHours);
-            store.setLogo(bitmap);
-            store.setLocation(location);
+            loadStoreData(store, c);
 
             c.close();
         }
         return store;
+    }
+
+    private void loadStoreData(Store store, Cursor c) {
+
+        String id = c.getString(0);
+        String name = c.getString(1);
+        String address = c.getString(2);
+        String email = c.getString(3);
+        String webpage = c.getString(4);
+        String customersPhone = c.getString(5);
+        String workingHours = c.getString(6);
+        String latitude = c.getString(8);
+        String longitude = c.getString(9);
+        byte[] image = c.getBlob(7);
+        Bitmap bitmap = getImage(image);
+        double latDouble = Double.parseDouble(latitude);
+        double lonDouble = Double.parseDouble(longitude);
+        Location location = new Location("");
+        location.setLatitude(latDouble);
+        location.setLongitude(lonDouble);
+
+        store.setObjectId(id);
+        store.setName(name);
+        store.setAddress(address);
+        store.setEmail(email);
+        store.setWebpage(webpage);
+        store.setCustomersPhone(customersPhone);
+        store.setWorkingHours(workingHours);
+        store.setLogo(bitmap);
+        store.setLocation(location);
     }
 
     private int isIdExist (String id, String table){

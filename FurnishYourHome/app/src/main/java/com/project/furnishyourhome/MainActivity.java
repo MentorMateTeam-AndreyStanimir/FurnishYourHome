@@ -59,15 +59,17 @@ import com.project.furnishyourhome.models.Sofa;
 import com.project.furnishyourhome.models.Table;
 import com.project.furnishyourhome.models.TypeItem;
 import com.project.furnishyourhome.models.parse.FurnitureItemParse;
-import com.project.furnishyourhome.models.parse.SofaParse;
 import com.project.furnishyourhome.models.parse.StoreParse;
-import com.project.furnishyourhome.models.parse.TableParse;
 import com.project.furnishyourhome.services.DataCountService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable {
+
+    private static final String TABLE_FURNITURES = "Furnitures";
+    private static final String TABLE_STORES = "Stores";
+    private static final String TABLE_TYPES = "Types";
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //private static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
@@ -141,9 +143,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             tablesList = new ArrayList<>();
             //stores          = new ArrayList<>();
         }
-        ParseObject.registerSubclass(SofaParse.class);
         ParseObject.registerSubclass(StoreParse.class);
-        ParseObject.registerSubclass(TableParse.class);
         ParseObject.registerSubclass(FurnitureItemParse.class);
         Parse.initialize(this, appId, appKey);
 
@@ -317,7 +317,10 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                 Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
             }
         });
-        this.mDrawerLeftList.addHeaderView(header);
+
+        if(this.mDrawerLeftList.getHeaderViewsCount() == 0) {
+            this.mDrawerLeftList.addHeaderView(header);
+        }
 
         // Set the adapter
         Log.d(TAG, "leftNavDrawerItems.size():" + leftNavDrawerItems.size());
@@ -529,7 +532,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private void downloadData() {
         try {
             types = new ArrayList<TypeItem>();
-
+            leftNavDrawerItems = new ArrayList<CustomListItem>();
             //menu items for left drawer
             final ParseQuery<ParseObject> typesQuery = ParseQuery.getQuery("Furniture");
             List<ParseObject> parseObjects = typesQuery.find();
@@ -569,6 +572,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             e.printStackTrace();
         }
 
+        this.furnituresList = new ArrayList<Furniture>();
+        this.sofasList = new ArrayList<Sofa>();
+        this.tablesList = new ArrayList<Table>();
         if (fItems != null) {
             for (FurnitureItemParse fItem : fItems) {
                 String type = fItem.getType();
@@ -576,30 +582,17 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                 // Now SofaParse and TableParse became useless
                 if(type.equals("Table")){
 
-                    this.furnituresList.add(fItem.getTable());
-                    this.tablesList.add(fItem.getTable());
+                    Table table = fItem.getTable();
+                    this.furnituresList.add(table);
+                    this.tablesList.add(table);
                 }else if (type.equals("Sofa")) {
 
-                    this.furnituresList.add(fItem.getSofa());
-                    this.sofasList.add(fItem.getSofa());
+                    Sofa sofa = fItem.getSofa();
+                    this.furnituresList.add(sofa);
+                    this.sofasList.add(sofa);
                 }
             }
         }
-
-        //items in STORE table
-            /*final ParseQuery<StoreParse> storeQuery = ParseQuery.getQuery(StoreParse.class);
-            List<StoreParse> storesList = null;
-            try {
-                storesList = storeQuery.find();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            if(storesList != null) {
-                for (StoreParse store : storesList) {
-                    stores.add(store.getStore());
-                }
-            }*/
     }
 
     private void saveDataAfterDownloading() {
@@ -610,9 +603,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         Log.d(TAG, "loading MyRoomFragment.newInstance(args)");
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
         tr.replace(R.id.container_my_room, MyRoomFragment.newInstance(args), "MyRoomFragment");
-        tr.commit();
-
-        holderCount.count = countDataOnServer; //ToDo: change to furnitures.size()
+        tr.commit();   //TODO: Е те тука гърми (понякога).
     }
 
     private void showProgressDialog() {
@@ -630,15 +621,24 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         Log.d(TAG, "Success");
 
         saveDataAfterDownloading();
-        mDrawerLeftList.setAdapter(null);
         setLeftDrawer();
+        saveDataInDb();
     }
 
     private class GetAsyncResult extends AsyncTask<Void, Void, Void> {
 
+        boolean isFromInternet = false;
+
         @Override
         protected Void doInBackground(Void... params) {
-            downloadData();
+
+            if(((FYHApp) getApplication()).getUtilitiesDb().isDbEmpty()){
+                isFromInternet = true;
+                downloadData();
+            } else {
+                holderCount.count = ((FYHApp) getApplication()).getUtilitiesDb().getTableCount(TABLE_FURNITURES);
+                loadDataFromDb();
+            }
 
             Log.d(TAG, "Success");
             return null;
@@ -659,21 +659,63 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             setLeftDrawer();
             progressDialog.dismiss();
 
-            boolean isSavedTypesIntoDB = ((FYHApp) getApplication()).getUtilitiesDb().addTypes(types);
-            if(isSavedTypesIntoDB){
-                Toast.makeText(context, "Types saved into DB", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(context, "Something went wrong (types)!", Toast.LENGTH_SHORT).show();
+            if(isFromInternet) {
+                saveDataInDb();
             }
-            boolean isSavedItemsIntoDB = ((FYHApp) getApplication()).getUtilitiesDb().addItems(furnituresList);
-            if(isSavedItemsIntoDB){
-                Toast.makeText(context, "Items saved into DB", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(context, "Something went wrong )Items)!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void saveDataInDb() {
+
+        int itemsCountInDb = ((FYHApp) getApplication()).getUtilitiesDb().getTableCount(TABLE_FURNITURES);
+
+        //if items in Database are more than the items from internet then clean all data
+        if(itemsCountInDb > this.furnituresList.size()) {
+            ((FYHApp) getApplication()).getUtilitiesDb().deleteTable(TABLE_FURNITURES);
+            ((FYHApp) getApplication()).getUtilitiesDb().deleteTable(TABLE_TYPES);
+        }
+
+        if (itemsCountInDb < this.furnituresList.size()) {
+                boolean isSavedTypesIntoDB = ((FYHApp) getApplication()).getUtilitiesDb().addTypes(types);
+                if (isSavedTypesIntoDB) {
+                    Log.d("Database", "Types saved into DB");
+                } else {
+                    Log.d("Database", "Something went wrong (types)");
+                }
+                boolean isSavedItemsIntoDB = ((FYHApp) getApplication()).getUtilitiesDb().addItems(furnituresList);
+                if (isSavedItemsIntoDB) {
+                    Log.d("Database", "Items saved into DB");
+                } else {
+                    Log.d("Database", "Something went wrong (items)");
+                }
             }
 
-            ArrayList<TypeItem> typesFromDB = ((FYHApp) getApplication()).getUtilitiesDb().getTypes();
-            ArrayList<Furniture> itemsFromDB = ((FYHApp) getApplication()).getUtilitiesDb().getAllItems();
+        holderCount.count = this.furnituresList.size();
+    }
+
+    private void loadDataFromDb() {
+        ArrayList<TypeItem> typesFromDB = ((FYHApp) getApplication()).getUtilitiesDb().getTypes();
+        ArrayList<Furniture> itemsFromDB = ((FYHApp) getApplication()).getUtilitiesDb().getAllItems();
+
+        leftNavDrawerItems = new ArrayList<CustomListItem>();
+        tablesList = new ArrayList<Table>();
+        sofasList = new ArrayList<Sofa>();
+
+        for (TypeItem type : typesFromDB) {
+
+            CustomListItem item = new CustomListItem(type.getType(), type.getBitmap());
+
+            leftNavDrawerItems.add(item);
+        }
+
+        furnituresList = itemsFromDB;
+        for (Furniture fItem : itemsFromDB) {
+
+            if(fItem instanceof Table){
+                tablesList.add((Table) fItem);
+            } else if (fItem instanceof Sofa){
+                sofasList.add((Sofa) fItem);
+            }
         }
     }
 }
