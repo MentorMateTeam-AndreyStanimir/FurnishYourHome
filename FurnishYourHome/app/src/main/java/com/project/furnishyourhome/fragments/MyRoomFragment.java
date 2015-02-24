@@ -126,7 +126,7 @@ public class MyRoomFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_my_room, container, false);
 
         customCanvas = (CanvasView) rootView.findViewById(R.id.cv_room_canvas);
-        customCanvas.setBackgroundResource(R.drawable.floor);
+        customCanvas.setBackgroundResource(R.drawable.room);
 
         chosenItems = new ArrayList<>();
         horizontalListItems = new ArrayList<>();

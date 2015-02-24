@@ -49,6 +49,7 @@ import com.project.furnishyourhome.adapters.ViewPagerAdapter;
 import com.project.furnishyourhome.database.FYHApp;
 import com.project.furnishyourhome.fragments.MyRoomFragment;
 import com.project.furnishyourhome.fragments.NavDrawerRightFragment;
+import com.project.furnishyourhome.interfaces.DbTableNames;
 import com.project.furnishyourhome.interfaces.IGestureListener;
 import com.project.furnishyourhome.interfaces.ISwipeable;
 import com.project.furnishyourhome.materialdesign.SlidingTabLayout;
@@ -68,13 +69,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable {
+public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable, DbTableNames {
 	 private static final String TAG = MainActivity.class.getSimpleName();
-	
-    private static final String TABLE_FURNITURES = "Furnitures";
-    private static final String TABLE_STORES = "Stores";
-    private static final String TABLE_TYPES = "Types";
-   
 
     //private static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
@@ -523,11 +519,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             }
         }
     }
-
-   /* @Override
-    public void onDoubleTap() {
-        Toast.makeText(this, "Double Tap", Toast.LENGTH_SHORT).show();
-    }*/
 
     @Override
     public void setSwipeable(boolean swipeable) {

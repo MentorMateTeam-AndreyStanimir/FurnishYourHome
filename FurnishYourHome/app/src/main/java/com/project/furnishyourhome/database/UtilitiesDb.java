@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 
 import com.project.furnishyourhome.R;
+import com.project.furnishyourhome.interfaces.DbTableNames;
 import com.project.furnishyourhome.models.Furniture;
 import com.project.furnishyourhome.models.Sofa;
 import com.project.furnishyourhome.models.Store;
@@ -21,12 +22,8 @@ import java.util.ArrayList;
 /**
  * Created by Andrey on 23.2.2015 г..
  */
-public class UtilitiesDb{
+public class UtilitiesDb implements DbTableNames{
     private SQLiteDatabase utilityDb;
-    //private static final String TABLE_USERS = "Users";
-    private static final String TABLE_FURNITURES = "Furnitures";
-    private static final String TABLE_STORES = "Stores";
-    private static final String TABLE_TYPES = "Types";
 
     public UtilitiesDb(SQLiteDatabase db) {
         this.utilityDb = db;
@@ -61,16 +58,10 @@ public class UtilitiesDb{
                     reg.put("storeId", storeId);
                     utilityDb.insert(TABLE_FURNITURES, null, reg);
 
-                    boolean isStoreAdded = addStore(store);
-
-                    if (!isStoreAdded) {
-                        return false;
-                    }
+                    addStore(store);
                 } catch (Exception e) {
                     return false;
                 }
-            } else {
-                return false;
             }
         }
 
@@ -100,8 +91,6 @@ public class UtilitiesDb{
                 reg.put("latitude", latitude);
                 reg.put("longitude", longitude);
                 utilityDb.insert(TABLE_STORES, null, reg);
-            } else {
-                return false;
             }
         } catch (Exception e) {
             return false;
@@ -125,8 +114,6 @@ public class UtilitiesDb{
                     reg.put("type", type);
                     reg.put("icon", imgData);
                     utilityDb.insert(TABLE_TYPES, null, reg);
-                } else {
-                    return false;
                 }
             }
         } catch (Exception e) {
