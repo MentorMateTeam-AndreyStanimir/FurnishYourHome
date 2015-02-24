@@ -60,7 +60,7 @@ public class Store implements Parcelable {
         out.writeString(name);
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        logo.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        logo.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] byteArray = stream.toByteArray();
         out.writeByteArray(byteArray);
 

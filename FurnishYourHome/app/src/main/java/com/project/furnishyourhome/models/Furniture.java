@@ -59,7 +59,7 @@ public abstract class Furniture implements Parcelable {
         out.writeString(name);
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        drawable.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        drawable.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] byteArray = stream.toByteArray();
         out.writeByteArray(byteArray);
 
@@ -170,7 +170,7 @@ public abstract class Furniture implements Parcelable {
 
     public byte[] getImageAsByteArray (){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        getDrawable().compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        getDrawable().compress(Bitmap.CompressFormat.PNG, 100, stream);
         //byte[] byteArray = stream.toByteArray();
         byteArray = stream.toByteArray(); // TODO: CHANGED
 

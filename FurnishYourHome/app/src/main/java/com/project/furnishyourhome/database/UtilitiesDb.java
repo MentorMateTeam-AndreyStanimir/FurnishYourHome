@@ -348,7 +348,7 @@ public class UtilitiesDb implements DbTableNames{
 
     private byte[] getBitmapAsByteArray(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
         return outputStream.toByteArray();
     }
 
