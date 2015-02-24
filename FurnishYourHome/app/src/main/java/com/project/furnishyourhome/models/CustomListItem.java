@@ -45,7 +45,7 @@ public class CustomListItem implements Parcelable {
         out.writeString(title);
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        this.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        this.bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byteArray = stream.toByteArray();
         out.writeByteArray(byteArray);
     }

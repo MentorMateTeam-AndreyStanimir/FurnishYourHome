@@ -3,6 +3,7 @@ package com.project.furnishyourhome.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,8 @@ import java.util.ArrayList;
  * Created by Andrey on 10.2.2015 г..
  */
 public class CustomListAdapter extends BaseAdapter {
+    private static final String TAG = CustomListAdapter.class.getSimpleName();
+
     private Context context;
     private ArrayList<CustomListItem> listItems;
     private int layoutID;
@@ -46,6 +49,7 @@ public class CustomListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         if (convertView == null) {
             LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
             convertView = mInflater.inflate(layoutID, null);
@@ -55,13 +59,14 @@ public class CustomListAdapter extends BaseAdapter {
         TextView tvTitle = (TextView) convertView.findViewById(R.id.tv_title_menu);
         if(layoutID == R.layout.favourites_list_item) {
             TextView tvInfo = (TextView) convertView.findViewById(R.id.tv_extra_info_menu);
-            tvInfo.setText("Store: "+listItems.get(position).getStore().getName()); // TODO: need to be the store
+            tvInfo.setText("Store: "+listItems.get(position).getStore().getName());
         }
 
         Bitmap bitmap = listItems.get(position).getBitmap();
 
         ivIcon.setImageBitmap(bitmap);
         tvTitle.setText(listItems.get(position).getTitle());
+        Log.d(TAG, listItems.get(position).getTitle()+"");
 
         return convertView;
     }

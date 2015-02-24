@@ -16,6 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@color/TextColorError"
         android:gravity="center" />
 </FrameLayout>

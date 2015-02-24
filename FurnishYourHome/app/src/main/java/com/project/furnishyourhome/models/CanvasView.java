@@ -9,14 +9,12 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.project.furnishyourhome.interfaces.ISwipeable;
 
 import java.util.ArrayList;
 
-public class CanvasView extends View
-{
+public class CanvasView extends View {
     private static final String TAG = CanvasView.class.getSimpleName();
     private static final float TOLERANCE = 5.0F;
     private ArrayList<CustomBitmap> addedBitmaps;
@@ -58,11 +56,11 @@ public class CanvasView extends View
                     && (x < canvasXend - addedBitmaps.get(itemOnFocus).getHalfWidth())
                     && (y >= canvasY)
                     && (y < canvasYend - addedBitmaps.get(itemOnFocus).getHalfHeight()) ) {
-                Log.d("MOVE", "x: " + x + " y: " + y);
+                //Log.d("MOVE", "x: " + x + " y: " + y);
                 if (hasItemOnFocus) {
                     addedBitmaps.get(itemOnFocus).setX(mX);
                     addedBitmaps.get(itemOnFocus).setY(mY);
-                    Log.d(TAG, itemOnFocus + "");
+                    //Log.d(TAG, itemOnFocus + "");
                 }
             }
         }
@@ -73,7 +71,7 @@ public class CanvasView extends View
         for (int i = 0; i<addedBitmaps.size(); i++) {
             if (this.addedBitmaps.get(i).isInBitmap(x, y)) {
                 itemOnFocus = i;
-                Log.d(TAG, itemOnFocus + "");
+                Log.d(TAG, "itemOnFocus: "+itemOnFocus);
                 hasItemOnFocus = true;
                 pager.setSwipeable(false);  // stops view pager swiping
                 break;
@@ -87,7 +85,7 @@ public class CanvasView extends View
     private void endTouch() {
         hasItemOnFocus = false;
         if (!addedBitmaps.isEmpty()) {
-            Toast.makeText(this.context, "Bitmap " + itemOnFocus + " set on cords ic_no_preview: " + addedBitmaps.get(itemOnFocus).getX() + " Y: " + addedBitmaps.get(this.itemOnFocus).getY(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this.context, "Bitmap " + itemOnFocus + " set on cords ic_no_preview: " + addedBitmaps.get(itemOnFocus).getX() + " Y: " + addedBitmaps.get(this.itemOnFocus).getY(), Toast.LENGTH_SHORT).show();
         }
         itemOnFocus = 0;
         pager.setSwipeable(true);
@@ -146,7 +144,7 @@ public class CanvasView extends View
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
-                if(!addedBitmaps.isEmpty()) {
+                if (!addedBitmaps.isEmpty()) {
                     moveTouch(x, y);
                     invalidate();
                 }

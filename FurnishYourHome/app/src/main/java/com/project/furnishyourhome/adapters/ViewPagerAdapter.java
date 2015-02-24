@@ -1,8 +1,10 @@
 package com.project.furnishyourhome.adapters;
 
+
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
@@ -11,7 +13,7 @@ import com.project.furnishyourhome.fragments.MyFurnitureFragment;
 import com.project.furnishyourhome.fragments.MyRoomFragment;
 
 
-public class ViewPagerAdapter extends FragmentStatePagerAdapter {
+public class ViewPagerAdapter extends FragmentPagerAdapter {
     private static final String TAG = ViewPagerAdapter.class.getSimpleName();
 
     Context context;
@@ -37,6 +39,7 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
         switch (position) {
             case 0:
                 Log.d(TAG, "loading MyRoomFragment.newInstance()");
+
                 return MyRoomFragment.newInstance();
             case 1:
                 if(this.numbOfTabs == 3) {

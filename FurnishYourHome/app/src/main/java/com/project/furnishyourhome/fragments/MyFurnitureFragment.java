@@ -1,8 +1,14 @@
 package com.project.furnishyourhome.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +27,7 @@ import java.util.ArrayList;
  * Created by Andrey on 11.2.2015 г..
  */
 public class MyFurnitureFragment extends Fragment {
+    private static final String TAG = MyFurnitureFragment.class.getSimpleName();
 
     private ArrayList <CustomListItem> chosenItems;
 
@@ -75,6 +82,40 @@ public class MyFurnitureFragment extends Fragment {
                         Toast.LENGTH_LONG).show();
             }
         });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                showDeleteAlertToUser(position);
+                return false;
+            }
+        });
         return rootView;
+    }
+
+    private void showDeleteAlertToUser(int position){
+        Log.d(TAG, "showDeleteAlertToUser");
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.Base_Theme_AppCompat_Dialog));
+        alertDialogBuilder.setMessage("Do you really want to delete this item?");
+        alertDialogBuilder.setCancelable(true);
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int id){
+                MyRoomFragment fragment = (MyRoomFragment) getActivity().getSupportFragmentManager().findFragmentByTag("MyRoomFragment");
+                Fragment.SavedState myFragmentState = getActivity().getSupportFragmentManager().saveFragmentInstanceState(fragment);
+                Bundle args = new Bundle();
+
+                FragmentTransaction tr = getActivity().getSupportFragmentManager().beginTransaction();
+                MyRoomFragment newFragment = MyRoomFragment.newInstance(args);
+                newFragment.setInitialSavedState(myFragmentState);
+                tr.replace(R.id.container_my_room, newFragment, "MyRoomFragment");
+                tr.commit();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int id){
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
     }
 }

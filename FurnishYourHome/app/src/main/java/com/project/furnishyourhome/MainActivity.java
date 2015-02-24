@@ -1,9 +1,12 @@
 package com.project.furnishyourhome;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.ComponentName;
+
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
@@ -11,13 +14,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ResultReceiver;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
@@ -27,6 +31,8 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -66,11 +72,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable {
-
+	 private static final String TAG = MainActivity.class.getSimpleName();
+	
     private static final String TABLE_FURNITURES = "Furnitures";
     private static final String TABLE_STORES = "Stores";
     private static final String TABLE_TYPES = "Types";
-    private static final String TAG = MainActivity.class.getSimpleName();
+   
 
     //private static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
@@ -97,6 +104,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     public ArrayList<TypeItem> types;
 
     private Toolbar toolbar;
+    ViewPagerAdapter adapterViewPager;
+    CustomViewPager pager;
 
     private boolean swipeable;
 
@@ -105,32 +114,53 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     @Override
     protected void onResume() {
         super.onResume();
-
-        NetworkInfo mWifi = getNetworkInfo();
-
-        if (isFirstTime && mWifi.isConnected()) {
-            loadData();
-            isFirstTime = false;
+        WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        if(wifi.isWifiEnabled()) {
+            Log.d(TAG, "wifi is ON");
+            if(isFirstTime){
+                loadData();
+                isFirstTime = false;
+            }
+        } else {
+            Log.d(TAG, "wifi is OFF");
+            showWiFiDisabledAlertToUser();
         }
     }
 
-    private NetworkInfo getNetworkInfo() {
-        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        if (mWifi.isConnected()) {
-            Log.d(TAG, "wifi is ON");
-        } else {
-            Log.d(TAG, "wifi is OFF");
-            DialogFragment dialog = new NetworkDialog();
-            dialog.show(getSupportFragmentManager(), "NetworkDialog");
+    private void showWiFiDisabledAlertToUser(){
+        Log.d(TAG, "showGPSDisabledAlertToUser");
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.Base_Theme_AppCompat_Dialog));
+        builder.setTitle("Network connectivity");
+        builder.setMessage("Your WiFi is OFF, do you want to turn it ON ?");
+        builder.setCancelable(false);
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                startActivityForResult(new Intent(Settings.ACTION_WIFI_SETTINGS), 1);
+            }
+        });
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            onResume();
         }
-        return mWifi;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.d(TAG, "Display density: "+getResources().getDisplayMetrics().density);
 
         this.context = this;
 
@@ -156,13 +186,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        NetworkInfo mWifi = getNetworkInfo();
-
-        if (isFirstTime && mWifi.isConnected()) {
-            loadData();
-            isFirstTime = false;
-        }
 
         // Start service data counter
         taskUpdateList = new TaskUpdateList();
@@ -235,8 +258,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private void setCustomToolbar() {
         // Creating The Toolbar and setting it as the Toolbar for the activity
         this.toolbar = (Toolbar) findViewById(R.id.tool_bar);
-        this.toolbar.setTitleTextColor(getResources().getColor(android.R.color.holo_green_light));
-        this.toolbar.setBackgroundColor(0xFFFFFFFF);
+        this.toolbar.setTitleTextColor(getResources().getColor(R.color.TextColor));
+        this.toolbar.setBackgroundColor(getResources().getColor(R.color.ColorPrimary));
         setSupportActionBar(toolbar);
 
         //for initializing right fragment
@@ -261,10 +284,10 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         }
 
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
-        ViewPagerAdapter adapterViewPager = new ViewPagerAdapter(this, getSupportFragmentManager(), titles, tabsNumber);
+        adapterViewPager = new ViewPagerAdapter(this, getSupportFragmentManager(), titles, tabsNumber);
 
         // Assigning ViewPager View and setting the adapter
-        CustomViewPager pager = (CustomViewPager) findViewById(R.id.pager);
+        pager = (CustomViewPager) findViewById(R.id.pager);
         pager.setOffscreenPageLimit(2);
         pager.setAdapter(adapterViewPager);
 
@@ -323,7 +346,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         }
 
         // Set the adapter
-        Log.d(TAG, "leftNavDrawerItems.size():" + leftNavDrawerItems.size());
+        Log.d(TAG, "leftNavDrawerItems.size(): "+leftNavDrawerItems.size());
         CustomListAdapter adapter = new CustomListAdapter(this, R.layout.drawer_list_item, leftNavDrawerItems);
         mDrawerLeftList.setAdapter(adapter);
         mDrawerLeftList.setOnItemClickListener(this);
@@ -355,7 +378,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         // Get the SearchView and set the searchable configuration
-        //SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -419,6 +441,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.action_settings:
+                return true;
+            case R.id.action_about:
+                startActivity(new Intent(this, AboutActivity.class));
                 return true;
             case R.id.action_search:
                 onSearchRequested();
@@ -607,10 +632,11 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     }
 
     private void showProgressDialog() {
-        progressDialog = new ProgressDialog(context);
+       	progressDialog = new ProgressDialog(context, ProgressDialog.THEME_DEVICE_DEFAULT_DARK);
         progressDialog.setTitle("Loading data");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setIndeterminate(true);
+        progressDialog.setCancelable(false);
         Log.d(TAG, "loading data");
         progressDialog.show();
     }
