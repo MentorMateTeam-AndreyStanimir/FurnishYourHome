@@ -52,12 +52,12 @@ public class NavDrawerRightFragment extends Fragment {
             tvInfo.setText("");
         } else {
             Bitmap bitmap =  BitmapFactory.decodeByteArray(bundle.getByteArray("bitmap"), 0, bundle.getByteArray("bitmap").length);
-            iv.setImageBitmap(bitmap);// TODO: NEED cosmetic fixes
+            iv.setImageBitmap(bitmap);
             tvTitle.setText(bundle.getString("title"));
-            tvPrice.setText("Цена: " + bundle.getDouble("price"));
-            tvDimensions.setText("Размери:\n"+bundle.getString("dimensions"));
-            tvMaterial.setText("Материали:\n"+bundle.getString("material"));
-            tvInfo.setText("Допълнителана информация:\n"+bundle.getString("info"));
+            tvPrice.setText( getString(R.string.price) + bundle.getDouble("price")+"\n");
+            tvDimensions.setText( getString(R.string.dimensions)+bundle.getString("dimensions") );
+            tvMaterial.setText( getString(R.string.material)+bundle.getString("material") );
+            tvInfo.setText( getString(R.string.info)+bundle.getString("info") );
         }
         return rootView;
     }

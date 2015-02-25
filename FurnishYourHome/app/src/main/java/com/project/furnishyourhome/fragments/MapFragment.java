@@ -28,7 +28,7 @@ import com.project.furnishyourhome.models.CustomListItem;
 
 import java.util.ArrayList;
 
-//TODO: show stores separate from your position
+
 public class MapFragment extends Fragment {
     private static final String TAG = MapFragment.class.getSimpleName();
 
@@ -72,6 +72,7 @@ public class MapFragment extends Fragment {
         Log.d(TAG, "onResume");
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         trackMyPosition();
+        showStoresOnMap();
         super.onResume();
     }
 
@@ -169,6 +170,7 @@ public class MapFragment extends Fragment {
         double lat = location.getLatitude();
         double lng = location.getLongitude();
         map.clear();
+        showStoresOnMap();
 
         MarkerOptions myLocation = new MarkerOptions();
         myLocation.position(new LatLng(lat, lng));
@@ -177,7 +179,5 @@ public class MapFragment extends Fragment {
         map.addMarker(myLocation);
         map.animateCamera( CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng) , TOP_VIEW) );
         Log.d(TAG, "me: "+lat+" "+lng);
-
-        showStoresOnMap();
     }
 }

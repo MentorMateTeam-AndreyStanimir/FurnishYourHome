@@ -186,9 +186,10 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         @Override
         public void run() {
-            Log.d("checkServerCount", countDataOnServer + "");
-            Log.d("holderCount.count", holderCount.count + "");
             if (holderCount.count != countDataOnServer) {
+                Log.d(TAG, "checkServerCount: "+countDataOnServer);
+                Log.d(TAG, "holderCount.count: "+holderCount.count);
+                Log.d(TAG, "downloading data");
                 loadData(true);
                 Toast.makeText(context, "The data was updated", Toast.LENGTH_LONG).show();
             }
@@ -217,7 +218,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         }
 
         public void run() {
-            Log.d("activityCount", countDataOnServer + "");
+            Log.d(TAG, "activityCount: "+countDataOnServer);
         }
     }
 
@@ -323,6 +324,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         }
 
         // Set the adapter
+        //TODO: bug initial size 4
         Log.d(TAG, "leftNavDrawerItems.size(): "+leftNavDrawerItems.size());
         CustomListAdapter adapter = new CustomListAdapter(this, R.layout.drawer_list_item, leftNavDrawerItems);
         mDrawerLeftList.setAdapter(adapter);
@@ -442,7 +444,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private void selectItem(int position) {
         selectedPosition = position;
         MyRoomFragment fragment = (MyRoomFragment) getSupportFragmentManager().findFragmentByTag("MyRoomFragment");
-        Fragment.SavedState myFragmentState = getSupportFragmentManager().saveFragmentInstanceState(fragment);
+        Fragment.SavedState myFragmentState = getSupportFragmentManager().saveFragmentInstanceState(fragment);//TODO: bug when resuming
         Bundle args = new Bundle();
 
         if (position == 0) {

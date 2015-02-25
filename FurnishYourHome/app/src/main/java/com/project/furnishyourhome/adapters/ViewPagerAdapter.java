@@ -13,7 +13,7 @@ import com.project.furnishyourhome.fragments.MyFurnitureFragment;
 import com.project.furnishyourhome.fragments.MyRoomFragment;
 
 //TODO: check FragmentStatePagerAdapter vs. FragmentPagerAdapter
-public class ViewPagerAdapter extends FragmentStatePagerAdapter {
+public class ViewPagerAdapter extends FragmentPagerAdapter {
     private static final String TAG = ViewPagerAdapter.class.getSimpleName();
 
     Context context;

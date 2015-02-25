@@ -10,7 +10,7 @@ public class FYHApp extends Application {
 
     public SQLiteDatabase getDB(){
         if(db == null){
-            db = new DBHelper(getBaseContext(), null, null, 0).open();
+            db = new DBHelper(getApplicationContext(), null, null, 0).open();
         }
         return db;
     }

@@ -12,7 +12,6 @@ import android.util.Log;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
-import com.project.furnishyourhome.MainActivity;
 import com.project.furnishyourhome.R;
 import com.project.furnishyourhome.models.parse.FurnitureParse;
 
@@ -21,6 +20,7 @@ import java.util.TimerTask;
 
 
 public class DataCountService extends Service {
+    private static final String TAG = DataCountService.class.getSimpleName();
 
     private final IBinder mBinder = new MyBinder();
     private Handler serviceHandler;
@@ -45,7 +45,7 @@ public class DataCountService extends Service {
     public void onCreate() {
         super.onCreate();
         Parse.initialize(this, getResources().getString(R.string.app_id), getResources().getString(R.string.app_key));
-        Log.d("StartService", "counter");
+        Log.d(TAG,"StartService: counter");
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -81,9 +81,9 @@ public class DataCountService extends Service {
             if (isUpdated) {
                 Bundle bundle = new Bundle();
                 bundle.putInt("count", count);
-                Log.d("count", count + "");
+                Log.d(TAG, "count: "+count);
                 isUpdated = false;
-                Log.d("dad", "dadad");
+                //Log.d("dad", "dadad");
                 resultReceiver.send(100, bundle);
             }
             serviceHandler.postDelayed(taskUpdate, 10000L);

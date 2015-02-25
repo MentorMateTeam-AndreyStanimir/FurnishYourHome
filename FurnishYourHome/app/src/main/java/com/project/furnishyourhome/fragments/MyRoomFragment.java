@@ -1,6 +1,5 @@
 package com.project.furnishyourhome.fragments;
 
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -52,8 +51,8 @@ public class MyRoomFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         Log.d(TAG, "onSaveInstanceState()");
-        outState.putInt("oldw", customCanvas.getWidth());
-        outState.putInt("oldh", customCanvas.getHeight());
+        //outState.putInt("oldw", customCanvas.getWidth());
+        //outState.putInt("oldh", customCanvas.getHeight());
         outState.putParcelableArrayList("savedBitmaps", customCanvas.getAddedBitmaps()); //items inside the canvas
         outState.putParcelableArrayList("chosenItems", chosenItems); //items for second fragment
         Log.d(TAG, "horizontalListItems.size() in outState is: "+horizontalListItems.size());
@@ -65,6 +64,11 @@ public class MyRoomFragment extends Fragment {
     public void onResume() {
         Log.d(TAG, "onResume()");
         super.onResume();
+/*
+        if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // TODO: this fucking recalculation
+            recalculateCoordinates(oldw, oldh, arrayList);
+        }*/
 
         CustomListAdapter adapter = new CustomListAdapter(getActivity(), R.layout.horizontal_list_item, horizontalListItems);
         adapter.notifyDataSetChanged();
@@ -134,14 +138,12 @@ public class MyRoomFragment extends Fragment {
         Bundle bundle = getArguments();
         if(savedInstanceState != null){
             arrayList = savedInstanceState.getParcelableArrayList("savedBitmaps");
-            if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                // TODO: this fucking recalculation
-                /*recalculateCoordinates(
-                        savedInstanceState.getInt("oldw"),
-                        savedInstanceState.getInt("oldh"),
-                        arrayList);*/
-            }
             customCanvas.setAddedBitmaps(arrayList);
+
+            //oldw = savedInstanceState.getInt("oldw");
+            //oldh = savedInstanceState.getInt("oldh");
+
+
             chosenItems = savedInstanceState.getParcelableArrayList("chosenItems");
             horizontalListItems = savedInstanceState.getParcelableArrayList("horizontalListItems");
             Log.d(TAG, "got items from savedInstanceState");
@@ -165,14 +167,14 @@ public class MyRoomFragment extends Fragment {
         return rootView;
     }
 
-    // TODO: this function
+   /* // TODO: this function
     private void recalculateCoordinates(int oldw, int oldh, ArrayList<CustomBitmap> arrayList) {
         Log.d(TAG, "recalculateCoordinates()");
         if ((oldw != 0) && (oldh != 0)) {
 //            float f1 = this.customCanvas.getWidth() / this.oldw;  // incorrect
 
-            float currentWidth = this.customCanvas.getWidth(); // get current canvas width
-            float currentHeight = this.customCanvas.getHeight();  // get current canvas height
+            float currentWidth = customCanvas.getCanvasWidth();// get current canvas width
+            float currentHeight = customCanvas.getCanvasHeight();  // get current canvas height
 
 //            Log.d("DIMENTIONS", "w: " + this.customCanvas.getWidth() + " oldw: " + this.oldw + " coef: " + f1);
 //            float f2 = this.customCanvas.getHeight() / this.oldh; // incorrect
@@ -185,6 +187,9 @@ public class MyRoomFragment extends Fragment {
                 float coefficientX = oldw / (item.getX() + item.getHalfWidth()); // add getHalfWidth to find the center ic_no_preview of the image
                 float coefficientY = oldh / (item.getY() + item.getHalfHeight()); // add getHalfHeight to find the center Y of the image
 
+                //float coefficientX = oldw / customCanvas.getCanvasWidth(); // add getHalfWidth to find the center ic_no_preview of the image
+                //float coefficientY = oldh / customCanvas.getCanvasHeight(); // add getHalfHeight to find the center Y of the image
+
                 Log.d("DIMENTIONS", "w: " + currentWidth + " oldw: " + oldw + " coef: " + coefficientX);
                 Log.d("DIMENTIONS", "h: " + currentHeight + " oldh: " + oldh + " coef: " + coefficientY);
 
@@ -194,7 +199,8 @@ public class MyRoomFragment extends Fragment {
                 item.setX(nextX);
                 item.setY(nextY);
                 arrayList.set(i, item);
+                customCanvas.setAddedBitmaps(arrayList);
             }
         }
-    }
+    }*/
 }

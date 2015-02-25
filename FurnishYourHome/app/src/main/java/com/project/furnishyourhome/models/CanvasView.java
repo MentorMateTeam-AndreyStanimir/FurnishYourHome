@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 public class CanvasView extends View {
     private static final String TAG = CanvasView.class.getSimpleName();
+
     private static final float TOLERANCE = 5.0F;
     private ArrayList<CustomBitmap> addedBitmaps;
     private float canvasX;
@@ -44,6 +45,16 @@ public class CanvasView extends View {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public float getCanvasWidth() {
+        Log.d(TAG, "width:"+getWidth());
+        return getWidth();
+    }
+
+    public float getCanvasHeight() {
+        Log.d(TAG, "height:"+getHeight());
+        return getHeight();
     }
 
     private void moveTouch(float x, float y) {

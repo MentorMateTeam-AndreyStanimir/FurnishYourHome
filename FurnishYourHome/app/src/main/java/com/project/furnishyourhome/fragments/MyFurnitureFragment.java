@@ -17,7 +17,7 @@ import com.project.furnishyourhome.models.CustomListItem;
 
 import java.util.ArrayList;
 
-//TODO: Total price, and delete items
+//TODO: delete items
 public class MyFurnitureFragment extends Fragment {
     private static final String TAG = MyFurnitureFragment.class.getSimpleName();
 
@@ -81,6 +81,13 @@ public class MyFurnitureFragment extends Fragment {
                 return false;
             }
         });*/
+
+        TextView tvTotalPrice = (TextView) rootView.findViewById(R.id.tv_total_price);
+        double totalPrice = 0;
+        for (int i=0; i<chosenItems.size(); i++) {
+            totalPrice += chosenItems.get(i).getPrice();
+        }
+        tvTotalPrice.setText("Total price: "+totalPrice);
         return rootView;
     }
 

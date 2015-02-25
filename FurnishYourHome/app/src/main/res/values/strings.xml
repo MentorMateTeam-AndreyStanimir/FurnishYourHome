@@ -22,6 +22,14 @@
     <string name="desc_list_item_icon">Item Icon</string>
     <!-- activity_main items -->
 
+    <!-- nav_drawer_right_fragment items -->
+    <string name="price">"Цена: </string>
+    <string name="dimensions">"Размери:\n</string>
+    <string name="material">"Материали:\n</string>
+    <string name="info">"Допълнителана информация:\n</string>
+    <!-- nav_drawer_right_fragment items -->
+
+
     <array name="tabs_three">
         <item>My Room</item>
         <item>My furniture</item>
