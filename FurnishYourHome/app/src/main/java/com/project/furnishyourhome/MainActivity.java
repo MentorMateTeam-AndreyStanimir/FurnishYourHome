@@ -1,10 +1,9 @@
 package com.project.furnishyourhome;
 
 import android.app.Activity;
-import android.content.ComponentName;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -83,7 +82,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private ActionBarDrawerToggle leftDrawerListener;
     private ListView mDrawerLeftList;
     private SimpleGestureFilter detector;
-    private Intent intent;
     private TaskUpdateList taskUpdateList;
     private Handler updateListHandler;
     private HolderCount holderCount = new HolderCount();
@@ -151,8 +149,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         this.context = this;
 
-        final String APP_ID = this.getResources().getString(R.string.appID);
-        final String APP_KEY = this.getResources().getString(R.string.appKey);
         // Enable Local Datastore.
         if (isFirstTime) {
             Parse.enableLocalDatastore(this);
@@ -163,7 +159,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         }
         ParseObject.registerSubclass(StoreParse.class);
         ParseObject.registerSubclass(FurnitureParse.class);
-        Parse.initialize(this, APP_ID, APP_KEY);
+        Parse.initialize(this, getResources().getString(R.string.app_id), getResources().getString(R.string.app_key));
 
         this.detector = new SimpleGestureFilter(this, this);
         this.swipeable = true;
@@ -181,8 +177,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         updateListHandler.postDelayed(taskUpdateList, 30000);
 
         resultReceiver = new MyResultReceiver(null);
-        this.intent = new Intent(this, DataCountService.class);
-        this.intent.putExtra("receiver", resultReceiver);
+        Intent intent = new Intent(this, DataCountService.class);
+        intent.putExtra("receiver", resultReceiver);
         startService(intent);
     }
 
@@ -236,7 +232,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                 try {
                     ((Activity) context).runOnUiThread(new UpdateUI(resultData.getInt("count")));
                 } catch (Exception e) {
-
+                    e.printStackTrace();
                 }
             }
         }
@@ -380,7 +376,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         Fragment.SavedState myFragmentState = getSupportFragmentManager().saveFragmentInstanceState(fragment);
         Bundle args = new Bundle();
 
-        ArrayList<Furniture> tempList = new ArrayList<>();
+        ArrayList<Furniture> tempList;
         ArrayList<CustomListItem> tempListItems;
 
         if(selectedPosition == 0){
@@ -523,8 +519,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     private void downloadData() {
         try {
-            types = new ArrayList<Type>();
-            leftNavDrawerItems = new ArrayList<CustomListItem>();
+            types = new ArrayList<>();
+            leftNavDrawerItems = new ArrayList<>();
             //menu items for left drawer
             final ParseQuery<ParseObject> typesQuery = ParseQuery.getQuery("Furniture");
             List<ParseObject> parseObjects = typesQuery.find();
@@ -565,8 +561,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             e.printStackTrace();
         }
 
-        this.furnitures = new ArrayList<>();
-        this.furnitureLists = new HashMap<>();
+        furnitures = new ArrayList<>();
+        furnitureLists = new HashMap<>();
         if (fItems != null) {
             for (FurnitureParse fItem : fItems) {
                 String type = fItem.getType();
@@ -575,17 +571,17 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                 if(type.equals("Table")){
 
                     Table table = fItem.getTable();
-                    this.furnitures.add(table);
+                    furnitures.add(table);
 
                     initializeHashMapKey("Table");
-                    this.furnitureLists.get("Table").add(table);
+                    furnitureLists.get("Table").add(table);
                 }else if (type.equals("Sofa")) {
 
                     Sofa sofa = fItem.getSofa();
-                    this.furnitures.add(sofa);
+                    furnitures.add(sofa);
 
                     initializeHashMapKey("Sofa");
-                    this.furnitureLists.get("Sofa").add(sofa);
+                    furnitureLists.get("Sofa").add(sofa);
                 }
             }
         }
@@ -665,12 +661,12 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         int itemsCountInDb = ((FYHApp) getApplication()).getUtilitiesDb().getTableCount(TABLE_FURNITURES);
 
         //if items in Database are more than the items from internet then clean all data
-        if(itemsCountInDb > this.furnitures.size()) {
+        if(itemsCountInDb > furnitures.size()) {
             ((FYHApp) getApplication()).getUtilitiesDb().deleteTable(TABLE_FURNITURES);
             ((FYHApp) getApplication()).getUtilitiesDb().deleteTable(TABLE_TYPES);
         }
 
-        if (itemsCountInDb < this.furnitures.size()) {
+        if (itemsCountInDb < furnitures.size()) {
                 boolean isSavedTypesIntoDB = ((FYHApp) getApplication()).getUtilitiesDb().addTypes(types);
                 if (isSavedTypesIntoDB) {
                     Log.d("Database", "Types saved into DB");
@@ -685,15 +681,15 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                 }
             }
 
-        holderCount.count = this.furnitures.size();
+        holderCount.count = furnitures.size();
     }
 
     private void loadDataFromDb() {
         ArrayList<Type> typesFromDB = ((FYHApp) getApplication()).getUtilitiesDb().getTypes();
         ArrayList<Furniture> itemsFromDB = ((FYHApp) getApplication()).getUtilitiesDb().getAllItems();
 
-        leftNavDrawerItems = new ArrayList<CustomListItem>();
-        this.furnitureLists = new HashMap<>();
+        leftNavDrawerItems = new ArrayList<>();
+        furnitureLists = new HashMap<>();
 
         for (Type type : typesFromDB) {
 

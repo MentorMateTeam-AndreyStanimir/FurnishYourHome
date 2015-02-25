@@ -12,8 +12,8 @@ import com.project.furnishyourhome.fragments.MapFragment;
 import com.project.furnishyourhome.fragments.MyFurnitureFragment;
 import com.project.furnishyourhome.fragments.MyRoomFragment;
 
-
-public class ViewPagerAdapter extends FragmentPagerAdapter {
+//TODO: check FragmentStatePagerAdapter vs. FragmentPagerAdapter
+public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     private static final String TAG = ViewPagerAdapter.class.getSimpleName();
 
     Context context;

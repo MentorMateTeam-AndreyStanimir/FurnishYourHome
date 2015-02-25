@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.project.furnishyourhome.R;
-import com.project.furnishyourhome.models.CustomListItem;
 
-import org.w3c.dom.Text;
 
-//ToDo: Still in progress.
 public class NavDrawerRightFragment extends Fragment {
     private static final String TAG = NavDrawerRightFragment.class.getSimpleName();
 
@@ -27,8 +23,7 @@ public class NavDrawerRightFragment extends Fragment {
     }
 
     public static NavDrawerRightFragment newInstance() {
-        NavDrawerRightFragment fragment = new NavDrawerRightFragment();
-        return fragment;
+        return new NavDrawerRightFragment();
     }
 
     public NavDrawerRightFragment() {

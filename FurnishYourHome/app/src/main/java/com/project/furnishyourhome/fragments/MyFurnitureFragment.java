@@ -1,14 +1,8 @@
 package com.project.furnishyourhome.fragments;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +17,7 @@ import com.project.furnishyourhome.models.CustomListItem;
 
 import java.util.ArrayList;
 
-/**
- * Created by Andrey on 11.2.2015 г..
- */
+//TODO: Total price, and delete items
 public class MyFurnitureFragment extends Fragment {
     private static final String TAG = MyFurnitureFragment.class.getSimpleName();
 
@@ -82,17 +74,17 @@ public class MyFurnitureFragment extends Fragment {
                         Toast.LENGTH_LONG).show();
             }
         });
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        /*listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 showDeleteAlertToUser(position);
                 return false;
             }
-        });
+        });*/
         return rootView;
     }
 
-    private void showDeleteAlertToUser(int position){
+    /*private void showDeleteAlertToUser(int position){
         Log.d(TAG, "showDeleteAlertToUser");
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.Base_Theme_AppCompat_Dialog));
         alertDialogBuilder.setMessage("Do you really want to delete this item?");
@@ -117,5 +109,5 @@ public class MyFurnitureFragment extends Fragment {
         });
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
-    }
+    }*/
 }

@@ -2,9 +2,7 @@ package com.project.furnishyourhome.models;
 
 import android.graphics.Bitmap;
 
-/**
- * Created by Andrey on 23.2.2015 г..
- */
+
 public class Type {
     private String type;
     private Bitmap bitmap;

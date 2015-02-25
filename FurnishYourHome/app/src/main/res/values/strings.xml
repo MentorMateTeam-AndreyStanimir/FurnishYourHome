@@ -15,6 +15,9 @@
     <string name="drawer_open">Drawer Opened</string>
     <string name="drawer_close">Drawer Closed</string>
 
+    <string name="app_id">ueFuNcN0Cx1xgBzycLJOgwqGqLwDzlt9zJEHulqJ</string>
+    <string name="app_key">s1vnSldgEhOfOMyBfIXSnKsl8F7YHuGNXisSr2jM</string>
+
     <string name="action_search_hint">Search...</string>
     <string name="desc_list_item_icon">Item Icon</string>
     <!-- activity_main items -->
@@ -32,5 +35,5 @@
 
     <string name="title_activity_about">AboutActivity</string>
 
-    <string name="about">Created by:\nStanimir Spasov\nAndrei....</string>
+    <string name="about">Created by:\nStanimir Spasov\nAndrey Traykov</string>
 </resources>

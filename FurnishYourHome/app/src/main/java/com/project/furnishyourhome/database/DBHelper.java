@@ -39,7 +39,7 @@ public class DBHelper extends SQLiteOpenHelper implements DbTableNames {
         return getWritableDatabase();
     }
 
-    public void close (){
+    /*public void close (){
         close();
-    }
+    }*/
 }

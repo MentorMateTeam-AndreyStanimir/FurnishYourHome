@@ -3,9 +3,7 @@ package com.project.furnishyourhome.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by Andrey on 18.2.2015 г..
- */
+
 public class Sofa extends Furniture {
     private String type = "Sofa";
     public Sofa() {

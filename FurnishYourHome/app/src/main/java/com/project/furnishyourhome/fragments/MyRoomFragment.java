@@ -1,18 +1,16 @@
 package com.project.furnishyourhome.fragments;
 
-import android.support.v4.app.FragmentTransaction;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.SimpleAdapter;
 
 import com.project.furnishyourhome.R;
 import com.project.furnishyourhome.adapters.CustomListAdapter;
@@ -167,6 +165,7 @@ public class MyRoomFragment extends Fragment {
         return rootView;
     }
 
+    // TODO: this function
     private void recalculateCoordinates(int oldw, int oldh, ArrayList<CustomBitmap> arrayList) {
         Log.d(TAG, "recalculateCoordinates()");
         if ((oldw != 0) && (oldh != 0)) {

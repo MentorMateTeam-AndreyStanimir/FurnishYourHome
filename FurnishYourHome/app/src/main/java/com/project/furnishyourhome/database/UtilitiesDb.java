@@ -124,7 +124,7 @@ public class UtilitiesDb implements DbTableNames{
     }
 
     public ArrayList<Type> getTypes (){
-        ArrayList<Type> types = new ArrayList<Type>();
+        ArrayList<Type> types = new ArrayList<>();
         if(getTableCount(TABLE_TYPES) > 0) {
 
             String sql = "SELECT * FROM " + TABLE_TYPES;
@@ -154,7 +154,7 @@ public class UtilitiesDb implements DbTableNames{
     }
 
     public ArrayList<Furniture> getAllItems() {
-        ArrayList<Furniture> temp = new ArrayList<Furniture>();
+        ArrayList<Furniture> temp = new ArrayList<>();
 
         if(getTableCount(TABLE_FURNITURES) > 0) {
             String sql = "SELECT * FROM " + TABLE_FURNITURES;
@@ -212,7 +212,7 @@ public class UtilitiesDb implements DbTableNames{
     }
 
     public ArrayList<Store> getStores (){
-        ArrayList<Store> stores  = new ArrayList<Store>();
+        ArrayList<Store> stores  = new ArrayList<>();
 
         if(getTableCount(TABLE_STORES) > 0) {
 
@@ -240,7 +240,7 @@ public class UtilitiesDb implements DbTableNames{
                     + furnitureId + "'";
 
             Cursor c = utilityDb.rawQuery(sql, null);
-            String type = "";
+            String type;
             c.moveToFirst();
             type = c.getString(c.getColumnIndex("type"));
 
@@ -301,7 +301,7 @@ public class UtilitiesDb implements DbTableNames{
                 + id + "'";
         Cursor c = utilityDb.rawQuery(sql, null);
         c.moveToFirst();
-        String idString = "";
+        String idString;
 
         try {
             idString = c.getString(0);

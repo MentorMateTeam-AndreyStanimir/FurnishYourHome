@@ -16,9 +16,7 @@ import com.project.furnishyourhome.models.CustomListItem;
 
 import java.util.ArrayList;
 
-/**
- * Created by Andrey on 10.2.2015 г..
- */
+
 public class CustomListAdapter extends BaseAdapter {
     private static final String TAG = CustomListAdapter.class.getSimpleName();
 

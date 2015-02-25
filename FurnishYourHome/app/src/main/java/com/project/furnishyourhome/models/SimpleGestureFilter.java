@@ -7,9 +7,6 @@ import android.view.MotionEvent;
 
 import com.project.furnishyourhome.interfaces.IGestureListener;
 
-/**
- * Created by Andrey on 18.2.2015 г..
- */
 
 public class SimpleGestureFilter extends SimpleOnGestureListener{
 

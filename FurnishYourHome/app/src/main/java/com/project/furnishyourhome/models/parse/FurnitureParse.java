@@ -15,9 +15,7 @@ import com.project.furnishyourhome.models.Table;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
-/**
- * Created by Andrey on 18.2.2015 г..
- */
+
 @ParseClassName("FurnitureItems")
 public class FurnitureParse extends ParseObject {
     protected String dimensions;

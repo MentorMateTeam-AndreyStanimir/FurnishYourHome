@@ -1,8 +1,5 @@
 package com.project.furnishyourhome.materialdesign;
 
-/**
- * Created by Andrey on 11.2.2015 г..
- */
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -62,7 +59,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
     private boolean mDistributeEvenly;
 
     private ViewPager mViewPager;
-    private SparseArray<String> mContentDescriptions = new SparseArray<String>();
+    private SparseArray<String> mContentDescriptions = new SparseArray<>();
     private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
 
     private final SlidingTabStrip mTabStrip;
@@ -168,8 +165,6 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
         int padding = (int) (TAB_VIEW_PADDING_DIPS * getResources().getDisplayMetrics().density);
         textView.setPadding(padding, padding, padding, padding);
-
-        // TODO: color in colors.xml
         textView.setTextColor(getResources().getColor(R.color.TextColor));
 
         return textView;
@@ -204,6 +199,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 lp.weight = 1;
             }
 
+            assert tabTitleView != null;
             tabTitleView.setText(adapter.getPageTitle(i));
             tabView.setOnClickListener(tabClickListener);
             String desc = mContentDescriptions.get(i, null);

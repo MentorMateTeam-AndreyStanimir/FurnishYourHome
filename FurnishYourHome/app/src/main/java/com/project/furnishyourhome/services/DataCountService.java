@@ -19,9 +19,7 @@ import com.project.furnishyourhome.models.parse.FurnitureParse;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * Created by Andrey on 22.2.2015 г..
- */
+
 public class DataCountService extends Service {
 
     private final IBinder mBinder = new MyBinder();
@@ -46,10 +44,7 @@ public class DataCountService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        final String APP_ID = this.getResources().getString(R.string.appID);
-        final String APP_KEY = this.getResources().getString(R.string.appKey);
-        Parse.initialize(this, APP_ID, APP_KEY);
+        Parse.initialize(this, getResources().getString(R.string.app_id), getResources().getString(R.string.app_key));
         Log.d("StartService", "counter");
     }
 

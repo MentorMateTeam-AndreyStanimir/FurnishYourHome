@@ -28,7 +28,7 @@ import com.project.furnishyourhome.models.CustomListItem;
 
 import java.util.ArrayList;
 
-
+//TODO: show stores separate from your position
 public class MapFragment extends Fragment {
     private static final String TAG = MapFragment.class.getSimpleName();
 

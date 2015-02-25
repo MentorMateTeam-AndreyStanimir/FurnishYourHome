@@ -10,13 +10,9 @@ import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.project.furnishyourhome.models.Store;
-import com.project.furnishyourhome.models.Table;
 
 import java.io.ByteArrayOutputStream;
 
-/**
- * Created by Andrey on 18.2.2015 г..
- */
 
 @ParseClassName("Store")
 public class StoreParse extends ParseObject {
