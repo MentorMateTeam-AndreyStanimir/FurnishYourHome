@@ -3,10 +3,12 @@ package com.project.furnishyourhome.models.parse;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.project.furnishyourhome.models.Sofa;
 import com.project.furnishyourhome.models.Store;
 import com.project.furnishyourhome.models.Table;
 
@@ -16,7 +18,8 @@ import java.util.List;
 /**
  * Created by Andrey on 18.2.2015 г..
  */
-public abstract class FurnitureParse extends ParseObject {
+@ParseClassName("FurnitureItems")
+public class FurnitureParse extends ParseObject {
     protected String dimensions;
     protected Bitmap drawable;
     protected String info;
@@ -148,5 +151,39 @@ public abstract class FurnitureParse extends ParseObject {
 
     public void setStore(String storeId) {
         put("store", storeId);
+    }
+
+    public Sofa getSofa(){
+        Sofa sofa = new Sofa(this.storeId);
+
+        sofa.setDimensions(this.getDimension());
+        sofa.setInfo(this.getInfo());
+        sofa.setMaterial(this.getMaterial());
+        sofa.setName(this.getName());
+        sofa.setPrice(this.getPrice());
+        sofa.setStore(this.getStore());
+        sofa.setDrawable(this.getDrawable());
+        sofa.setStoreId(this.storeId);
+        sofa.setObjectId(this.getObjectId());
+        sofa.setFurnitureId(this.getFurnitureId());
+
+        return sofa;
+    }
+
+    public Table getTable(){
+        Table table = new Table(this.storeId);
+
+        table.setDimensions(this.getDimension());
+        table.setInfo(this.getInfo());
+        table.setMaterial(this.getMaterial());
+        table.setName(this.getName());
+        table.setPrice(this.getPrice());
+        table.setStore(this.getStore());
+        table.setDrawable(this.getDrawable());
+        table.setStoreId(this.storeId);
+        table.setObjectId(this.getObjectId());
+        table.setFurnitureId(this.getFurnitureId());
+
+        return table;
     }
 }

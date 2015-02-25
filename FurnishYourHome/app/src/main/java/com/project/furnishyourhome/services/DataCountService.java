@@ -13,7 +13,8 @@ import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.project.furnishyourhome.MainActivity;
-import com.project.furnishyourhome.models.parse.FurnitureItemParse;
+import com.project.furnishyourhome.R;
+import com.project.furnishyourhome.models.parse.FurnitureParse;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -45,7 +46,10 @@ public class DataCountService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Parse.initialize(MainActivity.context, MainActivity.appId, MainActivity.appKey);
+
+        final String APP_ID = this.getResources().getString(R.string.appID);
+        final String APP_KEY = this.getResources().getString(R.string.appKey);
+        Parse.initialize(this, APP_ID, APP_KEY);
         Log.d("StartService", "counter");
     }
 
@@ -96,7 +100,7 @@ public class DataCountService extends Service {
 
         @Override
         public void run() {
-            final ParseQuery<FurnitureItemParse> query = ParseQuery.getQuery(FurnitureItemParse.class);
+            final ParseQuery<FurnitureParse> query = ParseQuery.getQuery(FurnitureParse.class);
 
             try {
                 count = query.count();

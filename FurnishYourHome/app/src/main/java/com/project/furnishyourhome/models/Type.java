@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 /**
  * Created by Andrey on 23.2.2015 г..
  */
-public class TypeItem {
+public class Type {
     private String type;
     private Bitmap bitmap;
     private String id;
@@ -14,10 +14,10 @@ public class TypeItem {
         return id;
     }
 
-    public TypeItem(){
+    public Type(){
     }
 
-    public TypeItem (String id, Bitmap bitmap, String type){
+    public Type(String id, Bitmap bitmap, String type){
         this.setId(id);
         this.setBitmap(bitmap);
         this.setType(type);

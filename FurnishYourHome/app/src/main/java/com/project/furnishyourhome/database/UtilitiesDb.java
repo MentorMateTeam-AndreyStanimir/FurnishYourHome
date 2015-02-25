@@ -14,7 +14,7 @@ import com.project.furnishyourhome.models.Furniture;
 import com.project.furnishyourhome.models.Sofa;
 import com.project.furnishyourhome.models.Store;
 import com.project.furnishyourhome.models.Table;
-import com.project.furnishyourhome.models.TypeItem;
+import com.project.furnishyourhome.models.Type;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -99,10 +99,10 @@ public class UtilitiesDb implements DbTableNames{
         return true;
     }
 
-    public boolean addTypes (ArrayList<TypeItem> types){
+    public boolean addTypes (ArrayList<Type> types){
 
         try {
-            for (TypeItem item : types) {
+            for (Type item : types) {
                 String type = item.getType();
                 Bitmap bitmap = item.getBitmap();
                 String id = item.getId();
@@ -123,8 +123,8 @@ public class UtilitiesDb implements DbTableNames{
         return true;
     }
 
-    public ArrayList<TypeItem> getTypes (){
-        ArrayList<TypeItem> types = new ArrayList<TypeItem>();
+    public ArrayList<Type> getTypes (){
+        ArrayList<Type> types = new ArrayList<Type>();
         if(getTableCount(TABLE_TYPES) > 0) {
 
             String sql = "SELECT * FROM " + TABLE_TYPES;
@@ -140,7 +140,7 @@ public class UtilitiesDb implements DbTableNames{
                     bitmap = BitmapFactory.decodeResource(Resources.getSystem(), R.drawable.ic_launcher);
                 }
 
-                TypeItem item = new TypeItem();
+                Type item = new Type();
                 item.setId(id);
                 item.setType(type);
                 item.setBitmap(bitmap);
@@ -311,7 +311,7 @@ public class UtilitiesDb implements DbTableNames{
         }
         c.close();
 
-        if (idString == "") {
+        if (idString.equals("")) {
 
             return 0;
         }

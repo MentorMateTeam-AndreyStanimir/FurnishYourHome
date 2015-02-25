@@ -60,8 +60,8 @@ import com.project.furnishyourhome.models.HolderCount;
 import com.project.furnishyourhome.models.SimpleGestureFilter;
 import com.project.furnishyourhome.models.Sofa;
 import com.project.furnishyourhome.models.Table;
-import com.project.furnishyourhome.models.TypeItem;
-import com.project.furnishyourhome.models.parse.FurnitureItemParse;
+import com.project.furnishyourhome.models.Type;
+import com.project.furnishyourhome.models.parse.FurnitureParse;
 import com.project.furnishyourhome.models.parse.StoreParse;
 import com.project.furnishyourhome.services.DataCountService;
 
@@ -70,17 +70,15 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable, DbTableNames {
-	 private static final String TAG = MainActivity.class.getSimpleName();
-
-    //private static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+	private static final String TAG = MainActivity.class.getSimpleName();
 
     private static boolean isFirstTime = true;
     private static ArrayList<Furniture> furnitures;
     private static HashMap<String, ArrayList<Furniture>> furnitureLists;
-    //private static ArrayList<Store> stores;
     private static ArrayList<CustomListItem> leftNavDrawerItems;
-    private int selectedPosition;
 
+    private Context context;
+    private int selectedPosition;
     private DrawerLayout leftDrawerLayout;
     private ActionBarDrawerToggle leftDrawerListener;
     private ListView mDrawerLeftList;
@@ -90,10 +88,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private Handler updateListHandler;
     private HolderCount holderCount = new HolderCount();
     private int countDataOnServer = 0;
-    public static Context context;
-    public static String appId = "ueFuNcN0Cx1xgBzycLJOgwqGqLwDzlt9zJEHulqJ";
-    public static String appKey = "s1vnSldgEhOfOMyBfIXSnKsl8F7YHuGNXisSr2jM";
-    public ArrayList<TypeItem> types;
+    public ArrayList<Type> types;
 
     private Toolbar toolbar;
     ViewPagerAdapter adapterViewPager;
@@ -110,7 +105,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         if(wifi.isWifiEnabled()) {
             Log.d(TAG, "wifi is ON");
             if(isFirstTime){
-                loadData();
+                loadData(false);
                 isFirstTime = false;
             }
         } else {
@@ -156,6 +151,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
         this.context = this;
 
+        final String APP_ID = this.getResources().getString(R.string.appID);
+        final String APP_KEY = this.getResources().getString(R.string.appKey);
         // Enable Local Datastore.
         if (isFirstTime) {
             Parse.enableLocalDatastore(this);
@@ -165,8 +162,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             //stores          = new ArrayList<>();
         }
         ParseObject.registerSubclass(StoreParse.class);
-        ParseObject.registerSubclass(FurnitureItemParse.class);
-        Parse.initialize(this, appId, appKey);
+        ParseObject.registerSubclass(FurnitureParse.class);
+        Parse.initialize(this, APP_ID, APP_KEY);
 
         this.detector = new SimpleGestureFilter(this, this);
         this.swipeable = true;
@@ -196,7 +193,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             Log.d("checkServerCount", countDataOnServer + "");
             Log.d("holderCount.count", holderCount.count + "");
             if (holderCount.count != countDataOnServer) {
-                loadDataSync();
+                loadData(true);
                 Toast.makeText(context, "The data was updated", Toast.LENGTH_LONG).show();
             }
             updateListHandler.postDelayed(taskUpdateList, 5000);
@@ -207,8 +204,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private DataCountService dataService;
     private ServiceConnection mConnection = new ServiceConnection() {
 
-        public void onServiceConnected(ComponentName className,
-                                       IBinder binder) {
+        public void onServiceConnected(ComponentName className, IBinder binder) {
             DataCountService.MyBinder dataBinder = (DataCountService.MyBinder) binder;
             dataService = dataBinder.getService();
             Toast.makeText(context, "Connected", Toast.LENGTH_SHORT).show();
@@ -259,8 +255,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         tr.commit();
     }
 
-    private void loadData() {
-        (new GetAsyncResult()).execute();
+    private void loadData(boolean isFromInternet) {
+        (new GetAsyncResult(isFromInternet)).execute();
     }
 
     private void setActionBarTabs() {
@@ -527,7 +523,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     private void downloadData() {
         try {
-            types = new ArrayList<TypeItem>();
+            types = new ArrayList<Type>();
             leftNavDrawerItems = new ArrayList<CustomListItem>();
             //menu items for left drawer
             final ParseQuery<ParseObject> typesQuery = ParseQuery.getQuery("Furniture");
@@ -548,7 +544,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                 CustomListItem item = new CustomListItem(type, icon);
 
                 //need for DB update
-                TypeItem typeItem = new TypeItem();
+                Type typeItem = new Type();
                 typeItem.setId(id);
                 typeItem.setType(type);
                 typeItem.setBitmap(icon);
@@ -560,8 +556,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             e.printStackTrace();
         }
 
-        final ParseQuery<FurnitureItemParse> furnitureItems = ParseQuery.getQuery(FurnitureItemParse.class);
-        List<FurnitureItemParse> fItems = null;
+        final ParseQuery<FurnitureParse> furnitureItems = ParseQuery.getQuery(FurnitureParse.class);
+        List<FurnitureParse> fItems = null;
 
         try {
             fItems = furnitureItems.find();
@@ -572,7 +568,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         this.furnitures = new ArrayList<>();
         this.furnitureLists = new HashMap<>();
         if (fItems != null) {
-            for (FurnitureItemParse fItem : fItems) {
+            for (FurnitureParse fItem : fItems) {
                 String type = fItem.getType();
 
                 // Now SofaParse and TableParse became useless
@@ -616,42 +612,38 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         progressDialog.show();
     }
 
-    private void loadDataSync (){
-        downloadData();
-
-        Log.d(TAG, "Success");
-
-        saveDataAfterDownloading();
-        setLeftDrawer();
-        saveDataInDb();
-    }
-
     private class GetAsyncResult extends AsyncTask<Void, Void, Void> {
 
         boolean isFromInternet = false;
 
+        private GetAsyncResult(boolean isFromInternet) {
+            this.isFromInternet = isFromInternet;
+        }
+
         @Override
         protected Void doInBackground(Void... params) {
 
-            if(((FYHApp) getApplication()).getUtilitiesDb().isDbEmpty()){
-                isFromInternet = true;
+            if(this.isFromInternet) {
                 downloadData();
             } else {
-                holderCount.count = ((FYHApp) getApplication()).getUtilitiesDb().getTableCount(TABLE_FURNITURES);
-                countDataOnServer = holderCount.count;
-                loadDataFromDb();
+                if (((FYHApp) getApplication()).getUtilitiesDb().isDbEmpty()) {
+                    this.isFromInternet = true;
+                    downloadData();
+                } else {
+                    holderCount.count = ((FYHApp) getApplication()).getUtilitiesDb().getTableCount(TABLE_FURNITURES);
+                    countDataOnServer = holderCount.count;
+                    loadDataFromDb();
+                }
             }
-
             Log.d(TAG, "Success");
             return null;
         }
 
         @Override
         protected void onPreExecute() {
-            showProgressDialog();
-
-            // Clean Navigation drawer adapter
-            mDrawerLeftList.setAdapter(null);
+            if(!this.isFromInternet) {
+                showProgressDialog();
+            }
         }
 
         @Override
@@ -659,10 +651,11 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
             saveDataAfterDownloading();
             setLeftDrawer();
-            progressDialog.dismiss();
 
-            if(isFromInternet) {
+            if(this.isFromInternet) {
                 saveDataInDb();
+            } else {
+                progressDialog.dismiss();
             }
         }
     }
@@ -696,13 +689,13 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     }
 
     private void loadDataFromDb() {
-        ArrayList<TypeItem> typesFromDB = ((FYHApp) getApplication()).getUtilitiesDb().getTypes();
+        ArrayList<Type> typesFromDB = ((FYHApp) getApplication()).getUtilitiesDb().getTypes();
         ArrayList<Furniture> itemsFromDB = ((FYHApp) getApplication()).getUtilitiesDb().getAllItems();
 
         leftNavDrawerItems = new ArrayList<CustomListItem>();
         this.furnitureLists = new HashMap<>();
 
-        for (TypeItem type : typesFromDB) {
+        for (Type type : typesFromDB) {
 
             CustomListItem item = new CustomListItem(type.getType(), type.getBitmap());
 
