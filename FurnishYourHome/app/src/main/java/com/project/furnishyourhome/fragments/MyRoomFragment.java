@@ -138,11 +138,9 @@ public class MyRoomFragment extends Fragment {
         Bundle bundle = getArguments();
         if(savedInstanceState != null){
             arrayList = savedInstanceState.getParcelableArrayList("savedBitmaps");
-            customCanvas.setAddedBitmaps(arrayList);
 
             //oldw = savedInstanceState.getInt("oldw");
             //oldh = savedInstanceState.getInt("oldh");
-
 
             chosenItems = savedInstanceState.getParcelableArrayList("chosenItems");
             horizontalListItems = savedInstanceState.getParcelableArrayList("horizontalListItems");
@@ -150,11 +148,16 @@ public class MyRoomFragment extends Fragment {
             Log.d(TAG, "horizontalListItems.size() "+horizontalListItems.size());
 
             if(bundle != null) {
-                horizontalListItems = bundle.getParcelableArrayList("horizontalListItems");
-                Log.d(TAG, "GOT items from bundle, overriding savedState");
-                Log.d(TAG, "horizontalListItems.size() from bundle: "+horizontalListItems.size());
+                if(bundle.containsKey("horizontalListItems")) {
+                    horizontalListItems = bundle.getParcelableArrayList("horizontalListItems");
+                    Log.d(TAG, "GOT items from bundle, overriding savedState");
+                    Log.d(TAG, "horizontalListItems.size() from bundle: "+horizontalListItems.size());
+                }
+                if(bundle.containsKey("deletedPosition")) {
+                    arrayList.remove(bundle.getInt("deletedPosition"));
+                }
             }
-
+            customCanvas.setAddedBitmaps(arrayList);
         } else {
             if(bundle != null) {
                 horizontalListItems = bundle.getParcelableArrayList("horizontalListItems");

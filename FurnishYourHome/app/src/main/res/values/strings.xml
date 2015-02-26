@@ -23,11 +23,18 @@
     <!-- activity_main items -->
 
     <!-- nav_drawer_right_fragment items -->
-    <string name="price">"Цена: </string>
-    <string name="dimensions">"Размери:\n</string>
-    <string name="material">"Материали:\n</string>
-    <string name="info">"Допълнителана информация:\n</string>
+
+    <string name="no_item_selected">"Не си си избрал мебел."</string>
+    <string name="price">"Цена: "</string>
+    <string name="dimensions">Размери:\n</string>
+    <string name="material">Материали:\n</string>
+    <string name="info">Допълнителана информация:\n</string>
     <!-- nav_drawer_right_fragment items -->
+
+    <!-- my_furniture_fragment items -->
+    <string name="total_price">"Общо: "</string>
+    <string name="currency">" лв."</string>
+    <!-- my_furniture_fragment items -->
 
 
     <array name="tabs_three">

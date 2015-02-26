@@ -45,7 +45,7 @@ public class NavDrawerRightFragment extends Fragment {
         Bundle bundle = getArguments();
         if(bundle == null) {
             iv.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_no_preview));
-            tvTitle.setText("no item selected");
+            tvTitle.setText(getResources().getString(R.string.no_item_selected));
             tvPrice.setText("");
             tvDimensions.setText("");
             tvMaterial.setText("");
@@ -54,7 +54,7 @@ public class NavDrawerRightFragment extends Fragment {
             Bitmap bitmap =  BitmapFactory.decodeByteArray(bundle.getByteArray("bitmap"), 0, bundle.getByteArray("bitmap").length);
             iv.setImageBitmap(bitmap);
             tvTitle.setText(bundle.getString("title"));
-            tvPrice.setText( getString(R.string.price) + bundle.getDouble("price")+"\n");
+            tvPrice.setText( getString(R.string.price) + bundle.getDouble("price")+getResources().getString(R.string.currency)+"\n");
             tvDimensions.setText( getString(R.string.dimensions)+bundle.getString("dimensions") );
             tvMaterial.setText( getString(R.string.material)+bundle.getString("material") );
             tvInfo.setText( getString(R.string.info)+bundle.getString("info") );
