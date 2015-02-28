@@ -14,64 +14,52 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.project.furnishyourhome.R;
 import com.project.furnishyourhome.adapters.CustomListAdapter;
-import com.project.furnishyourhome.models.CustomListItem;
-
-import java.util.ArrayList;
+import com.project.furnishyourhome.models.ItemsHolder;
 
 
 public class MyFurnitureFragment extends Fragment {
     private static final String TAG = MyFurnitureFragment.class.getSimpleName();
 
-    private ArrayList <CustomListItem> chosenItems;
-    ListView listView;
-    CustomListAdapter adapter;
-    TextView tvTotalPrice;
+    private ListView listView;
+    private CustomListAdapter adapter;
+    private TextView tvTotalPrice;
+    TextView tvEmptyList;
     double totalPrice;
-
-    public static MyFurnitureFragment newInstance(Bundle args) {
-        MyFurnitureFragment f = new MyFurnitureFragment();
-        f.setArguments(args);
-        return f;
-    }
 
     public static MyFurnitureFragment newInstance() {
         return new MyFurnitureFragment();
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("chosenItems", chosenItems);
-        super.onSaveInstanceState(outState);
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        Log.d(TAG, "setUserVisibleHint");
+        super.setUserVisibleHint(isVisibleToUser);
+        Log.d(TAG, "isVisibleToUser: "+isVisibleToUser);
+        if (isVisibleToUser) {
+           //todo: logic
+            onResume();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        Log.d(TAG, "onResume()");
+        super.onResume();
+        checkIfListIsEmpty();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_my_furniture, container, false);
 
-        TextView textView = (TextView) rootView.findViewById(R.id.tv_empty_list_info);
-
-        chosenItems = new ArrayList<>();
-        if(savedInstanceState != null) {
-            textView.setText("");
-            textView.setVisibility(View.GONE);
-            chosenItems = savedInstanceState.getParcelableArrayList("chosenItems");
-        }
+        tvEmptyList= (TextView) rootView.findViewById(R.id.tv_empty_list_info);
 
         listView = (ListView) rootView.findViewById(R.id.lv_my_furniture);
 
-        if(chosenItems.isEmpty() && getArguments()!=null) {
-            textView.setText("");
-            textView.setVisibility(View.GONE);
-            chosenItems = getArguments().getParcelableArrayList("chosenItems");
-        } else {
-            textView.setText("List is empty.");
-        }
-
-        adapter = new CustomListAdapter(getActivity().getApplicationContext(), R.layout.favourites_list_item, chosenItems);
+        adapter = new CustomListAdapter(getActivity().getApplicationContext(), R.layout.favourites_list_item, ItemsHolder.chosenItems);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -94,8 +82,8 @@ public class MyFurnitureFragment extends Fragment {
 
         tvTotalPrice = (TextView) rootView.findViewById(R.id.tv_total_price);
         totalPrice = 0;
-        for (int i=0; i<chosenItems.size(); i++) {
-            totalPrice += chosenItems.get(i).getPrice();
+        for (int i=0; i<ItemsHolder.chosenItems.size(); i++) {
+            totalPrice += ItemsHolder.chosenItems.get(i).getPrice();
         }
         tvTotalPrice.setText(getResources().getString(R.string.total_price)+totalPrice+getResources().getString(R.string.currency));
         return rootView;
@@ -108,24 +96,18 @@ public class MyFurnitureFragment extends Fragment {
         alertDialogBuilder.setCancelable(true);
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
             public void onClick(DialogInterface dialog, int id){
-                totalPrice -= chosenItems.get(position).getPrice();
-                chosenItems.remove(position);
+                totalPrice -= ItemsHolder.chosenItems.get(position).getPrice();
+                ItemsHolder.chosenItems.remove(position);
+                ItemsHolder.canvasItems.remove(position);
+
+                checkIfListIsEmpty();
+
                 adapter.notifyDataSetChanged();
                 tvTotalPrice.setText(getResources().getString(R.string.total_price)+totalPrice+getResources().getString(R.string.currency));
 
-                MyRoomFragment fragment = (MyRoomFragment) getActivity().getSupportFragmentManager().findFragmentByTag("MyRoomFragment");
-                Fragment.SavedState myFragmentState = getActivity().getSupportFragmentManager().saveFragmentInstanceState(fragment);
-                Bundle args = new Bundle();
-                Bundle mapArgs = new Bundle();
-
-                args.putInt("deletedPosition", position);
-                mapArgs.putParcelableArrayList("chosenItems", chosenItems);
-
                 FragmentTransaction tr = getActivity().getSupportFragmentManager().beginTransaction();
-                MyRoomFragment newFragment = MyRoomFragment.newInstance(args);
-                newFragment.setInitialSavedState(myFragmentState);
-                tr.replace(R.id.container_my_room, newFragment, "MyRoomFragment");
-                tr.replace(R.id.container_map, MapFragment.newInstance(mapArgs));
+                tr.replace(R.id.container_my_room, MyRoomFragment.newInstance());//todo: refactor
+                tr.replace(R.id.container_map, MapFragment.newInstance());
                 tr.commit();
 
             }
@@ -137,5 +119,15 @@ public class MyFurnitureFragment extends Fragment {
         });
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
+    }
+
+    private void checkIfListIsEmpty(){
+        if(ItemsHolder.chosenItems.isEmpty()) {
+            tvEmptyList.setVisibility(View.VISIBLE);
+            tvEmptyList.setText("List is empty.");
+        } else {
+            tvEmptyList.setText("");
+            tvEmptyList.setVisibility(View.GONE);
+        }
     }
 }

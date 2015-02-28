@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.project.furnishyourhome.R;
 import com.project.furnishyourhome.models.CustomListItem;
+import com.project.furnishyourhome.models.ItemsHolder;
 
 import java.util.ArrayList;
 
@@ -33,22 +34,12 @@ public class MapFragment extends Fragment {
     private static final String TAG = MapFragment.class.getSimpleName();
 
     private final float TOP_VIEW = 12.0f;
-
     private GoogleMap map;
-
     LocationManager locationManager;
-    ArrayList<CustomListItem> storesLocations;
 
     public static MapFragment newInstance() {
         Log.d(TAG, "newInstance()");
         return new MapFragment();
-    }
-
-    public static MapFragment newInstance (Bundle args){
-        Log.d(TAG, "newInstance (Bundle args)");
-        MapFragment f = new MapFragment();
-        f.setArguments(args);
-        return f;
     }
 
     @Override
@@ -94,12 +85,6 @@ public class MapFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        Log.d(TAG, "onPause");
-        super.onPause();
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
@@ -108,39 +93,21 @@ public class MapFragment extends Fragment {
         map = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
-        storesLocations = new ArrayList<>();
-        Bundle args = getArguments();
-        if(savedInstanceState != null) {
-            storesLocations = savedInstanceState.getParcelableArrayList("storesLocations");
-        } else {
-            if(args != null) {
-                storesLocations = args.getParcelableArrayList("chosenItems");
-                Log.d(TAG, "storesLocations.size(): "+storesLocations.size());
-            }
-        }
-
         return rootView;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        Log.d(TAG, "onSaveInstanceState");
-        outState.putParcelableArrayList("storesLocations", storesLocations);
-        super.onSaveInstanceState(outState);
     }
 
     private void showStoresOnMap() {
         Log.d(TAG, "showStoresOnMap");
-        for(int i=0; i<storesLocations.size(); i++) {
-            double lat = storesLocations.get(i).getStore().getLocation().getLatitude();
-            double lng = storesLocations.get(i).getStore().getLocation().getLongitude();
+        for(int i=0; i< ItemsHolder.chosenItems.size(); i++) {
+            double lat = ItemsHolder.chosenItems.get(i).getStore().getLocation().getLatitude();
+            double lng = ItemsHolder.chosenItems.get(i).getStore().getLocation().getLongitude();
 
             MarkerOptions storeLocation = new MarkerOptions();
             storeLocation.position(new LatLng(lat, lng));
-            storeLocation.title(storesLocations.get(i).getStore().getName());
-            storeLocation.icon(BitmapDescriptorFactory.fromBitmap(storesLocations.get(i).getStore().getLogo()));
+            storeLocation.title(ItemsHolder.chosenItems.get(i).getStore().getName());
+            storeLocation.icon(BitmapDescriptorFactory.fromBitmap(ItemsHolder.chosenItems.get(i).getStore().getLogo()));
             map.addMarker(storeLocation);
-            Log.d(TAG, storesLocations.get(i).getStore().getName()+": "+lat+" "+lng);
+            Log.d(TAG, ItemsHolder.chosenItems.get(i).getStore().getName()+": "+lat+" "+lng);
         }
     }
 

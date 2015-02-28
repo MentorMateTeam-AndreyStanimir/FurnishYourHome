@@ -67,7 +67,7 @@ public class DataCountService extends Service {
 
                               },
          //Set how long before to start calling the TimerTask (in milliseconds)
-                0,
+                1000,
         //Set the amount of time between each execution (in milliseconds)
                 60000);
 
