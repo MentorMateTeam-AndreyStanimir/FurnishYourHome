@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -103,7 +104,7 @@ public class MapFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
-
+        MapsInitializer.initialize(getActivity().getApplicationContext());
         //creating map
         map = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
@@ -134,6 +135,7 @@ public class MapFragment extends Fragment {
         for(int i=0; i<storesLocations.size(); i++) {
             double lat = storesLocations.get(i).getStore().getLocation().getLatitude();
             double lng = storesLocations.get(i).getStore().getLocation().getLongitude();
+
 
             MarkerOptions storeLocation = new MarkerOptions();
             storeLocation.position(new LatLng(lat, lng));

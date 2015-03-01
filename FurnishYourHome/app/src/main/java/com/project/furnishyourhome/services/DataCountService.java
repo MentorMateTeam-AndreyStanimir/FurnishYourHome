@@ -24,10 +24,9 @@ public class DataCountService extends Service {
 
     private final IBinder mBinder = new MyBinder();
     private Handler serviceHandler;
-    private Task myTask = new Task();
-    private TaskUpdate taskUpdate = new TaskUpdate();
-    private int count = 0;
-    private boolean isUpdated = false;
+    private TaskUpdate taskUpdate;
+    private int count;
+    private boolean isUpdated;
     private ResultReceiver resultReceiver;
 
     @Override
@@ -45,6 +44,9 @@ public class DataCountService extends Service {
     public void onCreate() {
         super.onCreate();
         Parse.initialize(this, getResources().getString(R.string.app_id), getResources().getString(R.string.app_key));
+        taskUpdate = new TaskUpdate();
+        count = 0;
+        isUpdated = false;
         Log.d(TAG,"StartService: counter");
     }
 
@@ -52,8 +54,7 @@ public class DataCountService extends Service {
         resultReceiver = intent.getParcelableExtra("receiver");
         serviceHandler = new Handler();
         serviceHandler.postDelayed(taskUpdate, 10000L);
-
-        //Declare the timer
+//Declare the timer
         Timer t = new Timer();
         //Set the schedule function and rate
         t.scheduleAtFixedRate(new TimerTask() {
@@ -65,11 +66,7 @@ public class DataCountService extends Service {
                                       thread.start();
                                   }
 
-                              },
-         //Set how long before to start calling the TimerTask (in milliseconds)
-                0,
-        //Set the amount of time between each execution (in milliseconds)
-                60000);
+                              }, 0, 60000);
 
         return Service.START_NOT_STICKY;
     }
@@ -101,11 +98,11 @@ public class DataCountService extends Service {
                 count = query.count();
                 isUpdated = true;
 
-//                try {
-//                    Thread.sleep(60000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    Thread.sleep(60000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             } catch (ParseException e) {
                 e.printStackTrace();
             }
