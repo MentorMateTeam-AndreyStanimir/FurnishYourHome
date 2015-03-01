@@ -6,10 +6,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
+import com.project.furnishyourhome.R;
+import com.project.furnishyourhome.fragments.ContainerMapFragment;
+import com.project.furnishyourhome.fragments.ContainerMyFurnitureFragment;
+import com.project.furnishyourhome.fragments.ContainerMyRoomFragment;
 import com.project.furnishyourhome.fragments.MapFragment;
-import com.project.furnishyourhome.fragments.MyFurnitureFragment;
 import com.project.furnishyourhome.fragments.MyRoomFragment;
 
 //TODO: check FragmentStatePagerAdapter vs. FragmentPagerAdapter
@@ -38,20 +42,19 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 
         switch (position) {
             case 0:
-                Log.d(TAG, "loading MyRoomFragment.newInstance()");
-
-                return MyRoomFragment.newInstance();
+                Log.d(TAG, "new ContainerMyRoomFragment()");
+                return new ContainerMyRoomFragment();
             case 1:
                 if(this.numbOfTabs == 3) {
-                    Log.d(TAG, "loading MyFurnitureFragment.newInstance()");
-                    return MyFurnitureFragment.newInstance();
+                    Log.d(TAG, "new ContainerMyFurnitureFragment()");
+                    return new ContainerMyFurnitureFragment();
                 } else {
-                    Log.d(TAG, "loading MapFragment.newInstance()");
-                    return MapFragment.newInstance();
+                    Log.d(TAG, "new ContainerMapFragment()");
+                    return new ContainerMapFragment();
                 }
             default:
-                Log.d(TAG, "loading MapFragment.newInstance()");
-                return MapFragment.newInstance();
+                Log.d(TAG, "new ContainerMapFragment()");
+                return new ContainerMapFragment();
         }
     }
 

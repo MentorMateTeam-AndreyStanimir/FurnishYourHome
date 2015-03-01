@@ -16,7 +16,6 @@ import com.project.furnishyourhome.adapters.CustomListAdapter;
 import com.project.furnishyourhome.models.CanvasView;
 import com.project.furnishyourhome.models.CustomBitmap;
 import com.project.furnishyourhome.models.CustomListItem;
-import com.project.furnishyourhome.models.ItemsHolder;
 
 import org.lucasr.twowayview.TwoWayView;
 
@@ -26,10 +25,13 @@ import java.util.ArrayList;
 public class MyRoomFragment extends Fragment {
     private static final String TAG = MyRoomFragment.class.getSimpleName();
 
+    private ArrayList<CustomBitmap> canvasItems;
+    private ArrayList<CustomListItem> horizontalListItems;
+    private CustomListAdapter adapter;
+    private ArrayList<CustomListItem> chosenItems;
     private CanvasView customCanvas;
+
     private TwoWayView twoWayView;
-    private CustomListAdapter horizontalListItemsAdapter;
-    //private CustomListAdapter adapter;
 
     //int oldh;
     //int oldw;
@@ -37,34 +39,50 @@ public class MyRoomFragment extends Fragment {
     public static MyRoomFragment newInstance() {
         Log.d(TAG, "newInstance()");
         return new MyRoomFragment();
+    }
 
+    public static MyRoomFragment newInstance(Bundle args) {
+        Log.d(TAG, "newInstance(Bundle args)");
+        MyRoomFragment f = new MyRoomFragment();
+        f.setArguments(args);
+        return f;
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        Log.d(TAG, "setUserVisibleHint");
-        super.setUserVisibleHint(isVisibleToUser);
-        Log.d(TAG, "isVisibleToUser: "+isVisibleToUser);
-        if (isVisibleToUser) {
-            //todo: logic
-            onResume();
-        }
-    }
+    public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate()");
+        super.onCreate(savedInstanceState);
 
-    @Override
-    public void onResume() {
-        Log.d(TAG, "onResume()");
-        super.onResume();
-/*
-        if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            // TODO: this fucking recalculation
-            recalculateCoordinates(oldw, oldh, arrayList);
-        }*/
-        if(horizontalListItemsAdapter != null) {
-            horizontalListItemsAdapter.notifyDataSetChanged();
-            twoWayView.setAdapter(horizontalListItemsAdapter);
+        canvasItems = new ArrayList<>();
+        chosenItems = new ArrayList<>();
+        horizontalListItems = new ArrayList<>();
+
+        if(savedInstanceState != null) {
+            Log.d(TAG, "restore from SAVED instance");
+            canvasItems = savedInstanceState.getParcelableArrayList("savedBitmaps");
+            chosenItems = savedInstanceState.getParcelableArrayList("chosenItems");
+            horizontalListItems = savedInstanceState.getParcelableArrayList("horizontalListItems");
+
+            if(getArguments() != null) {
+                if(getArguments().containsKey("horizontalListItems")) {
+                    horizontalListItems = getArguments().getParcelableArrayList("horizontalListItems");
+                    Log.d(TAG, "overriding SAVED instance, overriding horizontalListItems");
+                }
+                if(getArguments().containsKey("deletedPosition")) {
+                    canvasItems.remove(getArguments().getInt("deletedPosition"));
+                    Log.d(TAG, "overriding SAVED instance, removing item from canvasItems");
+                }
+            }
+        } else {
+            Log.d(TAG, "no SAVED instance");
         }
 
+        if(horizontalListItems.isEmpty() && getArguments()!=null) {
+            Log.d(TAG, "load items from ARGUMENTS");
+            horizontalListItems = getArguments().getParcelableArrayList("horizontalListItems");
+        } else {
+            Log.d(TAG, "no items from ARGUMENTS");
+        }
     }
 
     @Override
@@ -74,16 +92,24 @@ public class MyRoomFragment extends Fragment {
 
         customCanvas = (CanvasView) rootView.findViewById(R.id.cv_room_canvas);
         customCanvas.setBackgroundResource(R.drawable.room);
-        customCanvas.setAddedBitmaps(ItemsHolder.canvasItems);
+        customCanvas.setAddedBitmaps(canvasItems);
 
         twoWayView = (TwoWayView) rootView.findViewById(R.id.twv_furniture);
-        horizontalListItemsAdapter = new CustomListAdapter(getActivity(), R.layout.horizontal_list_item, ItemsHolder.horizontalListItems);
-        Log.d(TAG, "ItemsHolder.horizontalListItems: "+ItemsHolder.horizontalListItems.size());
-        //twoWayView.setAdapter(ItemsHolder.horizontalListItemsAdapter);
+
+        return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        Log.d(TAG, "onStart()");
+        super.onStart();
+
+        adapter = new CustomListAdapter(getActivity(), R.layout.horizontal_list_item, horizontalListItems);
+        twoWayView.setAdapter(adapter);
         twoWayView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                CustomListItem item = ItemsHolder.horizontalListItems.get(position);
+                CustomListItem item = horizontalListItems.get(position);
 
                 //its not the best but work stable
                 Bundle args = new Bundle();
@@ -116,21 +142,44 @@ public class MyRoomFragment extends Fragment {
 
                 customCanvas.addNewElement(resizedBitmap);
 
-                ItemsHolder.canvasItems = customCanvas.getAddedBitmaps();
-                ItemsHolder.chosenItems.add(ItemsHolder.horizontalListItems.get(position));
+                chosenItems.add(horizontalListItems.get(position));
+                Bundle args = new Bundle();
+                args.putParcelableArrayList("chosenItems", chosenItems);
 
-                FragmentTransaction tr = getActivity().getSupportFragmentManager().beginTransaction();//todo: refactor
-                tr.replace(R.id.container_my_furniture, MyFurnitureFragment.newInstance());
-                tr.replace(R.id.container_map, MapFragment.newInstance());
+                FragmentTransaction tr = getActivity().getSupportFragmentManager().beginTransaction();
+                tr.replace(R.id.container_my_furniture_fragment, MyFurnitureFragment.newInstance(args));
+                tr.replace(R.id.container_map_fragment, MapFragment.newInstance(args));
                 tr.commit();
                 return false;
             }
         });
-        return rootView;
     }
 
-   /* // TODO: this function
-    private void recalculateCoordinates(int oldw, int oldh, ArrayList<CustomBitmap> arrayList) {
+    @Override
+    public void onResume() {
+        Log.d(TAG, "onResume()");
+        super.onResume();
+        adapter.notifyDataSetChanged();
+
+        /*if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // TODO: this fucking recalculation
+            recalculateCoordinates(oldw, oldh, canvasItems);
+        }*/
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState()");
+        //outState.putInt("oldw", customCanvas.getWidth());
+        //outState.putInt("oldh", customCanvas.getHeight());
+        outState.putParcelableArrayList("savedBitmaps", customCanvas.getAddedBitmaps());
+        outState.putParcelableArrayList("chosenItems", chosenItems);
+        outState.putParcelableArrayList("horizontalListItems", horizontalListItems);
+        super.onSaveInstanceState(outState);
+    }
+
+    /* // TODO: this function
+    private void recalculateCoordinates(int oldw, int oldh, ArrayList<CustomBitmap> canvasItems) {
         Log.d(TAG, "recalculateCoordinates()");
         if ((oldw != 0) && (oldh != 0)) {
 //            float f1 = this.customCanvas.getWidth() / this.oldw;  // incorrect
@@ -143,8 +192,8 @@ public class MyRoomFragment extends Fragment {
 //
 //            Log.d("DIMENTIONS", "h: " + this.customCanvas.getHeight() + " oldh: " + this.oldh + " coef: " + f2);
 
-            for (int i = 0; i < arrayList.size(); i++) {
-                CustomBitmap item = arrayList.get(i); // and the problem with ic_no_preview and Y equals 0 disappears :)
+            for (int i = 0; i < canvasItems.size(); i++) {
+                CustomBitmap item = canvasItems.get(i); // and the problem with ic_no_preview and Y equals 0 disappears :)
 
                 float coefficientX = oldw / (item.getX() + item.getHalfWidth()); // add getHalfWidth to find the center ic_no_preview of the image
                 float coefficientY = oldh / (item.getY() + item.getHalfHeight()); // add getHalfHeight to find the center Y of the image
@@ -160,8 +209,8 @@ public class MyRoomFragment extends Fragment {
 
                 item.setX(nextX);
                 item.setY(nextY);
-                arrayList.set(i, item);
-                customCanvas.setAddedBitmaps(arrayList);
+                canvasItems.set(i, item);
+                customCanvas.setAddedBitmaps(canvasItems);
             }
         }
     }*/

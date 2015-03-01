@@ -17,59 +17,82 @@ import android.widget.TextView;
 
 import com.project.furnishyourhome.R;
 import com.project.furnishyourhome.adapters.CustomListAdapter;
-import com.project.furnishyourhome.models.ItemsHolder;
+import com.project.furnishyourhome.models.CustomListItem;
+
+import java.util.ArrayList;
 
 
 public class MyFurnitureFragment extends Fragment {
     private static final String TAG = MyFurnitureFragment.class.getSimpleName();
 
+    private ArrayList <CustomListItem> chosenItems;
     private ListView listView;
     private CustomListAdapter adapter;
     private TextView tvTotalPrice;
-    TextView tvEmptyList;
-    double totalPrice;
+    private TextView tvEmptyList;
+    private double totalPrice;
 
     public static MyFurnitureFragment newInstance() {
+        Log.d(TAG, "newInstance()");
         return new MyFurnitureFragment();
     }
 
+    public static MyFurnitureFragment newInstance(Bundle args) {
+        Log.d(TAG, "newInstance(Bundle args)");
+        MyFurnitureFragment f = new MyFurnitureFragment();
+        f.setArguments(args);
+        return f;
+    }
+
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        Log.d(TAG, "setUserVisibleHint");
-        super.setUserVisibleHint(isVisibleToUser);
-        Log.d(TAG, "isVisibleToUser: "+isVisibleToUser);
-        if (isVisibleToUser) {
-           //todo: logic
-            onResume();
+    public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate()");
+        super.onCreate(savedInstanceState);
+
+        chosenItems = new ArrayList<>();
+        if(savedInstanceState != null) {
+            Log.d(TAG, "restore from SAVED instance");
+            chosenItems = savedInstanceState.getParcelableArrayList("chosenItems");
+        } else {
+            Log.d(TAG, "no SAVED instance");
+        }
+
+        if(chosenItems.isEmpty() && getArguments()!=null) {
+            Log.d(TAG, "load items from ARGUMENTS");
+            chosenItems = getArguments().getParcelableArrayList("chosenItems");
+        } else {
+            Log.d(TAG, "no items from ARGUMENTS");
         }
     }
 
     @Override
-    public void onResume() {
-        Log.d(TAG, "onResume()");
-        super.onResume();
-        checkIfListIsEmpty();
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView()");
         View rootView = inflater.inflate(R.layout.fragment_my_furniture, container, false);
 
-        tvEmptyList= (TextView) rootView.findViewById(R.id.tv_empty_list_info);
+        tvEmptyList = (TextView) rootView.findViewById(R.id.tv_empty_list_info);
 
         listView = (ListView) rootView.findViewById(R.id.lv_my_furniture);
 
-        adapter = new CustomListAdapter(getActivity().getApplicationContext(), R.layout.favourites_list_item, ItemsHolder.chosenItems);
+        tvTotalPrice = (TextView) rootView.findViewById(R.id.tv_total_price);
+        totalPrice = 0;
+        for (int i=0; i<chosenItems.size(); i++) {
+            totalPrice += chosenItems.get(i).getPrice();
+        }
+        tvTotalPrice.setText(getResources().getString(R.string.total_price)+totalPrice+getResources().getString(R.string.currency));
+        return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        Log.d(TAG, "onStart()");
+        super.onStart();
+        adapter = new CustomListAdapter(getActivity().getApplicationContext(), R.layout.favourites_list_item, chosenItems);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-               /* Toast.makeText(
-                        getActivity(),
-                        "store location: lat "
-                                + chosenItems.get(position).getStore().getLocation().getLatitude()
-                                + " lon " + chosenItems.get(position).getStore().getLocation().getLongitude(),
-                        Toast.LENGTH_LONG).show();*/
+               //TODO: implement some code here
             }
         });
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -79,14 +102,6 @@ public class MyFurnitureFragment extends Fragment {
                 return false;
             }
         });
-
-        tvTotalPrice = (TextView) rootView.findViewById(R.id.tv_total_price);
-        totalPrice = 0;
-        for (int i=0; i<ItemsHolder.chosenItems.size(); i++) {
-            totalPrice += ItemsHolder.chosenItems.get(i).getPrice();
-        }
-        tvTotalPrice.setText(getResources().getString(R.string.total_price)+totalPrice+getResources().getString(R.string.currency));
-        return rootView;
     }
 
     private void showDeleteAlertToUser(final int position){
@@ -96,38 +111,64 @@ public class MyFurnitureFragment extends Fragment {
         alertDialogBuilder.setCancelable(true);
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
             public void onClick(DialogInterface dialog, int id){
-                totalPrice -= ItemsHolder.chosenItems.get(position).getPrice();
-                ItemsHolder.chosenItems.remove(position);
-                ItemsHolder.canvasItems.remove(position);
-
-                checkIfListIsEmpty();
-
+                Log.d(TAG, "positiveButtonClicked");
+                totalPrice -= chosenItems.get(position).getPrice();
+                chosenItems.remove(position);
                 adapter.notifyDataSetChanged();
                 tvTotalPrice.setText(getResources().getString(R.string.total_price)+totalPrice+getResources().getString(R.string.currency));
 
+                MyRoomFragment fragment = (MyRoomFragment) getActivity().getSupportFragmentManager().findFragmentByTag("MyRoomFragment");
+                Fragment.SavedState myFragmentState = getActivity().getSupportFragmentManager().saveFragmentInstanceState(fragment);
+                Bundle roomArgs = new Bundle();
+                Bundle mapArgs = new Bundle();
+
+                roomArgs.putInt("deletedPosition", position);
+                mapArgs.putParcelableArrayList("chosenItems", chosenItems);
+
                 FragmentTransaction tr = getActivity().getSupportFragmentManager().beginTransaction();
-                tr.replace(R.id.container_my_room, MyRoomFragment.newInstance());//todo: refactor
-                tr.replace(R.id.container_map, MapFragment.newInstance());
+                MyRoomFragment newFragment = MyRoomFragment.newInstance(roomArgs);
+                newFragment.setInitialSavedState(myFragmentState);
+                tr.replace(R.id.container_my_room_fragment, newFragment, "MyRoomFragment");
+                tr.replace(R.id.container_map_fragment, MapFragment.newInstance(mapArgs));
                 tr.commit();
+                onResume();
 
             }
         });
         alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener(){
             public void onClick(DialogInterface dialog, int id){
+                Log.d(TAG, "negativeButtonClicked");
                 dialog.cancel();
+                onResume();
             }
         });
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
     }
 
+    @Override
+    public void onResume() {
+        Log.d(TAG, "onResume()");
+        super.onResume();
+        adapter.notifyDataSetChanged();
+        checkIfListIsEmpty();
+    }
+
     private void checkIfListIsEmpty(){
-        if(ItemsHolder.chosenItems.isEmpty()) {
+        Log.d(TAG, "checkIfListIsEmpty()");
+        if(chosenItems != null && chosenItems.isEmpty()) {
             tvEmptyList.setVisibility(View.VISIBLE);
             tvEmptyList.setText("List is empty.");
         } else {
             tvEmptyList.setText("");
             tvEmptyList.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState(Bundle outState)");
+        outState.putParcelableArrayList("chosenItems", chosenItems);
+        super.onSaveInstanceState(outState);
     }
 }
