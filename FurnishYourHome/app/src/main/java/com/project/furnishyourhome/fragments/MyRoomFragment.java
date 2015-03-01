@@ -1,8 +1,6 @@
 package com.project.furnishyourhome.fragments;
 
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -16,7 +14,6 @@ import android.os.ResultReceiver;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,10 +52,11 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
     private static ArrayList<Type> types = new ArrayList<>();
     private static ArrayList<Furniture> furnitures = new ArrayList<>();
     private static ArrayList<CustomListItem> horizontalListItems;
-    private static ArrayList<CustomBitmap> arrayList;
+    private static ArrayList<CustomBitmap> canvasItems;
     private static ArrayList<CustomListItem> chosenItems;
     private static HolderCount holderCount = new HolderCount();
 
+    private CustomListAdapter adapter;
     private CanvasView customCanvas;
     private Intent intent;
     private TaskUpdateList taskUpdateList;
@@ -69,9 +67,6 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
 
     //int oldh;
     //int oldw;
-
-    public MyRoomFragment(){
-    }
 
     public static MyRoomFragment newInstance() {
         Log.d(TAG, "newInstance()");
@@ -90,29 +85,83 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        Log.d(TAG, "onSaveInstanceState()");
-        //outState.putInt("oldw", customCanvas.getWidth());
-        //outState.putInt("oldh", customCanvas.getHeight());
-        outState.putParcelableArrayList("savedBitmaps", customCanvas.getAddedBitmaps()); //items inside the canvas
-        arrayList = customCanvas.getAddedBitmaps();
-        outState.putParcelableArrayList("chosenItems", chosenItems); //items for second fragment
-        Log.d(TAG, "horizontalListItems.size() in outState is: "+horizontalListItems.size());
-        outState.putParcelableArrayList("horizontalListItems", horizontalListItems); //items for horizontal listView
-        super.onSaveInstanceState(outState);
+    public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate()");
+        super.onCreate(savedInstanceState);
+
+        if(chosenItems == null) {
+            chosenItems = new ArrayList<>();
+        }
+
+        if(horizontalListItems == null) {
+            horizontalListItems = new ArrayList<>();
+        }
+
+        if(canvasItems == null) {
+            canvasItems = new ArrayList<>();
+            //   arrayList = savedInstanceState.getParcelableArrayList("savedBitmaps");
+        }
+
+        if(savedInstanceState != null) {
+            Log.d(TAG, "restore from SAVED instance");
+           // canvasItems = savedInstanceState.getParcelableArrayList("savedBitmaps");
+            chosenItems = savedInstanceState.getParcelableArrayList("chosenItems");
+            horizontalListItems = savedInstanceState.getParcelableArrayList("horizontalListItems");
+
+            if(getArguments() != null) {
+                if(getArguments().containsKey("horizontalListItems")) {
+                    horizontalListItems = getArguments().getParcelableArrayList("horizontalListItems");
+                    Log.d(TAG, "overriding SAVED instance, overriding horizontalListItems");
+                }
+                if(getArguments().containsKey("deletedPosition")) {
+                    canvasItems.remove(getArguments().getInt("deletedPosition"));
+                    Log.d(TAG, "overriding SAVED instance, removing item from canvasItems");
+                }
+            }
+        } else {
+            Log.d(TAG, "no SAVED instance");
+        }
+
+        if(horizontalListItems.isEmpty() && getArguments()!=null) {
+            Log.d(TAG, "load items from ARGUMENTS");
+            horizontalListItems = getArguments().getParcelableArrayList("horizontalListItems");
+        } else {
+            Log.d(TAG, "no items from ARGUMENTS");
+        }
     }
 
     @Override
-    public void onResume() {
-        Log.d(TAG, "onResume()");
-        super.onResume();
-/*
-        if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            // TODO: this fucking recalculation
-            recalculateCoordinates(oldw, oldh, arrayList);
-        }*/
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView()");
+        View rootView = inflater.inflate(R.layout.fragment_my_room, container, false);
 
-        setTwoWayViewList();
+        customCanvas = (CanvasView) rootView.findViewById(R.id.cv_room_canvas);
+        customCanvas.setBackgroundResource(R.drawable.room);
+
+        customCanvas.setAddedBitmaps(canvasItems);
+
+        twoWayView = (TwoWayView) rootView.findViewById(R.id.twv_furniture);
+
+        this.activity = getActivity();
+
+        // Start service data counter
+        taskUpdateList = new TaskUpdateList();
+        updateListHandler = new Handler();
+        updateListHandler.postDelayed(taskUpdateList, 30000);
+
+        resultReceiver = new MyResultReceiver(null);
+        this.intent = new Intent(getActivity(), DataCountService.class);
+        this.intent.putExtra("receiver", resultReceiver);
+        activity.startService(intent);
+        return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        Log.d(TAG, "onStart()");
+        super.onStart();
+
+        this.setTwoWayViewList();
 
         twoWayView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -126,17 +175,13 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
 
                 customCanvas.addNewElement(resizedBitmap);
 
-                if(chosenItems == null){
-                    chosenItems = new ArrayList<>();
-                }
                 chosenItems.add(horizontalListItems.get(position));
                 Bundle args = new Bundle();
                 args.putParcelableArrayList("chosenItems", chosenItems);
 
                 FragmentTransaction tr = getActivity().getSupportFragmentManager().beginTransaction();
-
-                tr.replace(R.id.container_my_furniture, MyFurnitureFragment.newInstance(args));
-                tr.replace(R.id.container_map, MapFragment.newInstance(args));
+                tr.replace(R.id.container_my_furniture_fragment, MyFurnitureFragment.newInstance(args));
+                tr.replace(R.id.container_map_fragment, MapFragment.newInstance(args));
                 tr.commit();
                 return false;
             }
@@ -144,7 +189,7 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
     }
 
     private void setTwoWayViewList() {
-        CustomListAdapter adapter = null;
+        adapter = null;
         if(horizontalListItems == null || horizontalListItems.size() == 0){
             adapter = new CustomListAdapter(getActivity(), R.layout.horizontal_list_item, convertFurnitureToListItem(furnitures));
 
@@ -179,66 +224,27 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView()");
-        View rootView = inflater.inflate(R.layout.fragment_my_room, container, false);
+    public void onResume() {
+        Log.d(TAG, "onResume()");
+        super.onResume();
+        adapter.notifyDataSetChanged();
 
-        customCanvas = (CanvasView) rootView.findViewById(R.id.cv_room_canvas);
-        customCanvas.setBackgroundResource(R.drawable.room);
+        /*if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // TODO: this fucking recalculation
+            recalculateCoordinates(oldw, oldh, canvasItems);
+        }*/
+    }
 
-        if(chosenItems == null) {
-            chosenItems = new ArrayList<>();
-        }
-        if(horizontalListItems == null) {
-            horizontalListItems = new ArrayList<>();
-        }
-
-        twoWayView = (TwoWayView) rootView.findViewById(R.id.twv_furniture);
-
-        if(arrayList == null) {
-            arrayList = new ArrayList<>();
-            //   arrayList = savedInstanceState.getParcelableArrayList("savedBitmaps");
-        }
-        customCanvas.setAddedBitmaps(arrayList);
-
-        Bundle bundle = getArguments();
-        if(savedInstanceState != null){
-
-            //oldw = savedInstanceState.getInt("oldw");
-            //oldh = savedInstanceState.getInt("oldh");
-
-
-            chosenItems = savedInstanceState.getParcelableArrayList("chosenItems");
-            horizontalListItems = savedInstanceState.getParcelableArrayList("horizontalListItems");
-            Log.d(TAG, "got items from savedInstanceState");
-            Log.d(TAG, "horizontalListItems.size() "+horizontalListItems.size());
-
-            if(bundle != null) {
-                horizontalListItems = bundle.getParcelableArrayList("horizontalListItems");
-                Log.d(TAG, "GOT items from bundle, overriding savedState");
-                Log.d(TAG, "horizontalListItems.size() from bundle: "+horizontalListItems.size());
-            }
-
-        } else {
-            if(bundle != null) {
-                horizontalListItems = bundle.getParcelableArrayList("horizontalListItems");
-                Log.d(TAG, "GOT items from bundle");
-                Log.d(TAG, "horizontalListItems.size() from bundle: "+horizontalListItems.size());
-            }
-        }
-        this.activity = getActivity();
-
-        // TODO: THIS LIST VIEW NOT LOADING ON API 16
-        // Start service data counter
-        taskUpdateList = new TaskUpdateList();
-        updateListHandler = new Handler();
-        updateListHandler.postDelayed(taskUpdateList, 30000);
-
-        resultReceiver = new MyResultReceiver(null);
-        this.intent = new Intent(getActivity(), DataCountService.class);
-        this.intent.putExtra("receiver", resultReceiver);
-        activity.startService(intent);
-        return rootView;
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState()");
+        //outState.putInt("oldw", customCanvas.getWidth());
+        //outState.putInt("oldh", customCanvas.getHeight());
+        outState.putParcelableArrayList("savedBitmaps", customCanvas.getAddedBitmaps());
+        outState.putParcelableArrayList("chosenItems", chosenItems);
+        outState.putParcelableArrayList("horizontalListItems", horizontalListItems);
+        canvasItems = customCanvas.getAddedBitmaps();
+        super.onSaveInstanceState(outState);
     }
 
     private class TaskUpdateList implements Runnable {
@@ -298,7 +304,7 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
         public void onServiceConnected(ComponentName className, IBinder binder) {
             DataCountService.MyBinder dataBinder = (DataCountService.MyBinder) binder;
             dataService = dataBinder.getService();
-           Log.d(TAG, "Service connected");
+            Log.d(TAG, "Service connected");
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -488,7 +494,7 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
             Log.d(TAG, "loading MyRoomFragment.newInstance(args)");
             if(getActivity() != null) {
                 FragmentTransaction tr = getActivity().getSupportFragmentManager().beginTransaction();
-                tr.replace(R.id.container_my_room, myRoom, "MyRoomFragment");
+                tr.replace(R.id.container_my_room_fragment, myRoom, "MyRoomFragment");
                 tr.commit();
             }
         }

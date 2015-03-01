@@ -1,10 +1,6 @@
 package com.project.furnishyourhome.fragments;
 
-
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -12,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,11 +29,9 @@ public class MapFragment extends Fragment {
     private static final String TAG = MapFragment.class.getSimpleName();
 
     private final float TOP_VIEW = 12.0f;
-
+    private ArrayList<CustomListItem> storesLocations;
     private GoogleMap map;
-
-    LocationManager locationManager;
-    ArrayList<CustomListItem> storesLocations;
+    private LocationManager locationManager;
 
     public static MapFragment newInstance() {
         Log.d(TAG, "newInstance()");
@@ -53,32 +46,57 @@ public class MapFragment extends Fragment {
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        Log.d(TAG, "setUserVisibleHint");
-        super.setUserVisibleHint(isVisibleToUser);
-        Log.d(TAG, "isVisibleToUser: "+isVisibleToUser);
-        if (isVisibleToUser) {
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                Log.d(TAG, "GPS is ON");
-            } else {
-                Log.d(TAG, "GPS is OFF");
-                showGPSDisabledAlertToUser();
-            }
-            onResume();
+    public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate()");
+        super.onCreate(savedInstanceState);
+
+        storesLocations = new ArrayList<>();
+        if(savedInstanceState != null) {
+            Log.d(TAG, "restore form SAVED instance");
+            storesLocations = savedInstanceState.getParcelableArrayList("storesLocations");
+        } else {
+            Log.d(TAG, "no SAVED instance");
         }
+
+        if(storesLocations.isEmpty() && getArguments()!=null) {
+            Log.d(TAG, "load items from ARGUMENTS");
+            storesLocations = getArguments().getParcelableArrayList("chosenItems");
+        } else {
+            Log.d(TAG, "no items from ARGUMENTS");
+        }
+        Log.d(TAG, "storesLocations.size(): "+storesLocations.size());
+
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView()");
+        View rootView = inflater.inflate(R.layout.fragment_map, container, false);
+
+        MapsInitializer.initialize(getActivity().getApplicationContext());
+        map = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
+        map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+
+        return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        Log.d(TAG, "onStart()");
+        super.onStart();
     }
 
     @Override
     public void onResume() {
-        Log.d(TAG, "onResume");
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        Log.d(TAG, "onResume()");
+        super.onResume();
         trackMyPosition();
         showStoresOnMap();
-        super.onResume();
     }
 
     private void trackMyPosition() {
-        Log.d(TAG, "trackMyPosition");
+        Log.d(TAG, "trackMyPosition()");
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -100,38 +118,24 @@ public class MapFragment extends Fragment {
         super.onPause();
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
-        View rootView = inflater.inflate(R.layout.fragment_map, container, false);
-        MapsInitializer.initialize(getActivity().getApplicationContext());
-        //creating map
-        map = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
-        map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+    private void showMeOnTheMap(Location location) {
+        Log.d(TAG, "showMeOnTheMap()");
+        double lat = location.getLatitude();
+        double lng = location.getLongitude();
+        map.clear();
+        showStoresOnMap();
 
-        storesLocations = new ArrayList<>();
-        Bundle args = getArguments();
-        if(savedInstanceState != null) {
-            storesLocations = savedInstanceState.getParcelableArrayList("storesLocations");
-        } else {
-            if(args != null) {
-                storesLocations = args.getParcelableArrayList("chosenItems");
-                Log.d(TAG, "storesLocations.size(): "+storesLocations.size());
-            }
-        }
-
-        return rootView;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        Log.d(TAG, "onSaveInstanceState");
-        outState.putParcelableArrayList("storesLocations", storesLocations);
-        super.onSaveInstanceState(outState);
+        MarkerOptions myLocation = new MarkerOptions();
+        myLocation.position(new LatLng(lat, lng));
+        myLocation.title("me");
+        myLocation.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_me));
+        map.addMarker(myLocation);
+        map.animateCamera( CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng) , TOP_VIEW) );
+        Log.d(TAG, "me: "+lat+" "+lng);
     }
 
     private void showStoresOnMap() {
-        Log.d(TAG, "showStoresOnMap");
+        Log.d(TAG, "showStoresOnMap()");
         for(int i=0; i<storesLocations.size(); i++) {
             double lat = storesLocations.get(i).getStore().getLocation().getLatitude();
             double lng = storesLocations.get(i).getStore().getLocation().getLongitude();
@@ -146,40 +150,11 @@ public class MapFragment extends Fragment {
         }
     }
 
-    private void showGPSDisabledAlertToUser(){
-        Log.d(TAG, "showGPSDisabledAlertToUser");
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.Base_Theme_AppCompat_Dialog));
-        alertDialogBuilder.setMessage("GPS is disabled in your device. Would you like to enable it?");
-        alertDialogBuilder.setCancelable(false);
-        alertDialogBuilder.setPositiveButton("Enable GPS", new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int id){
-                Intent callGPSSettingIntent = new Intent(
-                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(callGPSSettingIntent);
-            }
-        });
-        alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int id){
-                dialog.cancel();
-            }
-        });
-        AlertDialog alert = alertDialogBuilder.create();
-        alert.show();
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState()");
+        outState.putParcelableArrayList("storesLocations", storesLocations);
+        super.onSaveInstanceState(outState);
     }
 
-    private void showMeOnTheMap(Location location) {
-        Log.d(TAG, "showMeOnTheMap");
-        double lat = location.getLatitude();
-        double lng = location.getLongitude();
-        map.clear();
-        showStoresOnMap();
-
-        MarkerOptions myLocation = new MarkerOptions();
-        myLocation.position(new LatLng(lat, lng));
-        myLocation.title("me");
-        myLocation.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_me));
-        map.addMarker(myLocation);
-        map.animateCamera( CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng) , TOP_VIEW) );
-        Log.d(TAG, "me: "+lat+" "+lng);
-    }
 }

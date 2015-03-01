@@ -2,7 +2,8 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/container_my_room"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="package com.project.furnishyourhome.fragments.MyRoomFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"

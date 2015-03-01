@@ -54,19 +54,17 @@ public class DataCountService extends Service {
         resultReceiver = intent.getParcelableExtra("receiver");
         serviceHandler = new Handler();
         serviceHandler.postDelayed(taskUpdate, 10000L);
-//Declare the timer
+        //Declare the timer
         Timer t = new Timer();
         //Set the schedule function and rate
         t.scheduleAtFixedRate(new TimerTask() {
 
-                                  @Override
-                                  public void run() {
-                                      //Called each time when 1000 milliseconds (1 second) (the period parameter)
-                                      Thread thread = new Thread(new Task());
-                                      thread.start();
-                                  }
-
-                              }, 0, 60000);
+            @Override
+            public void run() {
+                Thread thread = new Thread(new Task());
+                thread.start();
+            }
+        }, 1000, 60000);
 
         return Service.START_NOT_STICKY;
     }
@@ -106,7 +104,6 @@ public class DataCountService extends Service {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
         }
     }
 }

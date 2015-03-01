@@ -191,6 +191,7 @@ public class UtilitiesDb implements DbTableNames{
                     baseItem = new Sofa();
                 }
 
+                assert baseItem != null;
                 baseItem.setObjectId(id);
                 baseItem.setName(name);
                 baseItem.setMaterial(material);
