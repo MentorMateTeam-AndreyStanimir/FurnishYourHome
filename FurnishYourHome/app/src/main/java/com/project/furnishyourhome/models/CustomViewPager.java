@@ -47,6 +47,10 @@ public class CustomViewPager extends ViewPager implements ISwipeable {
         this.swipeable = swipeable;
     }
 
+    public boolean getSwipeable() {
+        return this.swipeable;
+    }
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent arg0) {
         return (this.swipeable) && super.onInterceptTouchEvent(arg0);

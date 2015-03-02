@@ -1,30 +1,20 @@
 package com.project.furnishyourhome;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.ResultReceiver;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -59,20 +49,18 @@ import com.project.furnishyourhome.materialdesign.SlidingTabLayout;
 import com.project.furnishyourhome.models.CustomListItem;
 import com.project.furnishyourhome.models.CustomViewPager;
 import com.project.furnishyourhome.models.Furniture;
-import com.project.furnishyourhome.models.HolderCount;
 import com.project.furnishyourhome.models.SimpleGestureFilter;
 import com.project.furnishyourhome.models.Sofa;
 import com.project.furnishyourhome.models.Table;
 import com.project.furnishyourhome.models.Type;
 import com.project.furnishyourhome.models.parse.FurnitureParse;
 import com.project.furnishyourhome.models.parse.StoreParse;
-import com.project.furnishyourhome.services.DataCountService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, ISwipeable, DbTableNames {
+public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, IGestureListener, DbTableNames {
 	private static final String TAG = MainActivity.class.getSimpleName();
 
     private static boolean isFirstTime = true;
@@ -284,8 +272,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         }
     }
 
-
-
     @Override
     protected void onNewIntent(Intent intent) {
         Log.d(TAG, "onNewIntent()");
@@ -453,7 +439,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
     @Override
     public void onSwipe(int direction) {
-        if (swipeable) {
+        if (this.pager.getSwipeable()) {
             getSupportActionBar().setShowHideAnimationEnabled(true);
             switch (direction) {
                 case SimpleGestureFilter.SWIPE_DOWN:
@@ -466,12 +452,6 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             }
         }
     }
-
-    @Override
-    public void setSwipeable(boolean swipeable) {
-        this.swipeable = swipeable;
-    }
-
 
     private class GetAsyncResult extends AsyncTask<Void, Void, Void> {
 
