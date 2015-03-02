@@ -11,9 +11,7 @@ import android.location.Location;
 import com.project.furnishyourhome.R;
 import com.project.furnishyourhome.interfaces.DbTableNames;
 import com.project.furnishyourhome.models.Furniture;
-import com.project.furnishyourhome.models.Sofa;
 import com.project.furnishyourhome.models.Store;
-import com.project.furnishyourhome.models.Table;
 import com.project.furnishyourhome.models.Type;
 
 import java.io.ByteArrayOutputStream;
@@ -185,11 +183,8 @@ public class UtilitiesDb implements DbTableNames{
                 // check type is this a Sofa or Table
                 String type = getType(furnitureId);
 
-                if (type.equals("Table")) {
-                    baseItem = new Table();
-                } else if (type.equals("Sofa")) {
-                    baseItem = new Sofa();
-                }
+                baseItem = new Furniture();
+                baseItem.setType(type);
 
                 assert baseItem != null;
                 baseItem.setObjectId(id);

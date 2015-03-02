@@ -44,14 +44,11 @@ import com.project.furnishyourhome.fragments.MyRoomFragment;
 import com.project.furnishyourhome.fragments.NavDrawerRightFragment;
 import com.project.furnishyourhome.interfaces.DbTableNames;
 import com.project.furnishyourhome.interfaces.IGestureListener;
-import com.project.furnishyourhome.interfaces.ISwipeable;
 import com.project.furnishyourhome.materialdesign.SlidingTabLayout;
 import com.project.furnishyourhome.models.CustomListItem;
 import com.project.furnishyourhome.models.CustomViewPager;
 import com.project.furnishyourhome.models.Furniture;
 import com.project.furnishyourhome.models.SimpleGestureFilter;
-import com.project.furnishyourhome.models.Sofa;
-import com.project.furnishyourhome.models.Table;
 import com.project.furnishyourhome.models.Type;
 import com.project.furnishyourhome.models.parse.FurnitureParse;
 import com.project.furnishyourhome.models.parse.StoreParse;
@@ -552,24 +549,14 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             furnitureLists = new HashMap<>();
             if (fItems != null) {
                 for (FurnitureParse fItem : fItems) {
-                    String type = fItem.getType();
-
                     // Now SofaParse and TableParse became useless
-                    if(type.equals("Table")){
 
-                        Table table = fItem.getTable();
-                        furnitures.add(table);
+                    Furniture furniture = fItem.getFurniture();
+                    furnitures.add(furniture);
 
-                        initializeHashMapKey("Table");
-                        furnitureLists.get("Table").add(table);
-                    }else if (type.equals("Sofa")) {
-
-                        Sofa sofa = fItem.getSofa();
-                        furnitures.add(sofa);
-
-                        initializeHashMapKey("Sofa");
-                        furnitureLists.get("Sofa").add(sofa);
-                    }
+                    String fType = furniture.getType();
+                    initializeHashMapKey(fType);
+                    furnitureLists.get(fType).add(furniture);
                 }
             }
             Log.d(TAG, "loadData() - doInBackground() - downloadData() - furnitures: "+furnitures);
@@ -593,13 +580,10 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
             furnitures = itemsFromDB;
             for (Furniture fItem : itemsFromDB) {
-                if(fItem instanceof Table){
-                    initializeHashMapKey("Table");
-                    furnitureLists.get("Table").add(fItem);
-                } else if (fItem instanceof Sofa) {
-                    initializeHashMapKey("Sofa");
-                    furnitureLists.get("Sofa").add(fItem);
-                }
+
+                String fType = fItem.getType();
+                initializeHashMapKey(fType);
+                furnitureLists.get(fType).add(fItem);
             }
             Log.d(TAG, "loadData() - doInBackground() - loadDataFromDb() - leftNavDrawerItems: "+leftNavDrawerItems);
             Log.d(TAG, "loadData() - doInBackground() - loadDataFromDb() - furnitureLists: "+furnitureLists);
@@ -610,21 +594,21 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             Bundle args = new Bundle();
             ArrayList<CustomListItem> listItems = convertFurnitureToListItem(furnitures);
             args.putParcelableArrayList("horizontalListItems", listItems);
-//
-//            MyRoomFragment fragment = (MyRoomFragment) getSupportFragmentManager().findFragmentByTag("MyRoomFragment");
-//            if(fragment != null) {
-//                Fragment.SavedState myFragmentState = getSupportFragmentManager().saveFragmentInstanceState(fragment);//TODO: bug when resuming
-//                FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-//                MyRoomFragment newFragment = MyRoomFragment.newInstance(args);
-//                newFragment.setInitialSavedState(myFragmentState);
-//                tr.replace(R.id.container_my_room_fragment, newFragment, "MyRoomFragment");
-//                tr.commit();
-//            }
 
-            Log.d(TAG, "loading MyRoomFragment.newInstance(args)");
-            FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-            tr.replace(R.id.container_my_room_fragment, MyRoomFragment.newInstance(args), "MyRoomFragment");
-            tr.commit();
+            MyRoomFragment fragment = (MyRoomFragment) getSupportFragmentManager().findFragmentByTag("MyRoomFragment");
+            if(fragment != null) {
+                Fragment.SavedState myFragmentState = getSupportFragmentManager().saveFragmentInstanceState(fragment);//TODO: bug when resuming
+                FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+                MyRoomFragment newFragment = MyRoomFragment.newInstance(args);
+                newFragment.setInitialSavedState(myFragmentState);
+                tr.replace(R.id.container_my_room_fragment, newFragment, "MyRoomFragment");
+                tr.commit();
+            }
+
+//            Log.d(TAG, "loading MyRoomFragment.newInstance(args)");
+//            FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+//            tr.replace(R.id.container_my_room_fragment, MyRoomFragment.newInstance(args), "MyRoomFragment");
+//            tr.commit();
         }
 
         private void saveDataInDb() {

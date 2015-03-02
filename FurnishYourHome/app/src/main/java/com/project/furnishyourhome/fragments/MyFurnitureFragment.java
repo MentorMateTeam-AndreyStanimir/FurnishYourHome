@@ -25,7 +25,7 @@ import java.util.ArrayList;
 public class MyFurnitureFragment extends Fragment {
     private static final String TAG = MyFurnitureFragment.class.getSimpleName();
 
-    private ArrayList <CustomListItem> chosenItems;
+    private static ArrayList <CustomListItem> chosenItems;
     private ListView listView;
     private CustomListAdapter adapter;
     private TextView tvTotalPrice;
@@ -49,7 +49,9 @@ public class MyFurnitureFragment extends Fragment {
         Log.d(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
 
-        chosenItems = new ArrayList<>();
+        if(chosenItems == null) {
+            chosenItems = new ArrayList<>();
+        }
         if(savedInstanceState != null) {
             Log.d(TAG, "restore from SAVED instance");
             chosenItems = savedInstanceState.getParcelableArrayList("chosenItems");

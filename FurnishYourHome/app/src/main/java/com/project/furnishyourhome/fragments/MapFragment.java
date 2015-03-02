@@ -27,9 +27,11 @@ import java.util.ArrayList;
 
 public class MapFragment extends Fragment {
     private static final String TAG = MapFragment.class.getSimpleName();
-
     private final float TOP_VIEW = 12.0f;
-    private ArrayList<CustomListItem> storesLocations;
+
+    private static ArrayList<CustomListItem> storesLocations;
+    private static Location myLocation;
+
     private GoogleMap map;
     private LocationManager locationManager;
 
@@ -50,10 +52,24 @@ public class MapFragment extends Fragment {
         Log.d(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
 
-        storesLocations = new ArrayList<>();
+        if(storesLocations == null) {
+            storesLocations = new ArrayList<>();
+        }
+
+        if(myLocation == null){
+            myLocation = new Location("");
+        }
+        
         if(savedInstanceState != null) {
             Log.d(TAG, "restore form SAVED instance");
             storesLocations = savedInstanceState.getParcelableArrayList("storesLocations");
+            double[] doubleArray = savedInstanceState.getDoubleArray("location");
+            if(doubleArray != null) {
+                Location newLocation = new Location("");
+                newLocation.setLatitude(doubleArray[0]);
+                newLocation.setLongitude(doubleArray[1]);
+                this.myLocation = newLocation;
+            }
         } else {
             Log.d(TAG, "no SAVED instance");
         }
@@ -93,6 +109,9 @@ public class MapFragment extends Fragment {
         super.onResume();
         trackMyPosition();
         showStoresOnMap();
+        if(myLocation != null){
+            showMeOnTheMap(myLocation);
+        }
     }
 
     private void trackMyPosition() {
@@ -100,7 +119,10 @@ public class MapFragment extends Fragment {
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                showMeOnTheMap(location);
+               if(location != null) {
+                   myLocation = location;
+                   showMeOnTheMap(location);
+               }
             }
             @Override
             public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -154,6 +176,12 @@ public class MapFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         Log.d(TAG, "onSaveInstanceState()");
         outState.putParcelableArrayList("storesLocations", storesLocations);
+        if(myLocation != null) {
+            outState.putDoubleArray("location", new double[]{
+                    myLocation.getLatitude(),
+                    myLocation.getLongitude()
+            });
+        }
         super.onSaveInstanceState(outState);
     }
 

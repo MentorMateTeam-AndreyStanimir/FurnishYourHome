@@ -34,8 +34,6 @@ import com.project.furnishyourhome.models.CustomBitmap;
 import com.project.furnishyourhome.models.CustomListItem;
 import com.project.furnishyourhome.models.Furniture;
 import com.project.furnishyourhome.models.HolderCount;
-import com.project.furnishyourhome.models.Sofa;
-import com.project.furnishyourhome.models.Table;
 import com.project.furnishyourhome.models.Type;
 import com.project.furnishyourhome.models.parse.FurnitureParse;
 import com.project.furnishyourhome.services.DataCountService;
@@ -441,15 +439,8 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
                     String type = fItem.getType();
 
                     // Now SofaParse and TableParse became useless
-                    if (type.equals("Table")) {
-
-                        Table table = fItem.getTable();
-                        furnitures.add(table);
-                    } else if (type.equals("Sofa")) {
-
-                        Sofa sofa = fItem.getSofa();
-                        furnitures.add(sofa);
-                    }
+                    Furniture furniture = fItem.getFurniture();
+                    furnitures.add(furniture);
                 }
             }
             Log.d(TAG, "Data from internet saved");

@@ -8,9 +8,8 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.project.furnishyourhome.models.Sofa;
+import com.project.furnishyourhome.models.Furniture;
 import com.project.furnishyourhome.models.Store;
-import com.project.furnishyourhome.models.Table;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
@@ -151,37 +150,21 @@ public class FurnitureParse extends ParseObject {
         put("store", storeId);
     }
 
-    public Sofa getSofa(){
-        Sofa sofa = new Sofa(this.storeId);
+    public Furniture getFurniture(){
+        Furniture furniture = new Furniture(this.storeId);
 
-        sofa.setDimensions(this.getDimension());
-        sofa.setInfo(this.getInfo());
-        sofa.setMaterial(this.getMaterial());
-        sofa.setName(this.getName());
-        sofa.setPrice(this.getPrice());
-        sofa.setStore(this.getStore());
-        sofa.setDrawable(this.getDrawable());
-        sofa.setStoreId(this.storeId);
-        sofa.setObjectId(this.getObjectId());
-        sofa.setFurnitureId(this.getFurnitureId());
+        furniture.setDimensions(this.getDimension());
+        furniture.setInfo(this.getInfo());
+        furniture.setMaterial(this.getMaterial());
+        furniture.setName(this.getName());
+        furniture.setPrice(this.getPrice());
+        furniture.setStore(this.getStore());
+        furniture.setDrawable(this.getDrawable());
+        furniture.setStoreId(this.storeId);
+        furniture.setObjectId(this.getObjectId());
+        furniture.setFurnitureId(this.getFurnitureId());
+        furniture.setType(this.getType());
 
-        return sofa;
-    }
-
-    public Table getTable(){
-        Table table = new Table(this.storeId);
-
-        table.setDimensions(this.getDimension());
-        table.setInfo(this.getInfo());
-        table.setMaterial(this.getMaterial());
-        table.setName(this.getName());
-        table.setPrice(this.getPrice());
-        table.setStore(this.getStore());
-        table.setDrawable(this.getDrawable());
-        table.setStoreId(this.storeId);
-        table.setObjectId(this.getObjectId());
-        table.setFurnitureId(this.getFurnitureId());
-
-        return table;
+        return furniture;
     }
 }

@@ -7,7 +7,7 @@ import android.os.Parcelable;
 
 import java.io.ByteArrayOutputStream;
 
-public abstract class Furniture implements Parcelable {
+public class Furniture implements Parcelable {
 
     private String objectId;
     private String name;
@@ -20,6 +20,7 @@ public abstract class Furniture implements Parcelable {
     private Store store;
     private String storeId;
     private String furnitureId;
+    private String type;
 
     public Furniture(){
     }
@@ -51,10 +52,11 @@ public abstract class Furniture implements Parcelable {
 
     @Override
     public int describeContents() {
-        return 0;
+        return this.hashCode();
     }
 
     public void writeToParcel(Parcel out, int flags) {
+        out.writeString(type);
         out.writeString(objectId);
         out.writeString(name);
 
@@ -73,18 +75,8 @@ public abstract class Furniture implements Parcelable {
 
     public static final Parcelable.Creator<Furniture> CREATOR = new Parcelable.Creator<Furniture>() {
         public Furniture createFromParcel(Parcel in) {
-            String type = in.readString();
-            Furniture furniture = null;
 
-            if(type.equals("Sofa")) {
-                furniture = new Sofa(in);
-            }
-
-            if(type.equals("Table")) {
-                furniture = new Table(in);
-            }
-
-            return furniture;
+            return new Furniture(in);
         }
 
         public Furniture[] newArray(int size) {
@@ -183,5 +175,13 @@ public abstract class Furniture implements Parcelable {
 
     public String getFurnitureId() {
         return furnitureId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
