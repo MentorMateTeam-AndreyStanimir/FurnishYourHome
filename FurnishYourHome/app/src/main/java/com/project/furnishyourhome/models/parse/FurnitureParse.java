@@ -133,7 +133,7 @@ public class FurnitureParse extends ParseObject {
 
     public Store getStore() {
         ParseObject store = getParseObject("store");
-        this.storeId = store.getObjectId();
+        this.storeId = store.getObjectId().trim();
         StoreParse obj = new StoreParse();
 
         ParseQuery<StoreParse> query = ParseQuery.getQuery(StoreParse.class);

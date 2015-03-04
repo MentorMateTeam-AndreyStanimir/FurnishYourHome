@@ -481,6 +481,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                     loadDataFromDb();
                 }
             }
+
+            //progressDialog.dismiss();
             Log.d(TAG, "loadData() - doInBackground() - Success");
             return null;
         }
@@ -492,10 +494,9 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
             if (localIsFromInternet) {
                 saveDataInDb();
-            } else {
-                //  progressDialog.dismiss();
             }
 
+            //progressDialog.dismiss();
             showDataAfterDownloading();
         }
 
@@ -562,7 +563,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             Log.d(TAG, "loadData() - doInBackground() - downloadData() - furnitures: "+furnitures);
             Log.d(TAG, "loadData() - doInBackground() - downloadData() - furnitureLists: "+furnitureLists);
             Log.d(TAG, "loadData() - onPostExecute() - dismissProgressDialog()");
-            progressDialog.dismiss();
+            //progressDialog.hide();
+           // progressDialog.dismiss();
         }
 
         private void loadDataFromDb() {

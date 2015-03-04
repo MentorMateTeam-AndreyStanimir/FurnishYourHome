@@ -317,7 +317,7 @@ public class UtilitiesDb implements DbTableNames{
 
     public int getTableCount (String table){
 
-        String sql = "SELECT Count (*) FROM " + table;
+        String sql = "SELECT * FROM " + table;
         Cursor c = utilityDb.rawQuery(sql, null);
         int count = c.getCount();
         c.close();
@@ -338,7 +338,7 @@ public class UtilitiesDb implements DbTableNames{
     }
 
     public void deleteTable(String table){
-        String sql = "DELETE * FROM " + table;
+        String sql = "DELETE FROM " + table;
         utilityDb.execSQL(sql);
     }
 

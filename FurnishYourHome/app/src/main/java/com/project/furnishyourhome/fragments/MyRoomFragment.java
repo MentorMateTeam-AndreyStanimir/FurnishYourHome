@@ -1,6 +1,8 @@
 package com.project.furnishyourhome.fragments;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -14,6 +16,7 @@ import android.os.ResultReceiver;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -271,7 +274,7 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
 
     private void showNotification() {
 //        // Create an intent that will be fired when the user clicks the notification.
-//        Intent intent = new Intent(getActivity(), MainActivity.class);
+//        Intent intent = new Intent(activity, MainActivity.class);
 //        PendingIntent pendingIntent = PendingIntent.getActivity (activity, 0, intent, 0);
 //
 //        // Use NotificationCompat.Builder to set up our notification.
@@ -284,14 +287,14 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
 //        // The content text, which appears in smaller text below the title
 //        builder.setContentText("See our new products");
 //        // Icon which appears on the left of the notification.
-//        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
+//        builder.setLargeIcon(BitmapFactory.decodeResource(activity.getResources(), R.mipmap.ic_launcher));
 //        // Notification will disappear after the user taps it, rather than remaining until it's explicitly dismissed.
 //        builder.setAutoCancel(true);
 //        // Set the intent that will fire when the user taps the notification.
 //        builder.setContentIntent(pendingIntent);
 //
 //        // Immediately display the notification icon in the notification bar.
-//        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(activity.NOTIFICATION_SERVICE);
+//        NotificationManager notificationManager = (NotificationManager) activity.getSystemService(activity.NOTIFICATION_SERVICE);
 //        notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
